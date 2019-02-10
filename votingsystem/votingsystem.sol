@@ -50,6 +50,14 @@ contract VotingSystem {
         return bytes32ToString(c.name);
     }
 
+    function addCandidate(bytes32 _name) public{
+        allCandidates.push(Candidate({
+                id: uint( keccak256(abi.encodePacked(_name,allCandidates.length))),
+                name: _name,
+                votecount: 0
+            }));
+    }
+
     function getCandidateStringNameID(uint id) public view returns (string memory){
         if(!doesCandidateExist(id)){
             return "Candidate not found";
