@@ -21,14 +21,54 @@ contract VotingSystem {
         for(uint i=0; i < candidates.length; i++){
             //create new candite for every entry in array.
             allCandidates.push(Candidate({
-                id: i,
+                id: uint( keccak256(abi.encodePacked(candidates[i],i))),
                 name: candidates[i],
                 votecount: 0
             }));
         }
     }
 
-    function isValidVote (uint id) public view returns (bool isValid){
+    //from ethereum.stackexchange.com. Author ismael
+    function bytes32ToString (bytes32 data) internal pure returns (string memory) {
+        bytes memory bytesString = new bytes(32);
+        for (uint j=0; j<32; j++) {
+            byte char = byte(bytes32(uint(data) * 2 ** (8 * j)));
+            if (char != 0) {
+                bytesString[j] = char;
+            }
+        }
+        return string(bytesString);
+    }
+
+    //with pure you cannot access the contract storage
+    function getCandidateStringNameIdx(uint index) public view returns (string memory){
+        if(index >= allCandidates.length){
+            return "Candidate not found";
+        }
+
+        Candidate memory c = allCandidates[index];
+        return bytes32ToString(c.name);
+    }
+
+    function getCandidateStringNameID(uint id) public view returns (string memory){
+        if(!doesCandidateExist(id)){
+            return "Candidate not found";
+        }
+        uint index = getCandidateIndex(id);
+        Candidate memory c = allCandidates[index];
+        return bytes32ToString(c.name);
+    }
+
+    function getCandidateIndex(uint id) private view returns (uint idx){
+        require(doesCandidateExist(id),"Error candite doesent exist");
+        for(uint i = 0; i < allCandidates.length ; i++){
+            if(allCandidates[i].id == id){
+                idx = i;
+            }
+        }
+    }
+
+    function doesCandidateExist (uint id) private view returns (bool isValid){
         isValid = false;
         for(uint i = 0; i < allCandidates.length ; i++){
             if(allCandidates[i].id == id){
@@ -37,7 +77,7 @@ contract VotingSystem {
         }
     }
     //unnessecary right now but maybe in the future a better check should be implemented
-    function hasNotVoted(address prospectVoter) public view returns (bool notVoted){
+    function hasNotVoted(address prospectVoter) private view returns (bool notVoted){
         notVoted = true;
         for(uint i = 0; i < finishedVoters.length ; i++){
             if(finishedVoters[i].voterAdr == prospectVoter && finishedVoters[i].hasVoted){
@@ -46,19 +86,11 @@ contract VotingSystem {
         }
     }
 
-   /* function findCandidate(uint id) public view returns (Candidate candite){
-        for(uint i = 0; i < allCandidates.length ; i++){
-            if(allCandidates[i].id == id){
-                candite = allCandidates[i]; //maybe dosent work. Not sure on how objects work
-            }
-        }
-    }*/
-
     //msg.sender is the address of person or
     //other contract that is interacting with
     //contract right now
     function vote (uint id) public {
-        if(isValidVote(id) && hasNotVoted(msg.sender)){
+        if(doesCandidateExist(id) && hasNotVoted(msg.sender)){
 
             for(uint i = 0; i < allCandidates.length ; i++){
                 if(allCandidates[i].id == id){
@@ -66,7 +98,6 @@ contract VotingSystem {
                     break;
                 }
             }
-
             finishedVoters.push(Voter({
                 voterAdr: msg.sender,
                 hasVoted: true,
