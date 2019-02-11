@@ -18,6 +18,14 @@ contract VotingSystem {
     Voter[] public finishedVoters;
 
     constructor(bytes32[] memory candidates) public{
+
+        //Add BlankVote
+            allCandidates.push(Candidate({
+                id: uint(keccak256(abi.encodePacked("0x426c616e6b566f7465"))), //maybe id = 0x0000 ???
+                name: "0x426c616e6b566f7465", //name = BlankVote //maybe should just be zeroes??
+                votecount: 0
+            }));
+
         for(uint i=0; i < candidates.length; i++){
             //create new candite for every entry in array.
             allCandidates.push(Candidate({
@@ -25,6 +33,8 @@ contract VotingSystem {
                 name: candidates[i],
                 votecount: 0
             }));
+
+
         }
     }
 
