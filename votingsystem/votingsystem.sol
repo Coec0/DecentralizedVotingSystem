@@ -1,4 +1,4 @@
-pragma solidity >=0.4.22 <0.6.0;
+pragma solidity >=0.5.1 <0.6.0;
 
 contract VotingSystem {
 
@@ -16,15 +16,18 @@ contract VotingSystem {
 
     Candidate[] public allCandidates;
     Voter[] public finishedVoters;
+    uint private blockStopNumber; //when the block.number reaches this stop the voting
 
-    constructor(bytes32[] memory candidates) public{
+    constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
+
+        blockStopNumber = blockamount + block.number;
 
         //Add BlankVote
-            allCandidates.push(Candidate({
-                id: uint(keccak256(abi.encodePacked("0x426c616e6b566f7465"))), //maybe id = 0x0000 ???
-                name: "0x426c616e6b566f7465", //name = BlankVote //maybe should just be zeroes??
-                votecount: 0
-            }));
+        allCandidates.push(Candidate({
+            id: uint(keccak256(abi.encodePacked("0x426c616e6b566f7465"))), //maybe id = 0x0000 ???
+            name: "0x426c616e6b566f7465", //name = BlankVote //maybe should just be zeroes??
+            votecount: 0
+        }));
 
         for(uint i=0; i < candidates.length; i++){
             //create new candite for every entry in array.
@@ -33,9 +36,17 @@ contract VotingSystem {
                 name: candidates[i],
                 votecount: 0
             }));
-
-
         }
+    }
+
+    function blocksLeft () public view returns (uint){
+         return blockStopNumber - block.number;
+    }
+
+    function isVotingOpen () public view returns (bool){
+        if(blocksLeft() <= 0)
+            return false;
+        return true;
     }
 
     //from ethereum.stackexchange.com. Author ismael
@@ -61,6 +72,7 @@ contract VotingSystem {
     }
 
     function addCandidate(bytes32 _name) public{
+        require(isVotingOpen(), "Voting is closed!");
         allCandidates.push(Candidate({
                 id: uint( keccak256(abi.encodePacked(_name,allCandidates.length))),
                 name: _name,
@@ -120,7 +132,10 @@ contract VotingSystem {
     //other contract that is interacting with
     //contract right now
     function vote (uint id) public {
-        if(doesCandidateExist(id) && hasNotVoted(msg.sender)){
+        require(isVotingOpen(), "Voting is closed!");
+        require(doesCandidateExist(id), "Not a valid ID");
+
+        if(hasNotVoted(msg.sender)){
 
             for(uint i = 0; i < allCandidates.length ; i++){
                 if(allCandidates[i].id == id){
