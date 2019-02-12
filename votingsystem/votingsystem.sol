@@ -17,9 +17,19 @@ contract VotingSystem {
     Candidate[] public allCandidates;
     Voter[] public finishedVoters;
     uint private blockStopNumber; //when the block.number reaches this stop the voting
+    address[] whitelist; //The accounts that are allowed to vote
+    bool enableWhitelist = false;
 
     constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
-
+    
+        //Add some default accounts that are allowed to vote:
+        whitelist.push(0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c);
+        whitelist.push(0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C);
+        whitelist.push(0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB);
+    
+        enableWhitelist = true;
+    
+        //Sets the block number where to voting will stop
         blockStopNumber = blockamount + block.number;
 
         //Add BlankVote
@@ -47,6 +57,16 @@ contract VotingSystem {
         if(blocksLeft() <= 0)
             return false;
         return true;
+    }
+    
+    //Checks if an address is on the whitelist
+    function isOnWhitelist(address adr) public view returns (bool){
+        for(uint i=0; i<whitelist.length; i++){
+            if(adr == whitelist[i]){
+                return true;
+            }
+        }
+        return false;
     }
 
     //from ethereum.stackexchange.com. Author ismael
@@ -116,12 +136,13 @@ contract VotingSystem {
         }
     }
 
+
     //Currently Loops through all candidates (o(n)).
-    function getLeader() public view returns
-        (uint id, bytes32 name, uint mostVotes){
+    function getCandidateInLead() public view returns
+        (uint id, bytes32 name, uint votes){
             for(uint i = 0; i < allCandidates.length ; i++){
-                if(allCandidates[i].votecount >= mostVotes){
-                    mostVotes = allCandidates[i].votecount;
+                if(allCandidates[i].votecount >= votes){
+                    votes = allCandidates[i].votecount;
                     name = allCandidates[i].name;
                     id = allCandidates[i].id;
                 }
@@ -134,8 +155,8 @@ contract VotingSystem {
     function vote (uint id) public {
         require(isVotingOpen(), "Voting is closed!");
         require(doesCandidateExist(id), "Not a valid ID");
-
-        if(hasNotVoted(msg.sender)){
+        require(hasNotVoted(msg.sender), "You have already voted");
+        require(isOnWhitelist(msg.sender), "You are not allowed to vote!");
 
             for(uint i = 0; i < allCandidates.length ; i++){
                 if(allCandidates[i].id == id){
@@ -148,6 +169,5 @@ contract VotingSystem {
                 hasVoted: true,
                 voteID: id
             }));
-        }
     }
 }
