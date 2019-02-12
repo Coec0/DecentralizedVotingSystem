@@ -61,7 +61,7 @@ contract VotingSystem {
     
     //Checks if an address is on the whitelist
     function isOnWhitelist(address adr) private view returns (bool){
-        if(!enableWhitelist){ return false;} //For easy debugging
+        if(!enableWhitelist){ return true;} //For easy debugging
         for(uint i=0; i<whitelist.length; i++){
             if(adr == whitelist[i]){
                 return true;
