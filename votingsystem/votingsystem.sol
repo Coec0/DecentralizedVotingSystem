@@ -104,6 +104,18 @@ contract VotingSystem {
         }
     }
 
+    //Currently Loops through all candidates (o(n)).
+    function getLeaderName() public view returns
+        (bytes32 name){
+            uint mostVotes;
+            for(uint i = 0; i < allCandidates.length ; i++){
+                if(allCandidates[i].votecount >= mostVotes){
+                    mostVotes = allCandidates[i].votecount;
+                    name = allCandidates[i].name;
+                }
+            }
+        }
+
     //msg.sender is the address of person or
     //other contract that is interacting with
     //contract right now
