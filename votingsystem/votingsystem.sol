@@ -105,13 +105,13 @@ contract VotingSystem {
     }
 
     //Currently Loops through all candidates (o(n)).
-    function getLeaderName() public view returns
-        (bytes32 name){
-            uint mostVotes;
+    function getLeader() public view returns
+        (uint id, bytes32 name, uint mostVotes){
             for(uint i = 0; i < allCandidates.length ; i++){
                 if(allCandidates[i].votecount >= mostVotes){
                     mostVotes = allCandidates[i].votecount;
                     name = allCandidates[i].name;
+                    id = allCandidates[i].id;
                 }
             }
         }
