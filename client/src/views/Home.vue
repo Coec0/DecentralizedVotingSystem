@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-  	<Navigation></Navigation>
+  	<NetworkType></NetworkType>
   	<div class="content">
   		<DataBox v-for="box in boxes" v-bind:title="box.title" v-bind:value="box.value" />
   	</div>
@@ -10,20 +10,18 @@
 <script>
 // @ is an alias to /src
 import DataBox from "@/components/DataBox.vue";
-import Navigation from "@/components/Navigation/Navigation.vue";
-const Web3 = require('web3');
-const web3 = new Web3(Web3.givenProvider);
+import NetworkType from "@/components/NetworkType.vue";
 
 export default {
   name: "home",
   components: {
     DataBox,
-    Navigation
+    NetworkType
   },
   data () {
   	return {
   		boxes: [
-  		{ title: "Network Type", value: null },
+  		{ title: "", value: null },
   		{ title: "", value: null },
   		{ title: "", value: null },
   		{ title: "", value: null },
@@ -36,9 +34,7 @@ export default {
   },
   methods: {
   	fetchData() {
-  		web3.eth.net.getNetworkType().then(type => {
-  			this.boxes[0].value = type;
-  		});
+  		
   	}
   }
 };
@@ -54,5 +50,6 @@ export default {
 	flex-wrap: wrap;
 	margin-left: 10%;
 	margin-right: 10%;
+  margin-top: 20px;
 }
 </style>
