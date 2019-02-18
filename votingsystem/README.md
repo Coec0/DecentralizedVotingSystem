@@ -1,6 +1,6 @@
 # Function Coventions
 
-All functions that only should be use for debuging starts with "function *debug*Function...". These functions should not be used by the front end or exist in the final product.
+All functions that only should be use for debuging starts with "function **debug**Function...". These functions should not be used by the front end or exist in the final product.
 
 # VotingSystem Smartcontracts
 Explains all the **public** functions and their in/out-puts
