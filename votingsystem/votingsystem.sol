@@ -4,7 +4,7 @@ contract VotingSystem {
 
     struct Voter {
         address voterAdr;
-        bool hasVoted; //in solidity this is false from start
+        //bool hasVoted; //in solidity this is false from start
         uint voteID; //id of the candidate the voter voted for. //and this is zero
     }
 
@@ -21,14 +21,14 @@ contract VotingSystem {
     bool enableWhitelist = false;
 
     constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
-    
+
         //Add some default accounts that are allowed to vote:
         whitelist.push(0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c);
         whitelist.push(0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C);
         whitelist.push(0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB);
-    
+
         enableWhitelist = true;
-    
+
         //Sets the block number where to voting will stop
         blockStopNumber = blockamount + block.number;
 
@@ -58,7 +58,7 @@ contract VotingSystem {
             return false;
         return true;
     }
-    
+
     //Checks if an address is on the whitelist
     function isOnWhitelist(address adr) private view returns (bool){
         if(!enableWhitelist){ return true;} //For easy debugging
@@ -131,7 +131,7 @@ contract VotingSystem {
     function hasNotVoted(address prospectVoter) private view returns (bool notVoted){
         notVoted = true;
         for(uint i = 0; i < finishedVoters.length ; i++){
-            if(finishedVoters[i].voterAdr == prospectVoter && finishedVoters[i].hasVoted){
+            if(finishedVoters[i].voterAdr == prospectVoter){ //&& finishedVoters[i].hasVoted){
                 notVoted = false;
             }
         }
@@ -150,25 +150,47 @@ contract VotingSystem {
             }
         }
 
+
+    function voteForCandidate(uint id) private {
+        for(uint i = 0; i < allCandidates.length ; i++){
+            if(allCandidates[i].id == id){
+                allCandidates[i].votecount++;
+                return;
+            }
+        }
+    }
+
+    function removeVoteForCandidate(uint id) private {
+       for(uint i = 0; i < allCandidates.length ; i++){
+            if(allCandidates[i].id == id){
+                allCandidates[i].votecount--;
+                return;
+            }
+        }
+    }
+
     //msg.sender is the address of person or
     //other contract that is interacting with
     //contract right now
     function vote (uint id) public {
         require(isVotingOpen(), "Voting is closed!");
         require(doesCandidateExist(id), "Not a valid ID");
-        require(hasNotVoted(msg.sender), "You have already voted");
         require(isOnWhitelist(msg.sender), "You are not allowed to vote!");
 
-            for(uint i = 0; i < allCandidates.length ; i++){
-                if(allCandidates[i].id == id){
-                    allCandidates[i].votecount++; //maybe dosent work. Not sure on how objects work
-                    break;
-                }
-            }
+        if(hasNotVoted(msg.sender)){
+            voteForCandidate(id);
             finishedVoters.push(Voter({
                 voterAdr: msg.sender,
-                hasVoted: true,
                 voteID: id
             }));
+        }else{
+            for(uint i = 0 ; i < finishedVoters.length ; i++){
+                if(finishedVoters[i].voterAdr == msg.sender){
+                    removeVoteForCandidate(finishedVoters[i].voteID);
+                    finishedVoters[i].voteID = id;
+                    voteForCandidate(id);
+                }
+            }
+        }
     }
 }
