@@ -49,7 +49,7 @@ contract VotingSystem {
         whitelist[adr] = true;
     }
     
-    function debugAddTestCandidates() public {
+    function debugAddTestWhitelistVoters() public {
         //Add some default accounts that are allowed to vote:
         whitelist[0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c] = true;
         whitelist[0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C] = true;
