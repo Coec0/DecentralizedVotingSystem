@@ -3,8 +3,8 @@ pragma solidity >=0.5.1 <0.6.0;
 contract VotingSystem {
 
     struct Voter {
-        address voterAdr;
-        uint voteID; //id of the candidate the voter voted for. //and this is zero
+        bool whitelisted;
+        uint votedFor; //id of the candidate the voter voted for. //and this is zero
     }
 
     struct Candidate {
@@ -14,9 +14,11 @@ contract VotingSystem {
     }
 
     Candidate[] public allCandidates;
-    Voter[] public finishedVoters;
+    //Voter[] public finishedVoters;
     uint private blockStopNumber; //when the block.number reaches this stop the voting
-    mapping(address => bool) public whitelist; //The accounts that are allowed to vote
+    mapping(address => Voter) public voterMap; //The accounts that are allowed to vote
+    mapping(uint => uint) public idToIndexMap; 
+    //mapping(address => uint) public votesMap; //Voters address map what candidate it voted for
     bool enableWhitelist = false;
 
     constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
@@ -26,16 +28,22 @@ contract VotingSystem {
         blockStopNumber = blockamount + block.number;
 
         //Add BlankVote
+        uint blankHash = uint(keccak256(abi.encodePacked("0x426c616e6b566f7465")));
+        idToIndexMap[blankHash] = 0;
+        
         allCandidates.push(Candidate({
-            id: uint(keccak256(abi.encodePacked("0x426c616e6b566f7465"))), //maybe id = 0x0000 ???
+            id: blankHash, //maybe id = 0x0000 ???
             name: "0x426c616e6b566f7465", //name = BlankVote //maybe should just be zeroes??
             votecount: 0
         }));
 
         for(uint i=0; i < candidates.length; i++){
+            
+            uint hash = uint( keccak256(abi.encodePacked(candidates[i],i)));
+            idToIndexMap[hash] = i+1;
             //create new candite for every entry in array.
             allCandidates.push(Candidate({
-                id: uint( keccak256(abi.encodePacked(candidates[i],i))),
+                id: hash,
                 name: candidates[i],
                 votecount: 0
             }));
@@ -44,17 +52,17 @@ contract VotingSystem {
     
     function addVoterToWhitelist(address adr) public {
         enableWhitelist = true; //TODO This is just for eaisier testing
-        whitelist[adr] = true;
+        voterMap[adr].whitelisted = true;
     }
     function removeVoterFromWhitelist(address adr) public{
-        whitelist[adr] = false;
+        voterMap[adr].whitelisted = false;
     }
     
     function debugAddTestWhitelistVoters() public {
         //Add some default accounts that are allowed to vote:
-        whitelist[0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c] = true;
-        whitelist[0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C] = true;
-        whitelist[0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB] = true;
+        voterMap[0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c].whitelisted = true;
+        voterMap[0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C].whitelisted = true;
+        voterMap[0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB].whitelisted = true;
     
         enableWhitelist = true;
     }
@@ -73,10 +81,7 @@ contract VotingSystem {
     function isOnWhitelist(address adr) private view returns (bool){
         if(!enableWhitelist){ return true;} //For easy debugging
         
-        if(whitelist[adr] == true){
-                return true;
-            }
-        return false;
+        return voterMap[adr].whitelisted;
     }
 
     //from ethereum.stackexchange.com. Author ismael
@@ -103,8 +108,10 @@ contract VotingSystem {
 
     function addCandidate(bytes32 _name) public{
         require(isVotingOpen(), "Voting is closed!");
+        uint hash = uint( keccak256(abi.encodePacked(_name,allCandidates.length)));
+        idToIndexMap[hash] = allCandidates.length;
         allCandidates.push(Candidate({
-                id: uint( keccak256(abi.encodePacked(_name,allCandidates.length))),
+                id: hash,
                 name: _name,
                 votecount: 0
             }));
@@ -136,16 +143,6 @@ contract VotingSystem {
             }
         }
     }
-    //unnessecary right now but maybe in the future a better check should be implemented
-    function hasNotVoted(address prospectVoter) private view returns (bool notVoted){
-        notVoted = true;
-        for(uint i = 0; i < finishedVoters.length ; i++){
-            if(finishedVoters[i].voterAdr == prospectVoter){
-                notVoted = false;
-            }
-        }
-    }
-
 
     //Currently Loops through all candidates (o(n)).
     function getCandidateInLead() public view returns
@@ -159,24 +156,6 @@ contract VotingSystem {
             }
         }
 
-    function voteForCandidate(uint id) private {
-        for(uint i = 0; i < allCandidates.length ; i++){
-            if(allCandidates[i].id == id){
-                allCandidates[i].votecount++;
-                return;
-            }
-        }
-    }
-
-    function removeVoteForCandidate(uint id) private {
-       for(uint i = 0; i < allCandidates.length ; i++){
-            if(allCandidates[i].id == id){
-                allCandidates[i].votecount--;
-                return;
-            }
-        }
-    }
-
     //msg.sender is the address of person or
     //other contract that is interacting with
     //contract right now
@@ -185,20 +164,13 @@ contract VotingSystem {
         require(doesCandidateExist(id), "Not a valid ID");
         require(isOnWhitelist(msg.sender), "You are not allowed to vote!");
 
-        if(hasNotVoted(msg.sender)){
-            voteForCandidate(id);
-            finishedVoters.push(Voter({
-                voterAdr: msg.sender,
-                voteID: id
-            }));
-        }else{
-            for(uint i = 0 ; i < finishedVoters.length ; i++){
-                if(finishedVoters[i].voterAdr == msg.sender){
-                    removeVoteForCandidate(finishedVoters[i].voteID);
-                    finishedVoters[i].voteID = id;
-                    voteForCandidate(id);
-                }
-            }
+        if(voterMap[msg.sender].votedFor == 0){ //Have not voted before
+            voterMap[msg.sender].votedFor = id;
+            allCandidates[idToIndexMap[id]].votecount++;
+        } else if (voterMap[msg.sender].votedFor != id){
+            allCandidates[idToIndexMap[voterMap[msg.sender].votedFor]].votecount--;
+            voterMap[msg.sender].votedFor = id;
+            allCandidates[idToIndexMap[id]].votecount++;
         }
     }
 }
