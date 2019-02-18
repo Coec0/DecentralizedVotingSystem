@@ -22,12 +22,6 @@ contract VotingSystem {
 
     constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
     
-        //Add some default accounts that are allowed to vote:
-        whitelist.push(0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c);
-        whitelist.push(0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C);
-        whitelist.push(0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB);
-    
-        enableWhitelist = true;
     
         //Sets the block number where to voting will stop
         blockStopNumber = blockamount + block.number;
@@ -47,6 +41,20 @@ contract VotingSystem {
                 votecount: 0
             }));
         }
+    }
+    
+    function addCandidateToWhitelist(address adr) public {
+        enableWhitelist = true; //TODO This is just for eaisier testing
+        whitelist.push(adr);
+    }
+    
+    function debugAddTestCandidates() public {
+        //Add some default accounts that are allowed to vote:
+        whitelist.push(0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c);
+        whitelist.push(0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C);
+        whitelist.push(0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB);
+    
+        enableWhitelist = true;
     }
 
     function blocksLeft () public view returns (uint){
