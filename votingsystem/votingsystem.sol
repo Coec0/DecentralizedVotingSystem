@@ -46,8 +46,10 @@ contract VotingSystem {
     
     function addVoterToWhitelist(address adr) public {
         enableWhitelist = true; //TODO This is just for eaisier testing
-
         whitelist[adr] = true;
+    }
+    function removeVoterFromWhitelist(address adr) public{
+        whitelist[adr] = false;
     }
     
     function debugAddTestWhitelistVoters() public {
