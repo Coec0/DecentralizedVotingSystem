@@ -17,7 +17,7 @@ contract VotingSystem {
     Candidate[] public allCandidates;
     Voter[] public finishedVoters;
     uint private blockStopNumber; //when the block.number reaches this stop the voting
-    address[] whitelist; //The accounts that are allowed to vote
+    mapping(address => bool) public whitelist; //The accounts that are allowed to vote
     bool enableWhitelist = false;
 
     constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
@@ -43,16 +43,17 @@ contract VotingSystem {
         }
     }
     
-    function addCandidateToWhitelist(address adr) public {
+    function addVoterToWhitelist(address adr) public {
         enableWhitelist = true; //TODO This is just for eaisier testing
-        whitelist.push(adr);
+
+        whitelist[adr] = true;
     }
     
     function debugAddTestCandidates() public {
         //Add some default accounts that are allowed to vote:
-        whitelist.push(0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c);
-        whitelist.push(0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C);
-        whitelist.push(0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB);
+        whitelist[0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c] = true;
+        whitelist[0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C] = true;
+        whitelist[0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB] = true;
     
         enableWhitelist = true;
     }
@@ -70,11 +71,10 @@ contract VotingSystem {
     //Checks if an address is on the whitelist
     function isOnWhitelist(address adr) private view returns (bool){
         if(!enableWhitelist){ return true;} //For easy debugging
-        for(uint i=0; i<whitelist.length; i++){
-            if(adr == whitelist[i]){
+        
+        if(whitelist[adr] == true){
                 return true;
             }
-        }
         return false;
     }
 
