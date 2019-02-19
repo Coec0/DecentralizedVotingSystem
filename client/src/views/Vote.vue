@@ -1,13 +1,17 @@
 <template>
 	<div class="vote gray">
 		<NetworkType></NetworkType>
-		<div class="title text-center">
-			<h1>{{ name }}</h1>
+		<div v-if="$store.state.dev" class="dev-console">
+			<span>Dev console</span><br>
+			<span>Node: </span><br><input v-model="nodeAddress"><br><br>
+			<span>Sc: </span><br><input v-model="blockChainAddress"><br><br>
+			<span>ABI: </span><br><input v-model="ABI"><br><br>
+			<button v-on:click="setDev">Set</button>
 		</div>
+		<h1>{{ name }}</h1>
 		<div class="content">
-			{{ $route.params.id }}
 			<div class="container">
-				<Voting></Voting>
+				<Voting v-bind:node="nodeAddress" v-bind:blockchain="blockChainAddress"></Voting>
 			</div>
 			<div class="container">
 				<Results></Results>
@@ -55,10 +59,14 @@ export default {
 				this.blockChainAddress = result.data.bcAddr;
 				this.ABI = result.data.abi;
 			});
+		},
+		setDev() {
+			this.$store.state.network.web3.eth.getAccounts(console.log)
+			//this.$store.commit('setWeb3HttpProvider', this.nodeAddress);
 		}
 	},
 	watch: {
-		'$route' (to, from) {
+		'$route' () {
 			this.fetchData();
 		}
 	}
@@ -73,23 +81,54 @@ export default {
 }
 
 .title {
-	margin-top: 100px;
+	height: 200px;
 }
 
-.title h1 {
+h1 {
 	font-size: 3rem;
+	margin-top: 2em;
+	margin-bottom: 2em;
 }
 
 .content {
-	margin-top: 100px;
+	padding: 50px;
 	width: 60%;
 	margin: auto;
 	background-color: rgba(44,62,80, 0.3);
-	height: 700px;
+	height: 1000px;
 }
 
 .container {
-	margin: 50px 50px;
+	margin-bottom: 50px;
 }
+
+.dev-console {
+	position: fixed; /* Sit on top of the page content */
+	display: block;
+	right: 10px;
+	top: 60px;
+	z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+	color: black;
+
+	width: 300px;
+	height: 200px;
+	background-color: white;
+	border: 1px solid black;
+}
+
+.dev-console input {
+	width: 90%;
+}
+
+.dev-console button {
+	background-color: #555555;
+	border: none;
+	color: white;
+	padding: 15px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;}
+
 
 </style>

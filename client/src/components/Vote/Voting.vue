@@ -7,6 +7,15 @@
 <script>
 export default {
 	name: 'Voting',
+	props: {
+		node: String,
+		blockchain: String
+	},
+	data() {
+		return {
+
+		}
+	}
 };
 </script>
 
