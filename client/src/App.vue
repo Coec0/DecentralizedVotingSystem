@@ -10,7 +10,6 @@
 import NotificationHeader from '@/components/NotificationHeader.vue';
 import Navigation from '@/components/Navigation/Navigation.vue';
 const Web3 = require('web3');
-const axios = require('axios');
 
 export default {
 	name: 'App',
@@ -25,19 +24,15 @@ export default {
 		};
 	},
 	created() {
-		const instance = axios.create({
-			baseURL: 'http://localhost:1234/api',
-			timeout: 1000
-		});
-		this.$store.commit('setAxios', instance)
+		
 	},
 	mounted() {
-		// if (!Web3.givenProvider) {
-		// 	this.notifications.push({ message: 'MetaMask not detected!' });
-		// 	return;
-		// }
+		if (!Web3.givenProvider) {
+			this.notifications.push({ message: 'MetaMask not detected!' });
+			return;
+		}
 		
-		// this.$store.axios.get('/activeElections').then(result => {
+		// this.$store.state.axios.get('/hello').then(result => {
 		// 	console.log(result)
 		// });
 
