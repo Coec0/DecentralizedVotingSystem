@@ -14,12 +14,14 @@ contract VotingSystem {
     }
 
     Candidate[] public allCandidates;
+    bytes32 private constant NOT_INSTANTIATED = 0x0000000000000000000000000000000000000000000000000000000000000000;
     //Voter[] public finishedVoters;
     uint private blockStopNumber; //when the block.number reaches this stop the voting
     mapping(address => Voter) public voterMap; //The accounts that are allowed to vote
     mapping(uint => uint) public idToIndexMap; 
     //mapping(address => uint) public votesMap; //Voters address map what candidate it voted for
     bool enableWhitelist = false;
+    uint private candidateArrayPosition; //Integer that keeps track of positions occupied by candidates in allCantidates[]
 
     constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
     
@@ -28,26 +30,25 @@ contract VotingSystem {
         blockStopNumber = blockamount + block.number;
 
         //Add BlankVote
-        uint blankHash = uint(keccak256(abi.encodePacked("0x426c616e6b566f7465")));
-        idToIndexMap[blankHash] = 0;
-        
-        allCandidates.push(Candidate({
-            id: blankHash, //maybe id = 0x0000 ???
-            name: "0x426c616e6b566f7465", //name = BlankVote //maybe should just be zeroes??
-            votecount: 0
-        }));
+        createCandidate("0x426c616e6b566f7465");
 
         for(uint i=0; i < candidates.length; i++){
-            
-            uint hash = uint( keccak256(abi.encodePacked(candidates[i],i)));
-            idToIndexMap[hash] = i+1;
-            //create new candite for every entry in array.
-            allCandidates.push(Candidate({
-                id: hash,
-                name: candidates[i],
-                votecount: 0
-            }));
+            createCandidate(candidates[i]);
         }
+        
+    }
+    
+    function createCandidate(bytes32 candidate) private{
+        require(candidate != NOT_INSTANTIATED, "A candidate may not have 0x00.. as name");
+        uint hash = uint( keccak256(abi.encodePacked(candidate,candidateArrayPosition)));
+        
+        idToIndexMap[hash] = candidateArrayPosition++;
+            
+        allCandidates.push(Candidate({
+              id: hash,
+              name: candidate,
+              votecount: 0
+        }));
     }
     
     function addVoterToWhitelist(address adr) public {
