@@ -30,7 +30,7 @@ contract VotingSystem {
         blockStopNumber = blockamount + block.number;
 
         //Add BlankVote
-        createCandidate("0x426c616e6b566f7465");
+        createCandidate(0x426c616e6b566f74650000000000000000000000000000000000000000000000);
 
         for(uint i=0; i < candidates.length; i++){
             createCandidate(candidates[i]);
