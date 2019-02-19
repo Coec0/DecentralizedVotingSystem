@@ -65,17 +65,7 @@ contract VotingSystem {
         voterMap[adr].whitelisted = false;
     }
     
-    //Adds some accounts to the whitelist. Theese accounts are the first three
-    //accounts in the "remix" IDE.
-    function debugAddTestWhitelistVoters() public {
-        //Add some default accounts that are allowed to vote:
-        voterMap[0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c].whitelisted = true;
-        voterMap[0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C].whitelisted = true;
-        voterMap[0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB].whitelisted = true;
-    
-        enableWhitelist = true;
-    }
-
+   
     //Returns the amounts of blocks left until the vote is over
     function blocksLeft () public view returns (uint){
          return blockStopNumber - block.number;
@@ -94,51 +84,6 @@ contract VotingSystem {
         if(!enableWhitelist){ return true;} //For easy debugging
         
         return voterMap[adr].whitelisted;
-    }
-
-    //from ethereum.stackexchange.com. Author ismael
-    //Should only be used for debugging
-    function bytes32ToString (bytes32 data) internal pure returns (string memory) {
-        bytes memory bytesString = new bytes(32);
-        for (uint j=0; j<32; j++) {
-            byte char = byte(bytes32(uint(data) * 2 ** (8 * j)));
-            if (char != 0) {
-                bytesString[j] = char;
-            }
-        }
-        return string(bytesString);
-    }
-
-    //with pure you cannot access the contract storage
-    //Gets the candidate string name from index in array position
-    function debugGetCandidateStringNameIdx(uint index) public view returns (string memory){
-        if(index >= allCandidates.length){
-            return "Candidate not found";
-        }
-
-        Candidate memory c = allCandidates[index];
-        return bytes32ToString(c.name);
-    }
-
-    //Get candidate string name from its ID.
-    function debugGetCandidateStringNameID(uint id) public view returns (string memory){
-        if(!doesCandidateExist(id)){
-            return "Candidate not found";
-        }
-        uint index = debugGetCandidateIndex(id);
-        Candidate memory c = allCandidates[index];
-        return bytes32ToString(c.name);
-    }
-
-
-    //Helper function for debugGetCandidateStringNameID
-    function debugGetCandidateIndex(uint id) private view returns (uint idx){
-        require(doesCandidateExist(id),"Error candidate doesent exist");
-        for(uint i = 0; i < allCandidates.length ; i++){
-            if(allCandidates[i].id == id){
-                idx = i;
-            }
-        }
     }
 
     //Checks if a candidate exists
@@ -177,4 +122,66 @@ contract VotingSystem {
             allCandidates[idToIndexMap[id]].votecount++;
         }
     }
+    
+/*************************** ONLY DEBUG FUNCTIONS BELOW ****************************/
+
+//from ethereum.stackexchange.com. Author ismael
+    //Should only be used for debugging
+    function bytes32ToString (bytes32 data) internal pure returns (string memory) {
+        bytes memory bytesString = new bytes(32);
+        for (uint j=0; j<32; j++) {
+            byte char = byte(bytes32(uint(data) * 2 ** (8 * j)));
+            if (char != 0) {
+                bytesString[j] = char;
+            }
+        }
+        return string(bytesString);
+    }
+
+    //Adds some accounts to the whitelist. Theese accounts are the first three
+    //accounts in the "remix" IDE.
+    function debugAddTestWhitelistVoters() public {
+        //Add some default accounts that are allowed to vote:
+        voterMap[0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c].whitelisted = true;
+        voterMap[0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C].whitelisted = true;
+        voterMap[0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB].whitelisted = true;
+    
+        enableWhitelist = true;
+    }
+
+
+
+    //with pure you cannot access the contract storage
+    //Gets the candidate string name from index in array position
+    function debugGetCandidateStringNameIdx(uint index) public view returns (string memory){
+        if(index >= allCandidates.length){
+            return "Candidate not found";
+        }
+
+        Candidate memory c = allCandidates[index];
+        return bytes32ToString(c.name);
+    }
+
+    //Get candidate string name from its ID.
+    function debugGetCandidateStringNameID(uint id) public view returns (string memory){
+        if(!doesCandidateExist(id)){
+            return "Candidate not found";
+        }
+        uint index = debugGetCandidateIndex(id);
+        Candidate memory c = allCandidates[index];
+        return bytes32ToString(c.name);
+    }
+
+
+    //Helper function for debugGetCandidateStringNameID
+    function debugGetCandidateIndex(uint id) private view returns (uint idx){
+        require(doesCandidateExist(id),"Error candidate doesent exist");
+        for(uint i = 0; i < allCandidates.length ; i++){
+            if(allCandidates[i].id == id){
+                idx = i;
+            }
+        }
+    }
+
+    
 }
