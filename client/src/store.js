@@ -8,7 +8,7 @@ Vue.use(Vuex);
 console.log(process.env)
 
 const axiosInstance = axios.create({
-	baseURL: process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'http://WHAT.URL.DO.WE.USE.com',
+	baseURL: process.env.NODE_ENV === 'development' ? 'http://localhost:8080/api' : 'http://URL.com/api',
 	timeout: 1000
 });
 
