@@ -21,8 +21,7 @@ contract VotingSystem {
     mapping(uint => uint) public idToIndexMap; 
     //mapping(address => uint) public votesMap; //Voters address map what candidate it voted for
     bool enableWhitelist = false;
-    //uint private candidateArrayPosition; //Integer that keeps track of positions occupied by candidates in allCantidates[]
-
+    
     constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
     
     
@@ -143,13 +142,8 @@ contract VotingSystem {
     }
 
     //Checks if a candidate exists
-    function doesCandidateExist (uint id) private view returns (bool isValid){
-        isValid = false;
-        for(uint i = 0; i < allCandidates.length ; i++){
-            if(allCandidates[i].id == id){
-                isValid = true;
-            }
-        }
+    function doesCandidateExist (uint id) private view returns (bool){
+        return allCandidates[idToIndexMap[id]].id == id;
     }
 
     //Currently Loops through all candidates (o(n)).
