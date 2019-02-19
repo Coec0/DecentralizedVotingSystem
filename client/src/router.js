@@ -16,6 +16,7 @@ export default new Router({
 			path: '/vote/:id',
 			name: 'vote',
 			component: () => import(/* webpackChunkName: "admin" */ '@/views/Vote')
-		}
+		},
+		{ path: '*', redirect: '/' }
 	]
 });
