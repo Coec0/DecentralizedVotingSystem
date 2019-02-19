@@ -2,25 +2,22 @@
 	<div class="home">
 		<NetworkType></NetworkType>
 		<div class="content">
-			<DataBox
-				v-for="box in boxes"
-				:key="box.id"
-				v-bind:title="box.title"
-				v-bind:value="box.value"
-			/>
+			 <section id="title">
+			 	<div>
+			 		Decentralized Voting System
+			 	</div>
+			 </section>
 		</div>
 	</div>
 </template>
 
 <script>
 // @ is an alias to /src
-import DataBox from '@/components/DataBox.vue';
 import NetworkType from '@/components/NetworkType.vue';
 
 export default {
 	name: 'home',
 	components: {
-		DataBox,
 		NetworkType
 	},
 	data() {
@@ -57,5 +54,10 @@ export default {
 	margin-left: 10%;
 	margin-right: 10%;
 	margin-top: 20px;
+}
+
+#title {
+	font-size: 32px;
+	text-align: center;
 }
 </style>

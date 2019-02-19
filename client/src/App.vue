@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<NotificationHeader v-if="notifications.length" v-bind:items="notifications"></NotificationHeader>
-		<Navigation></Navigation>
+		<Navigation v-bind:items="activeElections"></Navigation>
 		<router-view />
 	</div>
 </template>
@@ -10,6 +10,7 @@
 import NotificationHeader from '@/components/NotificationHeader.vue';
 import Navigation from '@/components/Navigation/Navigation.vue';
 const Web3 = require('web3');
+const axios = require('axios');
 
 export default {
 	name: 'App',
@@ -19,16 +20,33 @@ export default {
 	},
 	data() {
 		return {
-			notifications: []
+			notifications: [],
+			activeElections: null
 		};
 	},
 	created() {
-		if (!Web3.givenProvider) {
-			this.notifications.push({ message: 'MetaMask not detected!' });
-			return;
-		}
+		const instance = axios.create({
+			baseURL: 'http://localhost:1234/api',
+			timeout: 1000
+		});
+		this.$store.commit('setAxios', instance)
+	},
+	mounted() {
+		// if (!Web3.givenProvider) {
+		// 	this.notifications.push({ message: 'MetaMask not detected!' });
+		// 	return;
+		// }
+		
+		// this.$store.axios.get('/activeElections').then(result => {
+		// 	console.log(result)
+		// });
 
-		this.$store.commit('setWeb3Provider', Web3.givenProvider);
+		this.activeElections = [
+			{ id: 1, name: 'Riksdagsval', node: 'localhost:1234', bcAdr: 0x123123123 },
+			{ id: 2, name: 'Landstingsval', node: 'localhost:1234', bcAdr: 0x247821238 }
+		];
+
+		// this.$store.commit('setWeb3Provider', Web3.givenProvider);
 	}
 };
 </script>

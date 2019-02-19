@@ -16,6 +16,11 @@ export default new Router({
 			path: '/admin',
 			name: 'admin',
 			component: () => import(/* webpackChunkName: "admin" */ '@/views/Admin')
+		},
+		{
+			path: '/vote/:id',
+			name: 'vote',
+			component: () => import(/* webpackChunkName: "admin" */ '@/views/Vote')
 		}
 	]
 });

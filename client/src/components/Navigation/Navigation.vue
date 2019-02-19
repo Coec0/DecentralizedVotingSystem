@@ -5,7 +5,7 @@
 				<img src="@/assets/logo.png" />
 			</router-link>
 		</div>
-		<NavButton text="Admin" to="/admin"></NavButton>
+		<NavButton v-for="item in items" :key="item.id" :text="item.name" :to="'/vote/' + item.id.toString()"></NavButton>
 	</div>
 </template>
 
@@ -15,6 +15,9 @@ export default {
 	name: 'Navigation',
 	components: {
 		NavButton
+	},
+	props: {
+		items: Array
 	}
 };
 </script>
