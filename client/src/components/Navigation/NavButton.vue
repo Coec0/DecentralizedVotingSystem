@@ -17,7 +17,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .button {
-	width: 100px;
+	width: 150px;
 	height: 50px;
 	-webkit-transition-duration: 0.4s; /* Safari */
 	transition-duration: 0.4s;
@@ -37,6 +37,7 @@ export default {
 }
 
 .button .router-link-active {
-	color: white;
+	background-color: #2c3e50;
+	filter: brightness(85%);
 }
 </style>

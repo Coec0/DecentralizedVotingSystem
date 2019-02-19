@@ -1,13 +1,20 @@
 <template>
 	<div class="home">
 		<NetworkType></NetworkType>
-		<div class="content">
-			 <section id="title">
-			 	<div>
+		 <section>
+		 	<div class="content">
+		 		<div id="title">
 			 		Decentralized Voting System
 			 	</div>
-			 </section>
-		</div>
+		 	</div>
+		 </section>
+		 <section>
+		 	<div class="content">
+		 		<div id="title">
+			 		Step by step guide
+			 	</div>
+		 	</div>
+		 </section>
 	</div>
 </template>
 
@@ -21,16 +28,7 @@ export default {
 		NetworkType
 	},
 	data() {
-		return {
-			boxes: [
-				{ id: 1, title: '', value: null },
-				{ id: 2, title: '', value: null },
-				{ id: 3, title: '', value: null },
-				{ id: 4, title: '', value: null },
-				{ id: 5, title: '', value: null },
-				{ id: 6, title: '', value: null }
-			]
-		};
+		return {};
 	},
 	created() {
 		this.fetchData();
@@ -47,17 +45,25 @@ export default {
 	background: white;
 }
 .content {
-	background: white;
-	display: flex;
-	justify-content: space-between;
-	flex-wrap: wrap;
 	margin-left: 10%;
 	margin-right: 10%;
-	margin-top: 20px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+section {
+	width: 100%;
+	height: 200px;
+}
+
+section:nth-child(odd) {
+	background: #42b983;
 }
 
 #title {
 	font-size: 32px;
 	text-align: center;
+	color: black;
+	height: 15em;
 }
 </style>
