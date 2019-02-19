@@ -3,24 +3,23 @@ pragma solidity >=0.5.1 <0.6.0;
 contract VotingSystem {
 
     struct Voter {
-        bool whitelisted;
-        uint votedFor; //id of the candidate the voter voted for. //and this is zero
+        bool whitelisted; //If the voter is part of the "röstlängd"
+        uint votedFor; //Id of the candidate the voter voted for.
     }
 
     struct Candidate {
-        uint id; //TODO: unique id
-        bytes32 name;
-        uint votecount;
+        uint id; //A hash of the candidate
+        bytes32 name; //The candidates name
+        uint votecount; //The amount of votes
     }
 
-    Candidate[] public allCandidates;
-    bytes32 private constant NOT_INSTANTIATED = 0x0000000000000000000000000000000000000000000000000000000000000000;
-    //Voter[] public finishedVoters;
+     bytes32 private constant NOT_INSTANTIATED = 0x0000000000000000000000000000000000000000000000000000000000000000;
+
+    Candidate[] public allCandidates; //All the candidates
     uint private blockStopNumber; //when the block.number reaches this stop the voting
     mapping(address => Voter) public voterMap; //The accounts that are allowed to vote
-    mapping(uint => uint) public idToIndexMap; 
-    //mapping(address => uint) public votesMap; //Voters address map what candidate it voted for
-    bool enableWhitelist = false;
+    mapping(uint => uint) public idToIndexMap; //Gets the position of the candidate in allCandidates
+    bool enableWhitelist = false; //Disable the whitlist (röstlängd) until someone is added to it
     
     constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
     
@@ -56,7 +55,7 @@ contract VotingSystem {
     //Adds a voter to the whitelist (röstlängd), allowing it to vote.
     //If no voter is added, the whitelist is disabled
     function addVoterToWhitelist(address adr) public {
-        enableWhitelist = true; //TODO This is just for eaisier testing
+        enableWhitelist = true;
         voterMap[adr].whitelisted = true;
     }
     
@@ -81,7 +80,7 @@ contract VotingSystem {
     //Checks if an address is on the whitelist. If the whitelist
     //isn't enabled then always returns true
     function isOnWhitelist(address adr) private view returns (bool){
-        if(!enableWhitelist){ return true;} //For easy debugging
+        if(!enableWhitelist){ return true;}
         
         return voterMap[adr].whitelisted;
     }
