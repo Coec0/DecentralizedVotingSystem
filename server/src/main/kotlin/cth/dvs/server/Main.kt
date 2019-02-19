@@ -9,13 +9,21 @@ object Main{
 
         val http: Http = ignite().port(8080)
 
-        val x : RouteHandler;
+
+        DatabaseSupplier.init()
 
         http.get("/hello") {
             makeCORS()
             "Hello world from the server!\n"
         }
 
+
+        http.get("/api/getElections"){
+            makeCORS()
+            makeJSON()
+
+            
+        }
 
 
     }
