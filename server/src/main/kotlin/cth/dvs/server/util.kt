@@ -39,7 +39,7 @@ fun Election.randomize(): Election {
     this.bcAddr = Faker.instance().internet().ipV4Address()
     this.nodeAddr = Faker.instance().internet().ipV4Address()
 
-    this.abi = Faker.instance().numerify('#'.repeat(Faker.instance().number().numberBetween(50,200)))
+    this.abi = Faker.instance().numerify('#'.repeat(Faker.instance().number().numberBetween(50, 200)))
 
     return this
 }
@@ -48,7 +48,7 @@ object DatabaseSupplier {
     const val DB_PATH = "./db"
     const val POJO_PACKAGE = "cth.dvs.server.pojo"
 
-    var db : JsonDBTemplate
+    var db: JsonDBTemplate
 
 
     init {
@@ -69,7 +69,7 @@ object DatabaseSupplier {
             }
 
 
-        }catch (e:InvalidJsonDbApiUsageException){
+        } catch (e: InvalidJsonDbApiUsageException) {
             // The collection is already existing
         }
 
@@ -82,19 +82,31 @@ object DatabaseSupplier {
     }
 
 
-    public fun findAllElections():String{
+    public fun findAllElections(): String {
 
         val res = db.getCollection(Election::class.java)
         val jsonArr = JsonArray(res.size)
 
         res.forEach {
-            val e  = JsonObject()
-            e.addProperty("id",it.id)
-            e.addProperty("name",it.name)
+            val e = JsonObject()
+            e.addProperty("id", it.id)
+            e.addProperty("name", it.name)
             jsonArr.add(e)
         }
 
         return jsonArr.toString()
     }
 
+    public fun findElectionById(id: String): String {
+        val res = db.findById(id, Election::class.java)
+
+        return if (res == null)
+            "{}"
+        else
+            Gson().toJson(res).toString()
+
+    }
+
 }
+
+data class Result(val result: String, val success: Boolean)
