@@ -1,6 +1,5 @@
 <template>
-	<div class="home">
-		<NetworkType></NetworkType>
+	<div class="home grey">
 		 <section>
 		 	<div class="content">
 		 		<div id="title">
@@ -19,14 +18,8 @@
 </template>
 
 <script>
-// @ is an alias to /src
-import NetworkType from '@/components/NetworkType.vue';
-
 export default {
 	name: 'home',
-	components: {
-		NetworkType
-	},
 	data() {
 		return {};
 	},
@@ -42,7 +35,6 @@ export default {
 <style scoped>
 .home {
 	width: 100%;
-	background: white;
 }
 .content {
 	margin-left: 10%;
@@ -56,14 +48,9 @@ section {
 	height: 200px;
 }
 
-section:nth-child(odd) {
-	background: #42b983;
-}
-
 #title {
 	font-size: 32px;
 	text-align: center;
-	color: black;
 	height: 15em;
 }
 </style>

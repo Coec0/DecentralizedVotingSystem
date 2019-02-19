@@ -1,6 +1,6 @@
 <template>
-	<div id="network-type">
-		Connected ({{ type }})
+	<div class="network-type">
+		{{ type }}
 	</div>
 </template>
 
@@ -22,17 +22,17 @@ export default {
 	methods: {
 		updateStatus() {
 			if (!this.$store.state.web3) {
-				this.type = 'Web3 not initialized';
+				this.type = 'Not connected (Web3 not initialized)';
 				return;
 			}
 
 			if (!this.$store.state.web3.currentProvider) {
-				this.type = 'No provider';
+				this.type = 'Not connected (No provider)';
 				return;
 			}
 
 			this.$store.state.web3.eth.net.getNetworkType().then(t => {
-				this.type = t;
+				this.type = `Connected to ${t} network (${this.$store.state.web3.currentProvider.host})`;
 			});
 		}
 	}
@@ -41,7 +41,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#network-type {
+.network-type {
 	position: fixed; /* Sit on top of the page content */
 	display: block; /* Hidden by default */
 	right: 0;

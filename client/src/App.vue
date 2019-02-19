@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<NotificationHeader v-if="notifications.length" v-bind:items="notifications"></NotificationHeader>
-		<Navigation v-bind:items="activeElections"></Navigation>
+		<Navigation v-bind:items="votes"></Navigation>
 		<router-view />
 	</div>
 </template>
@@ -20,28 +20,20 @@ export default {
 	data() {
 		return {
 			notifications: [],
-			activeElections: null
+			votes: null
 		};
 	},
 	created() {
-		
-	},
-	mounted() {
+		this.$store.state.axios.get('/getElections').then(result => {
+			this.votes = result.data;
+		});
+
 		if (!Web3.givenProvider) {
 			this.notifications.push({ message: 'MetaMask not detected!' });
 			return;
 		}
 		
-		// this.$store.state.axios.get('/hello').then(result => {
-		// 	console.log(result)
-		// });
-
-		this.activeElections = [
-			{ id: 1, name: 'Riksdagsval', node: 'localhost:1234', bcAdr: 0x123123123 },
-			{ id: 2, name: 'Landstingsval', node: 'localhost:1234', bcAdr: 0x247821238 }
-		];
-
-		// this.$store.commit('setWeb3Provider', Web3.givenProvider);
+		this.$store.commit('setWeb3Provider', Web3.givenProvider)
 	}
 };
 </script>
@@ -52,19 +44,15 @@ export default {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
-	color: #2c3e50;
+	background-color: #fafafa;
 }
 
-.primary-color {
-	background-color: #2c3e50;
+.white {
+	background-color: #fff;
 }
 
-.secondary-color {
-	background-color: #42b983;
-}
-
-div {
-	color: white;
+.gray {
+	background-color: #fafafa;
 }
 
 body {
@@ -73,5 +61,13 @@ body {
 
 a {
 	color: inherit;
+}
+
+.text-center {
+	text-align: center!important;
+}
+
+.clear {
+	clear: both;
 }
 </style>

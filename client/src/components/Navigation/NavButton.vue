@@ -1,5 +1,5 @@
 <template>
-	<div class="button primary-color">
+	<div class="button">
 		<router-link v-bind:to="to" tag="div">{{ text }}</router-link>
 	</div>
 </template>
@@ -21,7 +21,13 @@ export default {
 	height: 50px;
 	-webkit-transition-duration: 0.4s; /* Safari */
 	transition-duration: 0.4s;
+	border-left: 1px solid rgba(0,0,0,0.05);
 }
+
+.button:last-child {
+	border-right: 1px solid rgba(0,0,0,0.05);
+}
+
 .button:hover {
 	color: white;
 	background-color: #2c3e50;
@@ -31,6 +37,7 @@ export default {
 
 .button div {
 	height: 100%;
+	padding: 0px 10px;
 	display: flex;
 	justify-content: center; /* align horizontal */
 	align-items: center; /* align vertical */
@@ -38,6 +45,7 @@ export default {
 
 .button .router-link-active {
 	background-color: #2c3e50;
+	color: white;
 	filter: brightness(85%);
 }
 </style>

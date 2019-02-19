@@ -1,7 +1,7 @@
 <template>
-	<div class="nav primary-color">
+	<div class="nav white">
 		<div class="logo-container">
-			<router-link id="home" to="/" tag="div">
+			<router-link id="logo" to="/" tag="div">
 				<img src="@/assets/logo.png" />
 			</router-link>
 		</div>
@@ -28,19 +28,20 @@ export default {
 	width: 100%;
 	display: flex;
 	align-items: center;
+	border-bottom: 1px solid rgba(0,0,0,0.3);
 }
-#home {
+#logo {
 	height: 100%;
 	display: flex;
 	justify-content: center; /* align horizontal */
 	align-items: center; /* align vertical */
 }
-#home img {
+#logo img {
 	max-width: 60%;
 	max-height: 60%;
 }
 .logo-container {
-	width: 100px;
+	width: 200px;
 	height: 50px;
 	-webkit-transition-duration: 0.4s; /* Safari */
 	transition-duration: 0.4s;
