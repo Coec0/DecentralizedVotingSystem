@@ -29,9 +29,6 @@ export default {
 .value {
   font-size: 32px;
   color: white;
-  
-  position: relative;
-  top: 35%;
 
   text-transform: uppercase;
 }
