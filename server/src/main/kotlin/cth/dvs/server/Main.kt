@@ -21,8 +21,7 @@ object Main{
         http.get("/api/getElections"){
             makeCORS()
             makeJSON()
-
-            
+            return@get DatabaseSupplier.findAllElections()
         }
 
 

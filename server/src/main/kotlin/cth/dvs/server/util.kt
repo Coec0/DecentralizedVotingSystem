@@ -1,6 +1,9 @@
 package cth.dvs.server
 
 import com.github.javafaker.Faker
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import cth.dvs.server.pojo.Election
 import io.jsondb.InvalidJsonDbApiUsageException
 import io.jsondb.JsonDBTemplate
@@ -45,8 +48,11 @@ object DatabaseSupplier {
     const val DB_PATH = "./db"
     const val POJO_PACKAGE = "cth.dvs.server.pojo"
 
+    var db : JsonDBTemplate
+
+
     init {
-        val db = JsonDBTemplate(DB_PATH, POJO_PACKAGE)
+        db = JsonDBTemplate(DB_PATH, POJO_PACKAGE)
 
 
 
@@ -75,5 +81,20 @@ object DatabaseSupplier {
 
     }
 
+
+    public fun findAllElections():String{
+
+        val res = db.getCollection(Election::class.java)
+        val jsonArr = JsonArray(res.size)
+
+        res.forEach {
+            val e  = JsonObject()
+            e.addProperty("id",it.id)
+            e.addProperty("name",it.name)
+            jsonArr.add(e)
+        }
+
+        return jsonArr.toString()
+    }
 
 }
