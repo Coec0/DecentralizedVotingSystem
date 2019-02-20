@@ -1,6 +1,5 @@
 package cth.dvs.server
 
-import spark.Redirect
 import spark.kotlin.*
 
 object Main {
