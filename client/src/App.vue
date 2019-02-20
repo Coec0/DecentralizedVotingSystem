@@ -32,7 +32,7 @@ export default {
 			this.notifications.push({ message: 'MetaMask detected! (Ignored)' });
 		}
 		
-		this.$store.commit('setWeb3Provider', Web3.givenProvider)
+		this.$store.commit('SET_WEB3_INSTANCE', new Web3('ws://localhost:7545'));
 	}
 };
 </script>

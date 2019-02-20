@@ -16,26 +16,30 @@ export default {
 	},
 	methods: {
 		updateStatus() {
-			if (!this.$store.state.network.web3) {
-				this.$store.commit('setNetworkStatus', 'Not connected (Web3 not initialized)');
+			if (!this.$store.state.web3.instance) {
+				this.$store.commit('SET_NETWORK_STATUS', 'Not connected (Web3 not initialized)');
 				return;
 			}
 
-			if (!this.$store.state.network.web3.currentProvider) {
-				this.$store.commit('setNetworkStatus', 'Not connected (No provider)');
+			if (!this.$store.state.web3.instance.currentProvider) {
+				this.$store.commit('SET_NETWORK_STATUS', 'Not connected (No provider)');
 				return;
 			}
 
-			this.$store.state.network.web3.eth.net.getNetworkType().then(t => {
-				this.$store.commit('setNetworkStatus', `Connected to ${t} network (${this.$store.state.network.web3.currentProvider.host})`);
-			}).catch((error) => {
-				this.$store.commit('setNetworkStatus', `Could not connect to network (${this.$store.state.network.web3.currentProvider.host})`);
-			});
-		},
+			if(this.$store.state.web3.instance.currentProvider.connected) {
+				this.$store.state.web3.instance.eth.net.getNetworkType().then(t => {
+					this.$store.commit('SET_NETWORK_STATUS', `Connected to ${t} network (${this.$store.getters.getCurrentProviderURL})`);
+				}).catch((error) => {
+					this.$store.commit('SET_NETWORK_STATUS', `Error fetching network type (${this.$store.getters.getCurrentProviderURL})`);
+				});
+			} else {
+				this.$store.commit('SET_NETWORK_STATUS', `Could not connect (${this.$store.getters.getCurrentProviderURL})`);
+			}
+		}
 	},
 	computed: {
 		status() {
-			return this.$store.state.network.status;
+			return this.$store.state.web3.status;
 		}
 	}
 };

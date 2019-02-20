@@ -15,29 +15,55 @@ const axiosInstance = axios.create({
 export default new Vuex.Store({
 	state: {
 		dev: dev,
-		network: {
-			$web3: null, //$ prefix is to disable Vue from attaching observers to web3, which results in an error
-			status: 'Retreiving status...'
+		web3: {
+			$instance: null, //$ prefix is to disable Vue from attaching observers to web3, which results in an error
+			status: 'Retreiving status...',
+			smartcontract: {
+				instance: null,
+				abi: null
+			}
 		},
 		axios: axiosInstance
 	},
 	mutations: {
-		setWeb3Provider(state, provider) {
-			if(state.network.web3) {
-				state.network.web3.setProvider(provider);
-			} else {
-				state.network.web3 = new Web3(provider);
-			}
+		SET_WEB3_INSTANCE(state, instance) {
+			console.log('Web3 instance set');
+			state.web3.instance = instance;
 		},
-		setWeb3HttpProvider(state, provider) {
-			if(state.network.web3) {
-				state.network.web3.setProvider(new Web3.providers.HttpProvider(provider));
-			} else {
-				state.network.web3 = new Web3(new Web3.providers.HttpProvider(provider));
-			}
+		SET_WEB3_DEFAULT_ACCOUNT(state, account) {
+			console.log('Web3 default account set');
+			state.web3.instance.eth.defaultAccount = account;
 		},
-		setNetworkStatus(state, status) {
-			state.network.status = status;
+		SET_NETWORK_STATUS(state, status) {
+			state.web3.status = status;
+		}
+	},
+	getters: {
+		getCurrentProviderURL: state => {
+			let web3 = state.web3.instance;
+
+			if (web3.currentProvider.isMetaMask)
+				return 'metamask';
+
+			if (web3.currentProvider.isTrust)
+				return 'trust';
+
+			if (web3.currentProvider.isToshi)
+				return 'toshi';
+
+			if (web3.currentProvider.constructor.name === 'EthereumProvider')
+				return 'mist';
+
+			if (web3.currentProvider.constructor.name === 'Web3FrameProvider')
+				return 'parity';
+
+			if (web3.currentProvider.connection && web3.currentProvider.connection.url)
+				return web3.currentProvider.connection.url;
+
+			if (!web3.currentProvider.connected && web3.currentProvider.host)
+				return web3.currentProvider.host;
+
+			return 'unknown';
 		}
 	}
 });
