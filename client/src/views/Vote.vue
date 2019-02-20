@@ -4,15 +4,20 @@
 		<div v-if="$store.state.dev" class="dev-console">
 			<div class="dev">
 				<span>Dev console</span>
-				<br>
-				<span>Node (websocket)</span>
-				<input v-model="node">
-				<span>Smartcontract</span>
-				<input v-model="smartcontract">
-				<span>ABI</span>
-				<input v-model="ABI">
-				<br>
-				<button v-on:click="setDev">Set</button>
+				<div>
+					<span>Node (websocket)</span>
+					<input v-model="node">
+					<button v-on:click="connectToNode">Connect</button>
+				</div>
+				
+				<div>
+					<span>Smartcontract</span>
+					<input v-model="smartcontract">
+					<span>ABI</span>
+					<input v-model="ABI">
+					<br>
+					<button v-on:click="setContract">Set Contract</button>
+				</div>
 			</div>
 			<div class="log">
 				<span v-for="item in dev.log">{{ item }}<br></span>
@@ -74,13 +79,24 @@ export default {
 				this.ABI = result.data.abi;
 			});
 		},
-		setDev() {
+		connectToNode() {
 			try {
-				let instance = new Web3(this.node);
-				this.$store.commit('SET_WEB3_INSTANCE', new Web3(this.node));
+				let web3Instance = new Web3(this.node);
+				this.$store.commit('SET_WEB3_INSTANCE', web3Instance);
 			} catch (err) {
-				this.dev.log.unshift(err.message);
+				console.log(err);
 				this.$store.commit('SET_WEB3_INSTANCE', null);
+			}
+		},
+		setContract() {
+			try {
+				let parsedABI = JSON.parse(this.ABI);
+				let contractInstance = this.$store.state.web3.instance.eth.Contract(parsedABI, this.smartcontract);
+				console.log(contractInstance);
+				this.$store.commit('SET_SMARTCONTRACT_INSTANCE', contractInstance);
+			} catch (err) {
+				console.log(err);
+				this.$store.commit('SET_SMARTCONTRACT_INSTANCE', null);
 			}
 		}
 	},
@@ -125,12 +141,12 @@ h1 {
 	position: fixed; /* Sit on top of the page content */
 	display: block;
 	right: 10px;
-	top: 60px;
+	top: 100px;
 	z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
 	color: black;
 
 	width: 250px;
-	height: 400px;
+	height: 600px;
 	background-color: white;
 	border: 1px solid black;
 
@@ -139,11 +155,11 @@ h1 {
 
 .dev-console .dev {
 	height: 60%;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	justify-content: center;
-	align-items: center;
+	display: inline-block;
+}
+
+.dev-console .dev div {
+	margin: 25px 0px;
 }
 
 .dev-console .log {

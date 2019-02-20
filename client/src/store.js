@@ -18,10 +18,7 @@ export default new Vuex.Store({
 		web3: {
 			$instance: null, //$ prefix is to disable Vue from attaching observers to web3, which results in an error
 			status: 'Retreiving status...',
-			smartcontract: {
-				instance: null,
-				abi: null
-			}
+			$smartcontract: null
 		},
 		axios: axiosInstance
 	},
@@ -36,10 +33,14 @@ export default new Vuex.Store({
 		},
 		SET_NETWORK_STATUS(state, status) {
 			state.web3.status = status;
+		},
+		SET_SMARTCONTRACT_INSTANCE(state, instance) {
+			console.log('SmartContract instance set')
+			state.web3.smartcontract = instance;
 		}
 	},
 	getters: {
-		getCurrentProviderURL: state => {
+		getCurrentProviderURL: (state) => {
 			let web3 = state.web3.instance;
 
 			if (web3.currentProvider.isMetaMask)

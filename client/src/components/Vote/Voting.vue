@@ -1,8 +1,8 @@
 <template>
 	<div class="voting white">
 		<h2>Voting</h2>
-		<div class="warning" v-for="warning in warnings" :key="warning.type">
-			{{ warning.description }} ({{ warning.type }})
+		<div class="error" v-for="error in errors" :key="error.type">
+			{{ error.description }} ({{ error.type }})
 		</div>
 		<div class="private-key-container">
 			<h4>Private key</h4>
@@ -32,13 +32,15 @@
 </template>
 
 <script>
+import Vue from 'vue';
+
 export default {
 	name: 'Voting',
 	data() {
 		return {
 			candidates: [],
 			selected: '',
-			warnings: {},
+			errors: {},
 			submit: {
 				submitting: false,
 				log: []
@@ -46,50 +48,35 @@ export default {
 		}
 	},
 	created() {
-		this.checkWarnings();
 		this.fetchCandidates();
+
+		this.checkErrors();
+		setInterval(function() {
+			this.checkErrors();
+		}.bind(this), 2000);
 	},
 	methods: {
-		checkWarnings() {
-			if(!this.$store.state.web3.instance.eth.defaultAccount) {
-				this.warnings.noAccount = {
-					type: 'no_default_account',
-					description: 'No default account set'
+		checkErrors() {
+			if(!this.$store.state.web3.instance) {
+				this.errors.noWeb3 = {
+					type: 'no_web3_instance',
+					description: 'No web3 instance'
 				};
+			} else {
+				Vue.delete(this.errors, 'noWeb3');
 			}
 
-			if(!this.$store.state.web3.smartcontract.instance) {
-				this.warnings.noSCInstance = {
+			if(!this.$store.state.web3.smartcontract) {
+				this.errors.noSC = {
 					type: 'no_smartcontract',
 					description: 'No smartcontract set'
 				};
-			}
-
-			if(!this.$store.state.web3.smartcontract.abi) {
-				this.warnings.noABI = {
-					type: 'no_abi',
-					description: 'No ABI set'
-				};
+			} else {
+				Vue.delete(this.errors, 'noSC');
 			}
 		},
 		fetchCandidates() {
-			this.candidates.push('asd');
-		}
-	},
-	computed: {
-		smartcontract() {
-			return this.$store.state.web3.smartcontract.instance;
-		},
-		abi() {
-			return this.$store.state.web3.smartcontract.abi;
-		}
-	},
-	watch: {
-		smartcontract(newsc, oldsc) {
-			this.checkWarnings();
-		},
-		abi(newabi, oldabi){
-			this.checkWarnings();
+			this.candidates.push('example');
 		}
 	}
 };
@@ -101,11 +88,15 @@ export default {
 
 }
 
-.warning {
-	background-color: rgba(255,0,0, 0.5);
+.error {
+	background-color: rgba(255,0,0, 0.7);
 	width: 90%;
 	border-radius: 5px;
 	margin: 10px auto;
+	height: 30px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .private-key-container textarea {
