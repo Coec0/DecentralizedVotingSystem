@@ -1,11 +1,16 @@
 pragma solidity >=0.5.1 <0.6.0;
 
-contract VotingSystem {
+interface Record {
+    function addVoterToWhitelist(address adr) external;
+    function removeVoterFromWhitelist(address adr) external;
+    function isOnWhiteList(address adr) external view returns (bool);
+    function disableWhitelist () external; 
+    function enableWhitelist () external;
+}
 
-    struct Voter {
-        bool whitelisted; //If the voter is part of the "röstlängd"
-        uint votedFor; //Id of the candidate the voter voted for.
-    }
+contract VotingSystem {
+    
+    mapping(address => uint) public votedOn;
 
     struct Candidate {
         uint id; //A hash of the candidate
@@ -17,11 +22,11 @@ contract VotingSystem {
 
     Candidate[] public allCandidates; //All the candidates
     uint private blockStopNumber; //when the block.number reaches this stop the voting
-    mapping(address => Voter) public voterMap; //The accounts that are allowed to vote
     mapping(uint => uint) public idToIndexMap; //Gets the position of the candidate in allCandidates
-    bool enableWhitelist = false; //Disable the whitlist (röstlängd) until someone is added to it
+    //bool enableWhitelist = false; //Disable the whitlist (röstlängd) until someone is added to it
+    Record private record;
     
-    constructor(bytes32[] memory candidates, uint blockamount) public{ //blockamount == amount of blocks
+    constructor(bytes32[] memory candidates, uint blockamount, address store) public{ //blockamount == amount of blocks
     
     
         //Sets the block number where to voting will stop
@@ -34,6 +39,8 @@ contract VotingSystem {
         for(uint i=0; i < candidates.length; i++){
             addCandidate(candidates[i]);
         }
+        
+        record = Record(store);
         
     }
     
@@ -52,17 +59,7 @@ contract VotingSystem {
         }));
     }
     
-    //Adds a voter to the whitelist (röstlängd), allowing it to vote.
-    //If no voter is added, the whitelist is disabled
-    function addVoterToWhitelist(address adr) public {
-        enableWhitelist = true;
-        voterMap[adr].whitelisted = true;
-    }
     
-    //Removes a voter from the whitelist(röstlängd), disallowing it to vote
-    function removeVoterFromWhitelist(address adr) public{
-        voterMap[adr].whitelisted = false;
-    }
     
    
     //Returns the amounts of blocks left until the vote is over
@@ -77,13 +74,7 @@ contract VotingSystem {
         return true;
     }
     
-    //Checks if an address is on the whitelist. If the whitelist
-    //isn't enabled then always returns true
-    function isOnWhitelist(address adr) private view returns (bool){
-        if(!enableWhitelist){ return true;}
-        
-        return voterMap[adr].whitelisted;
-    }
+   
 
     //Checks if a candidate exists
     function doesCandidateExist (uint id) private view returns (bool){
@@ -110,14 +101,14 @@ contract VotingSystem {
     function vote (uint id) public {
         require(isVotingOpen(), "Voting is closed!");
         require(doesCandidateExist(id), "Not a valid ID");
-        require(isOnWhitelist(msg.sender), "You are not allowed to vote!");
+        require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
 
-        if(voterMap[msg.sender].votedFor == 0){ //Have not voted before
-            voterMap[msg.sender].votedFor = id;
+        if(votedOn[msg.sender] == 0){ //Have not voted before
+            votedOn[msg.sender] = id;
             allCandidates[idToIndexMap[id]].votecount++;
-        } else if (voterMap[msg.sender].votedFor != id){
-            allCandidates[idToIndexMap[voterMap[msg.sender].votedFor]].votecount--;
-            voterMap[msg.sender].votedFor = id;
+        } else if (votedOn[msg.sender] != id){
+            allCandidates[idToIndexMap[votedOn[msg.sender]]].votecount--;
+            votedOn[msg.sender] = id;
             allCandidates[idToIndexMap[id]].votecount++;
         }
     }
@@ -141,11 +132,11 @@ contract VotingSystem {
     //accounts in the "remix" IDE.
     function debugAddTestWhitelistVoters() public {
         //Add some default accounts that are allowed to vote:
-        voterMap[0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c].whitelisted = true;
-        voterMap[0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C].whitelisted = true;
-        voterMap[0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB].whitelisted = true;
+        record.addVoterToWhitelist(0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c);
+        record.addVoterToWhitelist(0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C);
+        record.addVoterToWhitelist(0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB);
     
-        enableWhitelist = true;
+        record.enableWhitelist();
     }
 
 
