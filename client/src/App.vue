@@ -28,9 +28,8 @@ export default {
 			this.votes = result.data;
 		});
 
-		if (!Web3.givenProvider) {
-			this.notifications.push({ message: 'MetaMask not detected!' });
-			return;
+		if (Web3.givenProvider) {
+			this.notifications.push({ message: 'MetaMask detected! (Ignored)' });
 		}
 		
 		this.$store.commit('setWeb3Provider', Web3.givenProvider)
