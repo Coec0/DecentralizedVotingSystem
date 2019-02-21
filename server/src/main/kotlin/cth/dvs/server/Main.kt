@@ -1,7 +1,7 @@
 package cth.dvs.server
 
-import org.slf4j.Logger
-import spark.kotlin.*
+import spark.kotlin.Http
+import spark.kotlin.ignite
 
 object Main {
 
@@ -10,7 +10,7 @@ object Main {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        var strport : String
+        val strport : String
         var port = DEFAULT_PORT
         try {
             if (args.isNotEmpty()) {
@@ -55,6 +55,22 @@ object Main {
                 return@get DatabaseSupplier.findElectionById(id)
             }
 
+
+        }
+
+        http.post("/api/add","application/json"){
+            makeCORS()
+
+            val result = DatabaseSupplier.addFromJson( request.queryParams().first() ?:"")
+
+            if (result) {
+
+                response.status(200)
+                return@post "Added"
+            }else{
+                response.status(400)
+                return@post "Invalid JSON object"
+            }
 
         }
 

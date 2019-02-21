@@ -8,6 +8,7 @@ import cth.dvs.server.pojo.Election
 import io.jsondb.InvalidJsonDbApiUsageException
 import io.jsondb.JsonDBTemplate
 import spark.kotlin.RouteHandler
+import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.concurrent.TimeUnit
 
@@ -47,7 +48,7 @@ fun Election.randomize(): Election {
 
 fun Election.isActive(): Boolean {
     val currTimestamp = System.currentTimeMillis() / 1000
-    return this.expirationDate > currTimestamp
+    return (this.expirationDate?:0) > currTimestamp
 }
 
 object DatabaseSupplier {
@@ -93,9 +94,9 @@ object DatabaseSupplier {
         val res = db.getCollection(Election::class.java)
         val jsonArr = JsonArray(res.size)
 
-        res.filter{
+        res.filter {
             it.isActive()
-        }.forEach{
+        }.forEach {
             val e = JsonObject()
             e.addProperty("id", it.id)
             e.addProperty("name", it.name)
@@ -115,6 +116,23 @@ object DatabaseSupplier {
 
     }
 
+
+    fun addFromJson(rawData: String): Boolean {
+
+        try {
+            val gson = Gson()
+
+            val election = gson.fromJson(rawData, Election::class.java)
+
+            db.insert<Election>(election)
+
+            return true
+        } catch (e: Exception) {
+            return false
+        }
+
+
+    }
 }
 
 data class Result(val result: String, val success: Boolean)
