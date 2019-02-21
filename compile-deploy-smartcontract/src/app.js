@@ -10,16 +10,39 @@ var web3 = null;
 var account = null;
 var smartcontractArgs = null;
 
+let node = null;
+let privateKey = null;
+let contractArgs = null;
+
+let args = process.argv.slice(2);
+args.forEach(arg => {
+	let pair =arg.split('=');
+	if(!pair[1] || pair[1] == '') {
+		return;
+	}
+
+	let key = pair[0];
+	let value = pair[1];
+
+	if(key == 'node') {
+		node = value;
+	} else if(key == 'key') {
+		privateKey = value;
+	} else if(key == 'scargs') {
+		contractArgs = value;
+	}
+});
+
 const checkPrerequisits = function() {
 	return new Promise(async (resolve, reject) => {
 		//Check args
 		let errors = [];
-		if(!process.argv[2]) {
+		if(node == null) {
 			errors.push('No ethereum node specified in first argument');
 		} else {
 			try {
 				console.log('Connecting to node...');
-				web3 = new Web3(process.argv[2]);
+				web3 = new Web3(node);
 				let timeout = new Promise((resolve, reject) => {
 					let wait = setTimeout(() => {
 						resolve('timeout');
@@ -29,24 +52,23 @@ const checkPrerequisits = function() {
 				let result = await Promise.race([timeout, type]);
 
 				if(result == 'timeout') {
-					errors.push('Timed out trying to connect to node ' + process.argv[2]);
-					reject(errors);
-					return;
+					errors.push('Timed out trying to connect to node ' + node);
+					return reject(errors);
 				}
 
-				console.log(`Successfully connected to node ${process.argv[2]} of type ${result}`);
+				console.log(`Successfully connected to node ${node} of type ${result}`);
 			} catch(err) {
 				errors.push(err.message);
 			}
 		}
-		if(!process.argv[3]) {
+		if(privateKey == null) {
 			errors.push('No private key specified as second argument');
 		} else {
 			try {
-				if(!process.argv[3].startsWith('0x')) {
-					errors.push('Invalid private key (Must be begin with "0x"): ' + process.argv[3]);
+				if(!privateKey.startsWith('0x')) {
+					errors.push('Invalid private key (Must be begin with "0x"): ' + privateKey);
 				} else {
-					account = web3.eth.accounts.privateKeyToAccount(process.argv[3]);
+					account = web3.eth.accounts.privateKeyToAccount(privateKey);
 					console.log(`Account retrieved: ${account.address}`);
 					let balance = await web3.eth.getBalance(account.address);
 					console.log(`Account balance: ${balance} ETH`);
@@ -56,10 +78,10 @@ const checkPrerequisits = function() {
 				errors.push(err.message);
 			}
 		}
-		if(!process.argv[4]) {
+		if(contractArgs == null || web3 == null) {
 			console.log('NOTE: No deploy arguments given');
 		} else {
-			smartcontractArgs = JSON.parse(process.argv[4]);
+			smartcontractArgs = JSON.parse(contractArgs);
 
 			//Convert all text found in input to hex
 			let recursiveAsciiToHex = function(obj) {
@@ -116,7 +138,6 @@ const input = {
 
 const compileContracts = function() {
 	if(input.sources.length == 0) {
-		console.log()
 		console.log('No contracts found in folder');
 		return;
 	}
