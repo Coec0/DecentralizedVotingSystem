@@ -8,6 +8,7 @@ const contractsPath = path.resolve('contracts');
 
 var web3 = null;
 var account = null;
+var smartcontractArgs = null;
 
 const checkPrerequisits = function() {
 	return new Promise(async (resolve, reject) => {
@@ -54,6 +55,28 @@ const checkPrerequisits = function() {
 			} catch (err) {
 				errors.push(err.message);
 			}
+		}
+		if(!process.argv[4]) {
+			console.log('NOTE: No deploy arguments given');
+		} else {
+			smartcontractArgs = JSON.parse(process.argv[4]);
+
+			//Convert all text found in input to hex
+			let recursiveAsciiToHex = function(obj) {
+				for (var key in obj)
+				{
+					if (!obj.hasOwnProperty(key))
+						continue;
+					if(typeof obj[key] == 'string') {
+						obj[key] = web3.utils.asciiToHex(obj[key]);
+					}
+					if(typeof obj[key] == 'object') {
+						recursiveAsciiToHex(smartcontractArgs[key]);
+					}
+				}
+			}
+
+			recursiveAsciiToHex(smartcontractArgs);
 		}
 		if(errors.length > 0) {
 			reject(errors);
@@ -112,12 +135,14 @@ const compileContracts = function() {
 }
 
 const deploy = function() {
-	return new Promise((resolve, reject) => {
+	return new Promise(async (resolve, reject) => {
 		const compiledFiles = fs.readdirSync(buildPath);
 
-		compiledFiles.forEach(async (file) => {
-			console.log(`Attempting to deploy contract ${file} from account: ${account.address}`);
 
+		for (var i = 0; i < compiledFiles.length; i++) {
+			let file = compiledFiles[i];
+			console.log(`Attempting to deploy contract ${file} from account: ${account.address}`);
+			
 			const filePath = path.resolve(buildPath, file);
 			const contract = require(filePath);
 
@@ -125,10 +150,10 @@ const deploy = function() {
 				const deployedContract = await new web3.eth.Contract(contract.abi)
 				.deploy({
 					data: '0x' + contract.evm.bytecode.object,
-					arguments: process.argv[4]
+					arguments: [[web3.utils.asciiToHex('Test'),web3.utils.asciiToHex('1234')], 120]
 				})
 				.send({
-					from: account,
+					from: account.address,
 					gas: '2000000'
 				});
 
@@ -136,7 +161,9 @@ const deploy = function() {
 			} catch (err) {
 				console.log(`Error deploying contract ${file}. ${err.message}`);
 			}
-		});
+		}
+
+		resolve();
 	});
 };
 
