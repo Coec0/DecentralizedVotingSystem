@@ -1,13 +1,30 @@
 package cth.dvs.server
 
+import org.slf4j.Logger
 import spark.kotlin.*
 
 object Main {
 
+    const val DEFAULT_PORT  = 8080
+
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val http: Http = ignite().port(8080)
+        var strport : String
+        var port = DEFAULT_PORT
+        try {
+            if (args.isNotEmpty()) {
+                strport = args[0]
+                port = Integer.valueOf(strport)
+            }
+        }
+        catch (e : Exception){
+        }
+
+
+        println("Running Server on port $port")
+
+        val http: Http = ignite().port(port)
 
 
         DatabaseSupplier.init()

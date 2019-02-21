@@ -14,6 +14,6 @@ clear
 echo "Compiling the code..."
 mvn clean install
 clear
-echo -e "Done!\nRunning the server at port 8080"
+echo -e "Done!\nTrying to start the server at port $1"
 cd target
-java -jar Server-0.6-jar-with-dependencies.jar
+java -jar Server-0.6-jar-with-dependencies.jar $1
