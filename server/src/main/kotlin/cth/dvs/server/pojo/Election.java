@@ -53,6 +53,15 @@ public class Election {
 
     private String name;
 
+    public Long getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Long expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    private Long expirationDate;
 
     private String nodeAddr, bcAddr;
 

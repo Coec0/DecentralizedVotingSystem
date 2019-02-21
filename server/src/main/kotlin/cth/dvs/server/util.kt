@@ -7,10 +7,9 @@ import com.google.gson.JsonObject
 import cth.dvs.server.pojo.Election
 import io.jsondb.InvalidJsonDbApiUsageException
 import io.jsondb.JsonDBTemplate
-import spark.Request
-import spark.Response
 import spark.kotlin.RouteHandler
 import java.lang.StringBuilder
+import java.util.concurrent.TimeUnit
 
 
 fun RouteHandler.makeCORS() {
@@ -39,9 +38,16 @@ fun Election.randomize(): Election {
     this.bcAddr = Faker.instance().internet().ipV4Address()
     this.nodeAddr = Faker.instance().internet().ipV4Address()
 
+    this.expirationDate = Faker.instance().date().future(10, TimeUnit.DAYS).time;
+
     this.abi = Faker.instance().numerify('#'.repeat(Faker.instance().number().numberBetween(50, 200)))
 
     return this
+}
+
+fun Election.isActive(): Boolean {
+    val currTimestamp = System.currentTimeMillis() / 1000
+    return this.expirationDate > currTimestamp
 }
 
 object DatabaseSupplier {
@@ -87,7 +93,9 @@ object DatabaseSupplier {
         val res = db.getCollection(Election::class.java)
         val jsonArr = JsonArray(res.size)
 
-        res.forEach {
+        res.filter{
+            it.isActive()
+        }.forEach{
             val e = JsonObject()
             e.addProperty("id", it.id)
             e.addProperty("name", it.name)
@@ -100,7 +108,7 @@ object DatabaseSupplier {
     public fun findElectionById(id: String): String {
         val res = db.findById(id, Election::class.java)
 
-        return if (res == null)
+        return if (res == null || res.isActive())
             "{}"
         else
             Gson().toJson(res).toString()
