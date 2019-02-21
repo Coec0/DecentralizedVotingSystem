@@ -24,7 +24,7 @@ export default {
 		};
 	},
 	created() {
-		this.$store.state.axios.get('/getElections').then(result => {
+		this.$http.get('/getElections').then(result => {
 			this.votes = result.data;
 		});
 

@@ -1,16 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-const Web3 = require('web3');
-const axios = require('axios');
 
 Vue.use(Vuex);
 
 const dev = process.env.NODE_ENV === 'development';
-
-const axiosInstance = axios.create({
-	baseURL: 'http://localhost:8080/api',
-	timeout: 5000
-});
 
 export default new Vuex.Store({
 	state: {
@@ -19,8 +12,7 @@ export default new Vuex.Store({
 			$instance: null, //$ prefix is to disable Vue from attaching observers to web3, which results in an error
 			status: 'Retreiving status...',
 			$smartcontract: null
-		},
-		axios: axiosInstance
+		}
 	},
 	mutations: {
 		SET_WEB3_INSTANCE(state, instance) {

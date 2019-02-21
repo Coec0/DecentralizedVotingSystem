@@ -71,7 +71,7 @@ export default {
 	},
 	methods: {
 		fetchData() {
-			this.$store.state.axios.get(`/getElection/${this.$route.params.id}`).then(result => {
+			this.$http.get(`/getElection/${this.$route.params.id}`).then(result => {
 				this.id = result.data.id;
 				this.name = result.data.name;
 				this.node = result.data.nodeAddr;
