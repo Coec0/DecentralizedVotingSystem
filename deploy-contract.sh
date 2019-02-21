@@ -1,6 +1,6 @@
 NODE="ws://localhost:7545"
-PRIVATE_KEY="0x96ae0572826a6ec70ce2906b41c7f525d6d25a12e077c0f876e0172a768bc676"
-CONTRACT_ARGS='[["Kandidat_1","Kandidat_2"],120]'
+PRIVATE_KEY=""
+CONTRACT_ARGS='[["Kandidat 1", "Kandidat 2"],120]'
 
 set -e
 
@@ -23,5 +23,5 @@ find . -iname '*.sol' -exec cp {} ../compile-deploy-smartcontract/contracts \;
 
 cd ../compile-deploy-smartcontract/contracts
 npm install
-npm start $NODE $PRIVATE_KEY $CONTRACT_ARGS
+npm start $NODE $PRIVATE_KEY "$CONTRACT_ARGS"
 exit
