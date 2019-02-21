@@ -68,7 +68,7 @@ const checkPrerequisits = function() {
 					if (!obj.hasOwnProperty(key))
 						continue;
 					if(typeof obj[key] == 'string') {
-						obj[key] = web3.utils.asciiToHex(obj[key]);
+						obj[key] = web3.utils.asciiToHex(obj[key].replace('_', ' '));
 					}
 					if(typeof obj[key] == 'object') {
 						recursiveAsciiToHex(smartcontractArgs[key]);
@@ -150,7 +150,7 @@ const deploy = function() {
 				const deployedContract = await new web3.eth.Contract(contract.abi)
 				.deploy({
 					data: '0x' + contract.evm.bytecode.object,
-					arguments: [[web3.utils.asciiToHex('Test'),web3.utils.asciiToHex('1234')], 120]
+					arguments: smartcontractArgs
 				})
 				.send({
 					from: account.address,
