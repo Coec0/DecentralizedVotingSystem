@@ -109,10 +109,11 @@ object DatabaseSupplier {
     public fun findElectionById(id: String): String {
         val res = db.findById(id, Election::class.java)
 
-        return if (res == null || res.isActive())
+        return if (res == null || !res.isActive()) {
             "{}"
-        else
+        } else {
             Gson().toJson(res).toString()
+        }
 
     }
 
