@@ -48,6 +48,7 @@ export default {
 	},
 	mounted() {
 		this.init();
+		this.$store.commit('ADD_NOTIFICATION', { message: 'example warning', type: 'warn' })
 	},
 	methods: {
 		init() {
@@ -55,7 +56,7 @@ export default {
 				this.connectToNode();
 				this.setContract();
 				this.fetchCandidates();
-			});	
+			}).catch(err => this.$store.commit('ADD_NOTIFICATION', { message: err.message, type: 'warn' }));	
 		},
 		reset() {
 			this.id = null;
@@ -74,7 +75,7 @@ export default {
 					this.smartcontract = '0xbf1c5765869fa0d606bf14667f65f8b61a6dddcb';
 					this.ABI = '[ 	{ 		"constant": false, 		"inputs": [ 			{ 				"name": "candidate", 				"type": "bytes32" 			} 		], 		"name": "addCandidate", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"constant": false, 		"inputs": [], 		"name": "debugAddTestWhitelistVoters", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"constant": false, 		"inputs": [ 			{ 				"name": "id", 				"type": "uint256" 			} 		], 		"name": "vote", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"inputs": [ 			{ 				"name": "candidates", 				"type": "bytes32[]" 			}, 			{ 				"name": "blockamount", 				"type": "uint256" 			}, 			{ 				"name": "store", 				"type": "address" 			} 		], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "constructor" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"name": "allCandidates", 		"outputs": [ 			{ 				"name": "id", 				"type": "uint256" 			}, 			{ 				"name": "name", 				"type": "bytes32" 			}, 			{ 				"name": "votecount", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "blocksLeft", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "candidateCount", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "id", 				"type": "uint256" 			} 		], 		"name": "debugGetCandidateStringNameID", 		"outputs": [ 			{ 				"name": "", 				"type": "string" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "index", 				"type": "uint256" 			} 		], 		"name": "debugGetCandidateStringNameIdx", 		"outputs": [ 			{ 				"name": "", 				"type": "string" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "getCandidateInLead", 		"outputs": [ 			{ 				"name": "id", 				"type": "uint256" 			}, 			{ 				"name": "name", 				"type": "bytes32" 			}, 			{ 				"name": "votes", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"name": "idToIndexMap", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "isVotingOpen", 		"outputs": [ 			{ 				"name": "", 				"type": "bool" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "address" 			} 		], 		"name": "votedOn", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	} ]';
 					resolve();
-				}).catch(() => reject());
+				}).catch((err) => reject(err));
 			});
 		},
 		connectToNode() {
