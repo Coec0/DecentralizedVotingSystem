@@ -146,7 +146,7 @@ h1 {
 	color: black;
 
 	width: 250px;
-	height: 600px;
+	height: 450px;
 	background-color: white;
 	border: 1px solid black;
 
