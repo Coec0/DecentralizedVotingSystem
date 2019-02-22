@@ -2,6 +2,33 @@ const path = require('path');
 const fs = require('fs-extra');
 const solc = require('solc');
 const Web3 = require('web3');
+const ArgumentParser = require('argparse').ArgumentParser;
+const parser = new ArgumentParser({
+	version: '0.0.1',
+	addHelp: true,
+	description: ''
+});
+
+parser.addArgument(
+	[ '-n', '--node' ],
+	{
+		help: 'URL to node, ex: ws://localhost:7545'
+	}
+);
+parser.addArgument(
+	[ '-k', '--key' ],
+	{
+		help: 'Private key for wallet that deploys. Must begin with 0x'
+	}
+);
+parser.addArgument(
+	[ '-a', '--args' ],
+	{
+		help: 'The arguments to use for the contract when deploying, ex: "["1234", ["Kandidat 1", "Kandidat 2"], 120]"'
+	}
+);
+
+let args = parser.parseArgs();
 
 const buildPath = path.resolve('build');
 const contractsPath = path.resolve('contracts');
@@ -10,65 +37,42 @@ var web3 = null;
 var account = null;
 var smartcontractArgs = null;
 
-let node = null;
-let privateKey = null;
-let contractArgs = null;
-
-let args = process.argv.slice(2);
-args.forEach(arg => {
-	let pair =arg.split('=');
-	if(!pair[1] || pair[1] == '') {
-		return;
-	}
-
-	let key = pair[0];
-	let value = pair[1];
-
-	if(key == 'node') {
-		node = value;
-	} else if(key == 'key') {
-		privateKey = value;
-	} else if(key == 'scargs') {
-		contractArgs = value;
-	}
-});
-
 const checkPrerequisits = function() {
 	return new Promise(async (resolve, reject) => {
 		//Check args
 		let errors = [];
-		if(node == null) {
+		if(!args.node) {
 			errors.push('No ethereum node specified in first argument');
 		} else {
 			try {
 				console.log('Connecting to node...');
-				web3 = new Web3(node);
+				web3 = new Web3(args.node);
 				let timeout = new Promise((resolve, reject) => {
 					let wait = setTimeout(() => {
 						resolve('timeout');
-					}, 4000)
+					}, 15*1000)
 				});
 				let type = web3.eth.net.getNetworkType();
 				let result = await Promise.race([timeout, type]);
 
 				if(result == 'timeout') {
-					errors.push('Timed out trying to connect to node ' + node);
+					errors.push('Timed out trying to connect to node ' + args.node);
 					return reject(errors);
 				}
 
-				console.log(`Successfully connected to node ${node} of type ${result}`);
+				console.log(`Successfully connected to node ${args.node} of type ${result}`);
 			} catch(err) {
 				errors.push(err.message);
 			}
 		}
-		if(privateKey == null) {
+		if(!args.key) {
 			errors.push('No private key specified as second argument');
-		} else {
+		} else if(web3) {
 			try {
-				if(!privateKey.startsWith('0x')) {
-					errors.push('Invalid private key (Must be begin with "0x"): ' + privateKey);
+				if(!args.key.startsWith('0x')) {
+					errors.push('Invalid private key (Must be begin with "0x"): ' + args.key);
 				} else {
-					account = web3.eth.accounts.privateKeyToAccount(privateKey);
+					account = web3.eth.accounts.privateKeyToAccount(args.key);
 					console.log(`Account retrieved: ${account.address}`);
 					let balance = await web3.eth.getBalance(account.address);
 					console.log(`Account balance: ${balance} ETH`);
@@ -78,10 +82,10 @@ const checkPrerequisits = function() {
 				errors.push(err.message);
 			}
 		}
-		if(contractArgs == null || web3 == null) {
+		if(!args.args) {
 			console.log('NOTE: No deploy arguments given');
-		} else {
-			smartcontractArgs = JSON.parse(contractArgs);
+		} else if(web3) {
+			smartcontractArgs = JSON.parse(args.args);
 
 			//Convert all text found in input to hex
 			let recursiveAsciiToHex = function(obj) {
@@ -179,6 +183,7 @@ const deploy = function() {
 				});
 
 				console.log(`Contract ${file} deployed at address: ${deployedContract.options.address}`);
+				console.log(`ABI: \n\n ${JSON.stringify(contract.abi)} \n\n`);
 			} catch (err) {
 				console.log(`Error deploying contract ${file}. ${err.message}`);
 			}

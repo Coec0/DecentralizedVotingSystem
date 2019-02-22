@@ -19,9 +19,16 @@ if [ ! -d ./compile-deploy-smartcontract/contracts ]; then
 fi
 
 cd votingsystem
-find . -iname '*.sol' -exec cp {} ../compile-deploy-smartcontract/contracts \;
+
+printf "Please select file:\n"
+select FILENAME in *.sol;
+do
+     echo "Compiling $FILENAME ($REPLY)."
+     cp $FILENAME ../compile-deploy-smartcontract/contracts
+     break
+done
 
 cd ../compile-deploy-smartcontract/contracts
 npm install
-npm start node=$NODE key=$PRIVATE_KEY scargs="$CONTRACT_ARGS"
+npm start -- --node "$NODE" --key "$PRIVATE_KEY" --args "$CONTRACT_ARGS"
 exit
