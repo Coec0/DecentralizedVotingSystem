@@ -1,6 +1,6 @@
 <template>
 	<div class="notifications">
-		<div v-for="item in items" :key="item.message" class="notification">
+		<div v-for="item in items" :key="item.message" class="notification" v-bind:class="item.type">
 			{{ item.message }}
 		</div>
 	</div>
@@ -9,8 +9,10 @@
 <script>
 export default {
 	name: 'NotificationHeader',
-	props: {
-		items: Array
+	data() {
+		return {
+			items: this.$store.state.notifications
+		}
 	}
 };
 </script>
@@ -36,7 +38,12 @@ export default {
 }
 .notification {
 	padding: 2px 0px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+.notify {
 	background-color: #ffcc00;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+.warn {
+	background-color: #B33A3A;
 }
 </style>

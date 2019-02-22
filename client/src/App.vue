@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<NotificationHeader v-if="notifications.length" v-bind:items="notifications"></NotificationHeader>
+		<NotificationHeader v-if="this.$store.state.notifications.length"></NotificationHeader>
 		<Navigation v-bind:items="votes"></Navigation>
 		<router-view />
 	</div>
@@ -19,17 +19,16 @@ export default {
 	},
 	data() {
 		return {
-			notifications: [],
 			votes: null
-		};
+		}
 	},
-	created() {
+	mounted() {
 		this.$http.get('/getElections').then(result => {
 			this.votes = result.data;
 		});
 
 		if (Web3.givenProvider) {
-			this.notifications.push({ message: 'MetaMask detected! (Ignored)' });
+			this.$store.commit('ADD_NOTIFICATION', { message: 'MetaMask detected! (Ignored)', type: 'notify' });
 		}
 	}
 };

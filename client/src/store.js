@@ -12,7 +12,8 @@ export default new Vuex.Store({
 			$instance: null, //$ prefix is to disable Vue from attaching observers to web3, which results in an error
 			status: 'Retreiving status...',
 			$smartcontract: null
-		}
+		},
+		notifications: []
 	},
 	mutations: {
 		SET_WEB3_INSTANCE(state, instance) {
@@ -29,6 +30,9 @@ export default new Vuex.Store({
 		SET_SMARTCONTRACT_INSTANCE(state, instance) {
 			console.log('SmartContract instance set')
 			state.web3.smartcontract = instance;
+		},
+		ADD_NOTIFICATION(state, notification) {
+			state.notifications.push(notification);
 		}
 	},
 	getters: {
