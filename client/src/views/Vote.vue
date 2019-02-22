@@ -26,7 +26,7 @@
 		<h1>{{ name }}</h1>
 		<div class="content">
 			<div class="container">
-				<Voting v-bind:node="node" v-bind:blockchain="smartcontract"></Voting>
+				<Voting v-bind:candidates="candidates"></Voting>
 			</div>
 			<div class="container">
 				<Results></Results>
@@ -44,6 +44,7 @@ import NetworkType from '@/components/NetworkType.vue';
 import Voting from '@/components/Vote/Voting.vue';
 import Results from '@/components/Vote/Results.vue';
 import Info from '@/components/Vote/Info.vue';
+import utils from '../utils/utils.js';
 const Web3 = require('web3');
 
 export default {
@@ -61,22 +62,41 @@ export default {
 			node: null,
 			smartcontract: null,
 			ABI: null,
+			candidates: [],
 			dev: {
 				log: []
 			}
 		};
 	},
-	created() {
-		this.fetchData();
+	mounted() {
+		this.init();
 	},
 	methods: {
+		init() {
+			this.fetchData().then(() => {
+				this.connectToNode();
+				this.setContract();
+				this.fetchCandidates();
+			});	
+		},
+		reset() {
+			this.id = null;
+			this.name = null;
+			this.node = null;
+			this.smartcontract = null;
+			this.ABI = null;
+			this.candidates = [];
+		},
 		fetchData() {
-			this.$http.get(`/getElection/${this.$route.params.id}`).then(result => {
-				this.id = result.data.id;
-				this.name = result.data.name;
-				this.node = result.data.nodeAddr;
-				this.smartcontract = result.data.bcAddr;
-				this.ABI = result.data.abi;
+			return new Promise((resolve, reject) => {
+				this.$http.get(`/getElection/${this.$route.params.id}`).then(result => {
+					this.id = result.data.id;
+					this.name = result.data.name;
+					this.node = 'ws://localhost:7545';
+					this.smartcontract = '0xbf1c5765869fa0d606bf14667f65f8b61a6dddcb';
+					this.ABI = '[ 	{ 		"constant": false, 		"inputs": [ 			{ 				"name": "candidate", 				"type": "bytes32" 			} 		], 		"name": "addCandidate", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"constant": false, 		"inputs": [], 		"name": "debugAddTestWhitelistVoters", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"constant": false, 		"inputs": [ 			{ 				"name": "id", 				"type": "uint256" 			} 		], 		"name": "vote", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"inputs": [ 			{ 				"name": "candidates", 				"type": "bytes32[]" 			}, 			{ 				"name": "blockamount", 				"type": "uint256" 			}, 			{ 				"name": "store", 				"type": "address" 			} 		], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "constructor" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"name": "allCandidates", 		"outputs": [ 			{ 				"name": "id", 				"type": "uint256" 			}, 			{ 				"name": "name", 				"type": "bytes32" 			}, 			{ 				"name": "votecount", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "blocksLeft", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "candidateCount", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "id", 				"type": "uint256" 			} 		], 		"name": "debugGetCandidateStringNameID", 		"outputs": [ 			{ 				"name": "", 				"type": "string" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "index", 				"type": "uint256" 			} 		], 		"name": "debugGetCandidateStringNameIdx", 		"outputs": [ 			{ 				"name": "", 				"type": "string" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "getCandidateInLead", 		"outputs": [ 			{ 				"name": "id", 				"type": "uint256" 			}, 			{ 				"name": "name", 				"type": "bytes32" 			}, 			{ 				"name": "votes", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"name": "idToIndexMap", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "isVotingOpen", 		"outputs": [ 			{ 				"name": "", 				"type": "bool" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "address" 			} 		], 		"name": "votedOn", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	} ]';
+					resolve();
+				}).catch(() => reject());
 			});
 		},
 		connectToNode() {
@@ -92,17 +112,31 @@ export default {
 			try {
 				let parsedABI = JSON.parse(this.ABI);
 				let contractInstance = this.$store.state.web3.instance.eth.Contract(parsedABI, this.smartcontract);
-				console.log(contractInstance);
 				this.$store.commit('SET_SMARTCONTRACT_INSTANCE', contractInstance);
+				window.sc = contractInstance;
 			} catch (err) {
 				console.log(err);
 				this.$store.commit('SET_SMARTCONTRACT_INSTANCE', null);
 			}
+		},
+		fetchCandidates() {
+			this.$store.state.web3.smartcontract.methods.candidateCount().call().then(count => {
+				for (var i = 0; i < count; i++) {
+					this.$store.state.web3.smartcontract.methods.allCandidates(i).call().then(candidate => {
+						this.candidates.push({
+							id: candidate.id,
+							name: this.$store.state.web3.instance.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name)),
+							votecount: candidate.votecount
+						});
+					});
+				}
+			});
 		}
 	},
 	watch: {
 		'$route' () {
-			this.fetchData();
+			this.reset();
+			this.init();
 		}
 	}
 };
