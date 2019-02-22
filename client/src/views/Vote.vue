@@ -18,7 +18,7 @@
 
 <script>
 // @ is an alias to /src
-import NetworkType from '@/components/NetworkType.vue';
+import NetworkType from '@/components/Vote/NetworkType.vue';
 import VotePanel from '@/components/Vote/VotePanel.vue';
 import ResultPanel from '@/components/Vote/ResultPanel.vue';
 import InfoPanel from '@/components/Vote/InfoPanel.vue';
