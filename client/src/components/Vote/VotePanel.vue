@@ -35,7 +35,7 @@
 import Vue from 'vue';
 
 export default {
-	name: 'Voting',
+	name: 'VotePanel',
 	props: {
 		candidates: Array
 	},

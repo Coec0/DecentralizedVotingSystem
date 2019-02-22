@@ -6,13 +6,13 @@
 
 <script>
 export default {
-	name: 'Results',
+	name: 'ResultPanel',
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .results {
-	height: 50px;
+	min-height: 50px;
 }
 </style>

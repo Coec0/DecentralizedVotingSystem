@@ -26,13 +26,13 @@
 		<h1>{{ name }}</h1>
 		<div class="content">
 			<div class="container">
-				<Voting v-bind:candidates="candidates"></Voting>
+				<VotePanel v-bind:candidates="candidates"></VotePanel>
 			</div>
 			<div class="container">
-				<Results></Results>
+				<ResultPanel></ResultPanel>
 			</div>
 			<div class="container">
-				<Info v-bind:id="id" v-bind:name="name" v-bind:bc="node" v-bind:sc="smartcontract" v-bind:abi="ABI"></Info>
+				<InfoPanel v-bind:id="id" v-bind:name="name" v-bind:bc="node" v-bind:sc="smartcontract" v-bind:abi="ABI"></InfoPanel>
 			</div>
 		</div>
 	</div>
@@ -41,9 +41,9 @@
 <script>
 // @ is an alias to /src
 import NetworkType from '@/components/NetworkType.vue';
-import Voting from '@/components/Vote/Voting.vue';
-import Results from '@/components/Vote/Results.vue';
-import Info from '@/components/Vote/Info.vue';
+import VotePanel from '@/components/Vote/VotePanel.vue';
+import ResultPanel from '@/components/Vote/ResultPanel.vue';
+import InfoPanel from '@/components/Vote/InfoPanel.vue';
 import utils from '../utils/utils.js';
 const Web3 = require('web3');
 
@@ -51,9 +51,9 @@ export default {
 	name: 'vote',
 	components: {
 		NetworkType,
-		Voting,
-		Results,
-		Info
+		VotePanel,
+		ResultPanel,
+		InfoPanel
 	},
 	data() {
 		return {
