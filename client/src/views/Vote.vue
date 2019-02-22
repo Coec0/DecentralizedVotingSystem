@@ -1,30 +1,8 @@
 <template>
-	<div class="vote gray">
+	<div class="container vote gray">
 		<NetworkType></NetworkType>
-		<div v-if="$store.state.dev" class="dev-console">
-			<div class="dev">
-				<span>Dev console</span>
-				<div>
-					<span>Node (websocket)</span>
-					<input v-model="node">
-					<button v-on:click="connectToNode">Connect</button>
-				</div>
-				
-				<div>
-					<span>Smartcontract</span>
-					<input v-model="smartcontract">
-					<span>ABI</span>
-					<input v-model="ABI">
-					<br>
-					<button v-on:click="setContract">Set Contract</button>
-				</div>
-			</div>
-			<div class="log">
-				<span v-for="item in dev.log">{{ item }}<br></span>
-			</div>
-		</div>
-		<h1>{{ name }}</h1>
-		<div class="content">
+		<h1 class="text-center">{{ name }}</h1>
+		<div class="content row">
 			<div class="container">
 				<VotePanel v-bind:candidates="candidates"></VotePanel>
 			</div>
@@ -159,63 +137,13 @@ h1 {
 	margin-bottom: 2em;
 }
 
-.content {
-	padding: 50px;
-	width: 60%;
-	margin: auto;
-	background-color: rgba(44,62,80, 0.3);
-	height: 1000px;
-}
-
 .container {
-	margin-bottom: 50px;
+	margin-bottom: 20px;
 }
 
-.dev-console {
-	position: fixed; /* Sit on top of the page content */
-	display: block;
-	right: 10px;
-	top: 100px;
-	z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
-	color: black;
-
-	width: 250px;
-	height: 450px;
-	background-color: white;
-	border: 1px solid black;
-
-	overflow: hidden;
+.content {
+	padding: 40px;
+	margin: auto;
+	background-color: rgba(44,62,80, 0.1);
 }
-
-.dev-console .dev {
-	height: 60%;
-	display: inline-block;
-}
-
-.dev-console .dev div {
-	margin: 25px 0px;
-}
-
-.dev-console .log {
-	height: 40%;
-	margin: 5px;
-	font-size: 10px;
-}
-
-.dev input {
-	width: 90%;
-}
-
-.dev button {
-	background-color: #555555;
-	border: none;
-	color: white;
-	padding: 15px 32px;
-	text-align: center;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 16px;
-}
-
-
 </style>
