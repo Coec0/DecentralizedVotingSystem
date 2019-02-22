@@ -61,7 +61,7 @@ public class Election {
         this.expirationDate = expirationDate;
     }
 
-    private Long expirationDate;
+    private transient Long expirationDate;
 
     private String nodeAddr, bcAddr;
 
