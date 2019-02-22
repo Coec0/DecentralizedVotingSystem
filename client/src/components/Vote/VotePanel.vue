@@ -53,7 +53,7 @@ export default {
 		this.checkErrors();
 		setInterval(function() {
 			this.checkErrors();
-		}.bind(this), 2000);
+		}.bind(this), 500);
 	},
 	methods: {
 		checkErrors() {
