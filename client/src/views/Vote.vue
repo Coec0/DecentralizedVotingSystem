@@ -48,7 +48,6 @@ export default {
 	},
 	mounted() {
 		this.init();
-		this.$store.commit('ADD_NOTIFICATION', { message: 'example warning', type: 'warn' })
 	},
 	methods: {
 		init() {
