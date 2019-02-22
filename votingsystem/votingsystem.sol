@@ -43,6 +43,11 @@ contract VotingSystem {
         record = Record(store);
         
     }
+
+    //Returns amount of candidates
+    function candidateCount() public view returns (uint){
+        return allCandidates.length;
+    }
     
     //Creates a candidate from the name of the candidate and adds it to allCandidates[].
     function addCandidate(bytes32 candidate) public{
