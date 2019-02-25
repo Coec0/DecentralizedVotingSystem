@@ -1,18 +1,13 @@
 package cth.dvs.server.gui
 import cth.dvs.server.DatabaseSupplier
-import cth.dvs.server.isActive
 import cth.dvs.server.isInTheFuture
 import cth.dvs.server.pojo.Election
-import javafx.beans.property.ReadOnlyListProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
-import javafx.scene.control.Label
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Priority
 import tornadofx.*
-import tornadofx.App
-import tornadofx.View
-import java.util.*
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
+import java.lang.StringBuilder
 
 class GUIApp :App() {
  override val primaryView = Test::class
@@ -28,13 +23,28 @@ class Test: View("Main"){
     val myData = FXCollections.observableArrayList<Election>()
 
     override val root = borderpane {
-        center = vbox {
+        right = vbox {
 
-            button("Refresh"){
-                action {
-                    myData.setAll(DatabaseSupplier.getElections())
+            hbox {
+                button("Refresh") {
+                    action {
+                        myData.setAll(DatabaseSupplier.getElections())
+                    }
+                }
+
+                button("Copy to clipboard") {
+                    action {
+                        val sb = StringBuilder()
+                                .append("Node Address:\t${currNodeAddr.value}\n")
+                                .append("Blockchain Address:\t${currBcAddr.value}\n")
+                                .append("ABI:\t${currAbi.value}\n")
+
+                        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+                        clipboard.setContents(StringSelection(sb.toString()), null)
+                    }
                 }
             }
+
             tableview<Election>(myData) {
                 column("#", Election::getId)
                 column("Name", Election::getName)
@@ -53,7 +63,7 @@ class Test: View("Main"){
             }
         }
 
-        right = vbox{
+        left = vbox{
             form {
                 fieldset("Information") {
                     field("Name") {
@@ -75,5 +85,6 @@ class Test: View("Main"){
             }
         }
     }
+
 
 }
