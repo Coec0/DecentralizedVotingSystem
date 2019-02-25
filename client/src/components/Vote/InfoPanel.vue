@@ -8,19 +8,19 @@
 			</tr>
 			<tr>
 				<th>Name:</th>
-				<td>{{ name }}</td>
+				<td><div>{{ name }}</div></td>
 			</tr>
 			<tr>
 				<th>Node:</th>
-				<td>{{ bc }}</td>
+				<td><div>{{ bc }}</div></td>
 			</tr>
 			<tr>
 				<th>SmartContract:</th>
-				<td>{{ sc }}</td>
+				<td><div>{{ sc }}</div></td>
 			</tr>
 			<tr>
 				<th>ABI:</th>
-				<td>{{ abi }}</td>
+				<td><div>{{ abi }}</div></td>
 			</tr>
 		</table>
 	</div>
@@ -28,7 +28,7 @@
 
 <script>
 export default {
-	name: 'Info',
+	name: 'InfoPanel',
 	props: {
 		id: String,
 		name: String,
@@ -42,7 +42,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .info {
-	height: 200px;
+	min-height: 200px;
 }
 
 .info table {

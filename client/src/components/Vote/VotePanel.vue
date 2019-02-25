@@ -16,7 +16,7 @@
 			<h4>Candidates</h4>
 			<select v-model="selected">
 				<option disabled value="">Please select one</option>
-				<option v-for="candidate in candidates" :key="candidate">{{ candidate }}</option>
+				<option v-for="candidate in candidates" :key="candidate.id">{{ candidate.name }}</option>
 			</select>
 		</div>
 		<div class="submit-container">
@@ -35,10 +35,12 @@
 import Vue from 'vue';
 
 export default {
-	name: 'Voting',
+	name: 'VotePanel',
+	props: {
+		candidates: Array
+	},
 	data() {
 		return {
-			candidates: [],
 			selected: '',
 			errors: {},
 			submit: {
@@ -48,8 +50,6 @@ export default {
 		}
 	},
 	created() {
-		this.fetchCandidates();
-
 		this.checkErrors();
 		setInterval(function() {
 			this.checkErrors();

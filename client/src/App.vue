@@ -60,11 +60,4 @@ a {
 	color: inherit;
 }
 
-.text-center {
-	text-align: center!important;
-}
-
-.clear {
-	clear: both;
-}
 </style>
