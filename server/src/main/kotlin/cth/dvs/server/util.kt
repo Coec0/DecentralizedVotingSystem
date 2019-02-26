@@ -7,7 +7,9 @@ import com.google.gson.JsonObject
 import cth.dvs.server.pojo.Election
 import io.jsondb.InvalidJsonDbApiUsageException
 import io.jsondb.JsonDBTemplate
+import javafx.collections.ObservableList
 import spark.kotlin.RouteHandler
+import tornadofx.observable
 import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.concurrent.TimeUnit
@@ -46,10 +48,12 @@ fun Election.randomize(): Election {
     return this
 }
 
-fun Election.isActive(): Boolean {
+fun Long.isInTheFuture(): Boolean{
     val currTimestamp = System.currentTimeMillis() / 1000
-    return (this.expirationDate?:0) > currTimestamp
+    return (this?:0) > currTimestamp
 }
+
+fun Election.isActive() = this.expirationDate.isInTheFuture()
 
 object DatabaseSupplier {
     const val DB_PATH = "./db"
@@ -104,6 +108,11 @@ object DatabaseSupplier {
         }
 
         return jsonArr.toString()
+    }
+
+    public fun getElections(): ObservableList<Election> {
+        val res = db.getCollection(Election::class.java)
+        return res.observable()
     }
 
     public fun findElectionById(id: String): String {

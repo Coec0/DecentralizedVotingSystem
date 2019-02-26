@@ -1,7 +1,9 @@
 package cth.dvs.server
 
+import cth.dvs.server.gui.GUIApp
 import spark.kotlin.Http
 import spark.kotlin.ignite
+import tornadofx.launch
 
 object Main {
 
@@ -23,6 +25,7 @@ object Main {
 
 
         println("Running Server on port $port")
+
 
         val http: Http = ignite().port(port)
 
@@ -74,5 +77,6 @@ object Main {
 
         }
 
+        launch<GUIApp>(args)
     }
 }
