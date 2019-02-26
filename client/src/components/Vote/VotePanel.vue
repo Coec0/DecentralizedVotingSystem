@@ -21,12 +21,6 @@
 		</div>
 		<div class="submit-container">
 			<button class="button">Submit</button>
-			<div v-if="submit.submitting" class="progress">
-				<div class="loader"></div>
-				<div class="log">
-					<span v-for="item in submit.log">{{ item }}<br></span>
-				</div>
-			</div>
 		</div>
 	</div>
 </template>
@@ -42,11 +36,7 @@ export default {
 	data() {
 		return {
 			selected: '',
-			errors: {},
-			submit: {
-				submitting: false,
-				log: []
-			}
+			errors: {}
 		}
 	},
 	created() {
@@ -74,9 +64,6 @@ export default {
 			} else {
 				Vue.delete(this.errors, 'noSC');
 			}
-		},
-		fetchCandidates() {
-			this.candidates.push('example');
 		}
 	}
 };

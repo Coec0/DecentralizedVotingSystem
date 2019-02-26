@@ -1,12 +1,39 @@
 <template>
 	<div class="results white">
 		<h2>Results</h2>
+		<highcharts :options="chartOptions"></highcharts>
 	</div>
 </template>
 
 <script>
+import {Chart} from 'highcharts-vue'
+
 export default {
 	name: 'ResultPanel',
+	components: {
+		highcharts: Chart
+	},
+	props: {
+		results: Array
+	},
+	data() {
+		return {
+			chartOptions: {
+				chart: {
+					plotBackgroundColor: null,
+					plotBorderWidth: null,
+					plotShadow: false,
+					type: 'pie'
+				},
+				title: {
+					text: null
+				},
+				series: [{
+					data: this.results
+				}]
+			}
+		}
+	}
 };
 </script>
 

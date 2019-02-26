@@ -7,7 +7,7 @@
 				<VotePanel v-bind:candidates="candidates"></VotePanel>
 			</div>
 			<div class="container">
-				<ResultPanel></ResultPanel>
+				<ResultPanel v-bind:results="results"></ResultPanel>
 			</div>
 			<div class="container">
 				<InfoPanel v-bind:id="id" v-bind:name="name" v-bind:bc="node" v-bind:sc="smartcontract" v-bind:abi="ABI"></InfoPanel>
@@ -41,6 +41,7 @@ export default {
 			smartcontract: null,
 			ABI: null,
 			candidates: [],
+			results: [],
 			dev: {
 				log: []
 			}
@@ -64,6 +65,7 @@ export default {
 			this.smartcontract = null;
 			this.ABI = null;
 			this.candidates = [];
+			this.results = [];
 		},
 		fetchData() {
 			return new Promise((resolve, reject) => {
@@ -71,8 +73,8 @@ export default {
 					this.id = result.data.id;
 					this.name = result.data.name;
 					this.node = 'ws://localhost:7545';
-					this.smartcontract = '0xbf1c5765869fa0d606bf14667f65f8b61a6dddcb';
-					this.ABI = '[ 	{ 		"constant": false, 		"inputs": [ 			{ 				"name": "candidate", 				"type": "bytes32" 			} 		], 		"name": "addCandidate", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"constant": false, 		"inputs": [], 		"name": "debugAddTestWhitelistVoters", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"constant": false, 		"inputs": [ 			{ 				"name": "id", 				"type": "uint256" 			} 		], 		"name": "vote", 		"outputs": [], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "function" 	}, 	{ 		"inputs": [ 			{ 				"name": "candidates", 				"type": "bytes32[]" 			}, 			{ 				"name": "blockamount", 				"type": "uint256" 			}, 			{ 				"name": "store", 				"type": "address" 			} 		], 		"payable": false, 		"stateMutability": "nonpayable", 		"type": "constructor" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"name": "allCandidates", 		"outputs": [ 			{ 				"name": "id", 				"type": "uint256" 			}, 			{ 				"name": "name", 				"type": "bytes32" 			}, 			{ 				"name": "votecount", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "blocksLeft", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "candidateCount", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "id", 				"type": "uint256" 			} 		], 		"name": "debugGetCandidateStringNameID", 		"outputs": [ 			{ 				"name": "", 				"type": "string" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "index", 				"type": "uint256" 			} 		], 		"name": "debugGetCandidateStringNameIdx", 		"outputs": [ 			{ 				"name": "", 				"type": "string" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "getCandidateInLead", 		"outputs": [ 			{ 				"name": "id", 				"type": "uint256" 			}, 			{ 				"name": "name", 				"type": "bytes32" 			}, 			{ 				"name": "votes", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"name": "idToIndexMap", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [], 		"name": "isVotingOpen", 		"outputs": [ 			{ 				"name": "", 				"type": "bool" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	}, 	{ 		"constant": true, 		"inputs": [ 			{ 				"name": "", 				"type": "address" 			} 		], 		"name": "votedOn", 		"outputs": [ 			{ 				"name": "", 				"type": "uint256" 			} 		], 		"payable": false, 		"stateMutability": "view", 		"type": "function" 	} ]';
+					this.smartcontract = '0x74786d96fad14ca646aacd52145bb3b8f703f051';
+					this.ABI = '[ { "constant": false, "inputs": [ { "name": "id", "type": "uint256" } ], "name": "vote", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "candidate", "type": "bytes32" } ], "name": "addCandidate", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "idToIndexMap", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "id", "type": "uint256" } ], "name": "debugGetCandidateStringNameID", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "address" } ], "name": "votedOn", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "debugAddTestWhitelistVoters", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "candidateCount", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getCandidateInLead", "outputs": [ { "name": "id", "type": "uint256" }, { "name": "name", "type": "bytes32" }, { "name": "votes", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "blocksLeft", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "isVotingOpen", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "allCandidates", "outputs": [ { "name": "id", "type": "uint256" }, { "name": "name", "type": "bytes32" }, { "name": "votecount", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "index", "type": "uint256" } ], "name": "debugGetCandidateStringNameIdx", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "inputs": [ { "name": "candidates", "type": "bytes32[]" }, { "name": "blockamount", "type": "uint256" }, { "name": "store", "type": "address" } ], "payable": false, "stateMutability": "nonpayable", "type": "constructor" } ]';
 					resolve();
 				}).catch((err) => reject(err));
 			});
@@ -101,14 +103,21 @@ export default {
 			this.$store.state.web3.smartcontract.methods.candidateCount().call().then(count => {
 				for (var i = 0; i < count; i++) {
 					this.$store.state.web3.smartcontract.methods.allCandidates(i).call().then(candidate => {
+						let name = this.$store.state.web3.instance.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name));
 						this.candidates.push({
 							id: candidate.id,
-							name: this.$store.state.web3.instance.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name)),
-							votecount: candidate.votecount
+							name: name,
+							votecount: parseInt(candidate.votecount)
 						});
+
+						this.results.push({
+							name: name,
+							y: parseInt(candidate.votecount)
+						})
+						console.log(this.results)
 					});
 				}
-			});
+			}).catch(console.error);
 		}
 	},
 	watch: {
