@@ -114,7 +114,6 @@ export default {
 							name: name,
 							y: parseInt(candidate.votecount)
 						})
-						console.log(this.results)
 					});
 				}
 			}).catch(console.error);

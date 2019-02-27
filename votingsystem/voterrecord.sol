@@ -5,6 +5,9 @@ contract VoterRecord {
     address public owner;
     
     mapping(address => bool) public whitelist; //The accounts that are allowed to vote
+
+    constructor() public {        
+    }
     
     bool private isWhitelistEnabled;
     
