@@ -10,7 +10,7 @@
 				<ResultPanel v-bind:results="results"></ResultPanel>
 			</div>
 			<div class="container">
-				<InfoPanel v-bind:id="id" v-bind:name="name" v-bind:bc="node" v-bind:sc="smartcontract" v-bind:abi="ABI"></InfoPanel>
+				<InfoPanel v-bind:id="id" v-bind:name="name" v-bind:bc="node" v-bind:sc="smartcontract" v-bind:abi="abi"></InfoPanel>
 			</div>
 		</div>
 	</div>
@@ -39,7 +39,7 @@ export default {
 			name: null,
 			node: null,
 			smartcontract: null,
-			ABI: null,
+			abi: null,
 			candidates: [],
 			results: [],
 			dev: {
@@ -56,14 +56,17 @@ export default {
 				this.connectToNode();
 				this.setContract();
 				this.fetchCandidates();
-			}).catch(err => this.$store.commit('ADD_NOTIFICATION', { message: err.message, type: 'warn' }));	
+			}).catch(err => {
+				console.error(err);
+				this.$store.commit('ADD_NOTIFICATION', { message: err.message, type: 'warn' });
+			});	
 		},
 		reset() {
 			this.id = null;
 			this.name = null;
 			this.node = null;
 			this.smartcontract = null;
-			this.ABI = null;
+			this.abi = null;
 			this.candidates = [];
 			this.results = [];
 		},
@@ -73,8 +76,8 @@ export default {
 					this.id = result.data.id;
 					this.name = result.data.name;
 					this.node = 'ws://localhost:7545';
-					this.smartcontract = '0x74786d96fad14ca646aacd52145bb3b8f703f051';
-					this.ABI = '[ { "constant": false, "inputs": [ { "name": "id", "type": "uint256" } ], "name": "vote", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "candidate", "type": "bytes32" } ], "name": "addCandidate", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "idToIndexMap", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "id", "type": "uint256" } ], "name": "debugGetCandidateStringNameID", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "address" } ], "name": "votedOn", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "debugAddTestWhitelistVoters", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "candidateCount", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getCandidateInLead", "outputs": [ { "name": "id", "type": "uint256" }, { "name": "name", "type": "bytes32" }, { "name": "votes", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "blocksLeft", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "isVotingOpen", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "allCandidates", "outputs": [ { "name": "id", "type": "uint256" }, { "name": "name", "type": "bytes32" }, { "name": "votecount", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "index", "type": "uint256" } ], "name": "debugGetCandidateStringNameIdx", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "inputs": [ { "name": "candidates", "type": "bytes32[]" }, { "name": "blockamount", "type": "uint256" }, { "name": "store", "type": "address" } ], "payable": false, "stateMutability": "nonpayable", "type": "constructor" } ]';
+					this.smartcontract = result.data.bcAddr;
+					this.abi = result.data.abi;
 					resolve();
 				}).catch((err) => reject(err));
 			});
@@ -90,7 +93,7 @@ export default {
 		},
 		setContract() {
 			try {
-				let parsedABI = JSON.parse(this.ABI);
+				let parsedABI = JSON.parse(this.abi);
 				let contractInstance = this.$store.state.web3.instance.eth.Contract(parsedABI, this.smartcontract);
 				this.$store.commit('SET_SMARTCONTRACT_INSTANCE', contractInstance);
 				window.sc = contractInstance;

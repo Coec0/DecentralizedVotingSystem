@@ -22,6 +22,7 @@
 		<div class="submit-container">
 			<button v-on:click="vote" class="button">Submit</button>
 		</div>
+		<div v-if="voteSubmitted">Vote suvmitted!</div>
 	</div>
 </template>
 
@@ -35,6 +36,7 @@ export default {
 	},
 	data() {
 		return {
+			voteSubmitted: false,
 			selected: '',
 			errors: {},
 			privateKey: null
@@ -68,7 +70,9 @@ export default {
 		},
 		vote() {
 			let account = this.$store.state.web3.instance.eth.accounts.privateKeyToAccount(this.privateKey);
-			this.$store.state.web3.smartcontract.methods.vote(this.selected).send({from: account.address }).then(console.log)
+			this.$store.state.web3.smartcontract.methods.vote(this.selected).send({from: account.address }).then(success => {
+				this.voteSubmitted = true;
+			}).catch(console.error);
 		}
 	}
 };
