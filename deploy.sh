@@ -72,13 +72,14 @@ npm install  &> /dev/null
 cd ..
 
 echo 'Starting ganache-cli'
+echo "----------------------------------------------------------------------------------"
 ganache-cli --port=$PORT --account="$PRIVATE_KEY,1000000000000000000000000" --account="0x227176555b1feee67db212e8b5d313455aa0579021e858ef94d8d4fb4f5bba57,10000000000000000000" --account="0x2e4b4b39c108ac0bc5b6fe6a5667ff9f1501dfc0132da2b78a8b9150262eaa73,1000000000000000000000" --quiet &
 sleep 5
+echo "----------------------------------------------------------------------------------"
 
 cp votingsystem/voterrecord.sol compile-deploy-smartcontract/contracts
 cd compile-deploy-smartcontract
 echo 'Deploying voterrecord.sol...'
-echo
 RECORDADDRESS=$(node src/app.js --node "$NODE" --key "$PRIVATE_KEY" --output "address" --file "voterrecord")
 sleep 1
 
@@ -95,13 +96,14 @@ sleep 1
 cp votingsystem/votingsystem.sol compile-deploy-smartcontract/contracts
 cd compile-deploy-smartcontract
 echo 'Deploying votingsystem.sol...'
-echo
 VOTING=$(node src/app.js --node "$NODE" --key "$PRIVATE_KEY" --args "$CONTRACT_ARGS" --output "abi/address" --file "votingsystem")
 
 votingarray=($VOTING)
 SCADDRESS=${votingarray[0]}
 ABI=${votingarray[1]}
-echo $SCADDRESS
-echo $ABI
+
+echo "Starting server..."
+cd ../server
+bash run.sh --node="$NODE" --sc="$SCADDRESS" --abi="$ABI"
 
 exit

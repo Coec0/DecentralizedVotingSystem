@@ -1,5 +1,7 @@
 package cth.dvs.server.cli
 
+import com.github.javafaker.Faker
+import java.util.concurrent.TimeUnit
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -25,6 +27,7 @@ public class AddCommand : CliktCommand() {
         SettingsBundle.ELECTION.nodeAddr = node
         SettingsBundle.ELECTION.bcAddr = sc
         SettingsBundle.ELECTION.abi = abi
+        SettingsBundle.ELECTION.expirationDate = Faker.instance().date().future(10, TimeUnit.DAYS).time;
 
 
     }

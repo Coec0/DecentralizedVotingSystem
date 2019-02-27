@@ -10,10 +10,8 @@ if ! [ -x "$(command -v java)" ]; then
   exit 1
 fi
 
-clear
 echo "Compiling the code..."
-mvn clean install
-clear
-echo -e "Done!\nTrying to start the server at port $1"
+mvn clean install > /dev/null
+echo -e "Done!\nTrying to start the server"
 cd target
-java -jar Server-0.6-jar-with-dependencies.jar $1
+java -jar Server-0.6-jar-with-dependencies.jar $1 $2 $3
