@@ -6,7 +6,7 @@
 		</div>
 		<div class="private-key-container">
 			<h4>Private key</h4>
-			<textarea rows="4"></textarea>
+			<textarea v-model="privateKey" rows="4"></textarea>
 		</div>
 		<div class="personal-number-container">
 			<h4>Personal number</h4>
@@ -16,11 +16,11 @@
 			<h4>Candidates</h4>
 			<select v-model="selected">
 				<option disabled value="">Please select one</option>
-				<option v-for="candidate in candidates" :key="candidate.id">{{ candidate.name }}</option>
+				<option v-for="candidate in candidates" :key="candidate.id" v-bind:value="candidate.id">{{ candidate.name }}</option>
 			</select>
 		</div>
 		<div class="submit-container">
-			<button class="button">Submit</button>
+			<button v-on:click="vote" class="button">Submit</button>
 		</div>
 	</div>
 </template>
@@ -36,7 +36,8 @@ export default {
 	data() {
 		return {
 			selected: '',
-			errors: {}
+			errors: {},
+			privateKey: null
 		}
 	},
 	created() {
@@ -64,6 +65,10 @@ export default {
 			} else {
 				Vue.delete(this.errors, 'noSC');
 			}
+		},
+		vote() {
+			let account = this.$store.state.web3.instance.eth.accounts.privateKeyToAccount(this.privateKey);
+			this.$store.state.web3.smartcontract.methods.vote(this.selected).send({from: account.address }).then(console.log)
 		}
 	}
 };
@@ -89,6 +94,10 @@ export default {
 .private-key-container textarea {
 	width: 70%;
 	resize: none;
+}
+
+.personal-number-container {
+	display: none;
 }
 
 .candidates-container {

@@ -27,6 +27,25 @@ parser.addArgument(
 		help: 'The arguments to use for the contract when deploying, ex: "["1234", ["Kandidat 1", "Kandidat 2"], 120]"'
 	}
 );
+parser.addArgument(
+	'--debug',
+	{
+		help: 'Disables debug logging and only outputs address of contract'
+	}
+);
+parser.addArgument(
+	'--output',
+	{
+		help: 'Can be set to abi, address or abi/address'
+	}
+);
+
+parser.addArgument(
+	'--file',
+	{
+		help: 'Specify filename in contracts to compile and deploy'
+	}
+);
 
 let args = parser.parseArgs();
 
@@ -45,7 +64,7 @@ const checkPrerequisits = function() {
 			errors.push('No ethereum node specified in first argument');
 		} else {
 			try {
-				console.log('Connecting to node...');
+				if(args.debug) console.log('Connecting to node...');
 				web3 = new Web3(args.node);
 				let timeout = new Promise((resolve, reject) => {
 					let wait = setTimeout(() => {
@@ -55,12 +74,12 @@ const checkPrerequisits = function() {
 				let type = web3.eth.net.getNetworkType();
 				let result = await Promise.race([timeout, type]);
 
-				if(result == 'timeout') {
+				if(result === 'timeout') {
 					errors.push('Timed out trying to connect to node ' + args.node);
 					return reject(errors);
 				}
 
-				console.log(`Successfully connected to node ${args.node} of type ${result}`);
+				if(args.debug) console.log(`Successfully connected to node ${args.node} of type ${result}`);
 			} catch(err) {
 				errors.push(err.message);
 			}
@@ -73,9 +92,9 @@ const checkPrerequisits = function() {
 					errors.push('Invalid private key (Must be begin with "0x"): ' + args.key);
 				} else {
 					account = web3.eth.accounts.privateKeyToAccount(args.key);
-					console.log(`Account retrieved: ${account.address}`);
+					if(args.debug) console.log(`Account retrieved: ${account.address}`);
 					let balance = await web3.eth.getBalance(account.address);
-					console.log(`Account balance: ${balance} ETH`);
+					if(args.debug) console.log(`Account balance: ${balance} ETH`);
 					resolve();
 				}	
 			} catch (err) {
@@ -83,7 +102,7 @@ const checkPrerequisits = function() {
 			}
 		}
 		if(!args.args) {
-			console.log('NOTE: No deploy arguments given');
+			if(args.debug) console.log('NOTE: No deploy arguments given');
 		} else if(web3) {
 			smartcontractArgs = JSON.parse(args.args);
 
@@ -94,6 +113,8 @@ const checkPrerequisits = function() {
 					if (!obj.hasOwnProperty(key))
 						continue;
 					if(typeof obj[key] == 'string') {
+						if(obj[key].startsWith('0x'))
+							continue;
 						obj[key] = web3.utils.asciiToHex(obj[key].replace('_', ' '));
 					}
 					if(typeof obj[key] == 'object') {
@@ -119,6 +140,9 @@ const contractSources = function() {
 	const contractsFiles = fs.readdirSync(contractsPath);
 
 	contractsFiles.forEach(file => {
+		if(args.file && !file.toLowerCase().includes(args.file))
+			return;
+
 		const contractFullPath = path.resolve(contractsPath, file);
 		sources[file] = {
 			content: fs.readFileSync(contractFullPath, 'utf8')
@@ -142,21 +166,21 @@ const input = {
 
 const compileContracts = function() {
 	if(input.sources.length == 0) {
-		console.log('No contracts found in folder');
+		console.error('No contracts found in folder');
 		return;
 	}
 
-	console.time('Compiled in');
+	if(args.debug) console.time('Compiled in');
 	const compiledContracts = JSON.parse(solc.compile(JSON.stringify(input))).contracts;
 
 	for (let contract in compiledContracts) {
 		for(let contractName in compiledContracts[contract]) {
 			fs.outputJsonSync(path.resolve(buildPath, `${contractName}.json`), compiledContracts[contract][contractName], { spaces: '\t' });
-			console.log(`Compiled ${contractName}.sol to ${contractName}.json`);
+			if(args.debug) console.log(`Compiled ${contractName}.sol to ${contractName}.json`);
 		}
 	}
 
-	console.timeEnd('Compiled in');
+	if(args.debug) console.timeEnd('Compiled in');
 }
 
 const deploy = function() {
@@ -166,12 +190,16 @@ const deploy = function() {
 
 		for (var i = 0; i < compiledFiles.length; i++) {
 			let file = compiledFiles[i];
-			console.log(`Attempting to deploy contract ${file} from account: ${account.address}`);
+			if(args.file && !file.toLowerCase().includes(args.file)) {
+				continue;
+			}
+			if(args.debug) console.log(`Attempting to deploy contract ${file} from account: ${account.address}`);
 			
 			const filePath = path.resolve(buildPath, file);
 			const contract = require(filePath);
 
 			try  {
+				if(args.debug) console.log(smartcontractArgs)
 				const deployedContract = await new web3.eth.Contract(contract.abi)
 				.deploy({
 					data: '0x' + contract.evm.bytecode.object,
@@ -182,10 +210,15 @@ const deploy = function() {
 					gas: '2000000'
 				});
 
-				console.log(`Contract ${file} deployed at address: ${deployedContract.options.address}`);
-				console.log(`ABI: \n\n ${JSON.stringify(contract.abi)} \n\n`);
+				if(args.debug) {
+					console.log(`Contract ${file} deployed at address: ${deployedContract.options.address}`);
+					console.log(`ABI: \n\n ${JSON.stringify(contract.abi)} \n\n`);
+				}
+				if(args.output.includes('address')) console.log(`${deployedContract.options.address}`);
+				if(args.output.includes('abi')) console.log(`${JSON.stringify(contract.abi)}`);
+			
 			} catch (err) {
-				console.log(`Error deploying contract ${file}. ${err.message}`);
+				console.error(err.message);
 			}
 		}
 
@@ -198,7 +231,7 @@ checkPrerequisits().then(() => {
 	compileContracts();
 	deploy().then(() => {
 		process.exit(0);
-	});
+	}).catch(err => console.error);
 }).catch((errors) => {
 	console.error('Error(s) detected!');
 	errors.forEach(e => console.error('> ' + e));
