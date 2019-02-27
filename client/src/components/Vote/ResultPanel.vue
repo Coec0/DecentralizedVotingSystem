@@ -29,6 +29,7 @@ export default {
 					text: null
 				},
 				series: [{
+					name: 'Votes',
 					data: this.results
 				}]
 			}
