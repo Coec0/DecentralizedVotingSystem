@@ -48,9 +48,9 @@ fun Election.randomize(): Election {
     return this
 }
 
-fun Long.isInTheFuture(): Boolean{
+fun Long.isInTheFuture(): Boolean {
     val currTimestamp = System.currentTimeMillis() / 1000
-    return (this?:0) > currTimestamp
+    return (this ?: 0) > currTimestamp
 }
 
 fun Election.isActive() = this.expirationDate.isInTheFuture()
@@ -64,8 +64,6 @@ object DatabaseSupplier {
 
     init {
         db = JsonDBTemplate(DB_PATH, POJO_PACKAGE)
-
-
 
 
         try {
@@ -82,6 +80,26 @@ object DatabaseSupplier {
 
         } catch (e: InvalidJsonDbApiUsageException) {
             // The collection is already existing
+        }
+
+
+
+
+
+        try{
+            val temp = Election()
+            temp.id = "9090"
+            db.remove(temp,temp::class.java)
+        }
+        catch (e:Exception){}
+        try {
+
+
+
+            if (SettingsBundle.ELECTION.name != null)
+                db.insert<Election>(SettingsBundle.ELECTION)
+        } catch (e: Exception) {
+
         }
 
 

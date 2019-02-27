@@ -1,5 +1,7 @@
 package cth.dvs.server
 
+import cth.dvs.server.cli.AddCommand
+import cth.dvs.server.cli.PortCommand
 import cth.dvs.server.gui.GUIApp
 import spark.kotlin.Http
 import spark.kotlin.ignite
@@ -12,22 +14,16 @@ object Main {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val strport : String
-        var port = DEFAULT_PORT
-        try {
-            if (args.isNotEmpty()) {
-                strport = args[0]
-                port = Integer.valueOf(strport)
-            }
-        }
-        catch (e : Exception){
-        }
+
+        //PortCommand().main(args)
 
 
-        println("Running Server on port $port")
+        AddCommand().main(args)
+
+        println("Running Server on port ${SettingsBundle.PORT}")
 
 
-        val http: Http = ignite().port(port)
+        val http: Http = ignite().port(SettingsBundle.PORT)
 
 
         DatabaseSupplier.init()
