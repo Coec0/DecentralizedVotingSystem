@@ -6,7 +6,7 @@
 		</div>
 		<div class="private-key-container">
 			<h4>Private key</h4>
-			<textarea v-model="privateKey" rows="4"></textarea>
+			<textarea v-model="privateKey" rows="4" v-bind:class="{ redborder: errors.noPK }"></textarea>
 		</div>
 		<div class="personal-number-container">
 			<h4>Personal number</h4>
@@ -22,7 +22,7 @@
 		<div class="submit-container">
 			<button v-on:click="vote" class="button">Submit</button>
 		</div>
-		<div v-if="voteSubmitted">Vote suvmitted!</div>
+		<div v-if="voteSubmitted">Vote submitted!</div>
 	</div>
 </template>
 
@@ -38,8 +38,11 @@ export default {
 		return {
 			voteSubmitted: false,
 			selected: '',
-			errors: {},
-			privateKey: null
+			errors: {
+				noPK: false
+			},
+			privateKey: null,
+			personalNumber: null
 		}
 	},
 	created() {
@@ -69,10 +72,52 @@ export default {
 			}
 		},
 		vote() {
-			let account = this.$store.state.web3.instance.eth.accounts.privateKeyToAccount(this.privateKey);
-			this.$store.state.web3.smartcontract.methods.vote(this.selected).send({from: account.address }).then(success => {
-				this.voteSubmitted = true;
-			}).catch(console.error);
+			if(!this.privateKey) {
+				this.noPK();
+				return;
+			} else {
+				this.enteredPK();
+			}
+
+			let web3 = this.$store.state.web3.instance;
+			let account;
+			try {
+				account = web3.eth.accounts.privateKeyToAccount(this.privateKey);
+			} catch (error) {
+				this.invalidPK();
+				return;
+			}
+
+			web3.eth.getBalance(account.address).then(result => {
+				if(result > 0) {
+					this.$store.state.web3.smartcontract.methods.vote(this.selected).send({from: account.address }).then(success => {
+						this.success();
+					}).catch(error => {
+						console.log(error);
+						this.voteError(error);
+					});
+				} else {
+					this.noCurrency();
+				}
+			});	
+		},
+		noPK() {
+			this.errors.noPK = true;
+		},
+		enteredPK() {
+			this.errors.noPK = false;
+		},
+		invalidPK() {
+			console.log('Looks like an invalid private key chief');
+		},
+		noCurrency() {
+			console.log('Account contains no currency, incorrect private key?')
+		},
+		voteError(error) {
+			console.log('Error occured when trying to vote')
+		},
+		success() {
+			this.voteSubmitted = true;
 		}
 	}
 };
@@ -82,6 +127,10 @@ export default {
 <style scoped>
 .voting {
 
+}
+
+.redborder {
+	border: solid 1px red;
 }
 
 .error {

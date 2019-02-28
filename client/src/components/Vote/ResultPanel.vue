@@ -1,7 +1,8 @@
 <template>
 	<div class="results white">
 		<h2>Results</h2>
-		<highcharts :options="chartOptions"></highcharts>
+		<highcharts v-if="voteCount > 0" :options="chartOptions"></highcharts>
+		<div v-else>No results</div>
 	</div>
 </template>
 
@@ -15,6 +16,11 @@ export default {
 	},
 	props: {
 		results: Array
+	},
+	computed: {
+		voteCount: function () {
+			return this.results.reduce((tot, cur) => { return tot += cur.y }, 0);
+		}
 	},
 	data() {
 		return {
