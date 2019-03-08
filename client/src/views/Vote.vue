@@ -52,11 +52,11 @@ export default {
 	},
 	methods: {
 		init() {
-			this.fetchData().then(() => {
+			this.fetchData().then(() => {	// .then() tar in en funktion som körs när this.fetchData() har kört klart.
 				this.connectToNode();
 				this.setContract();
 				this.fetchCandidates();
-			}).catch(err => {
+			}).catch(err => {				// .catch() tar in en funktion som körs när this.fetchData() har kört klart men det blev ett fel.
 				console.error(err);
 				this.$store.commit('ADD_NOTIFICATION', { message: err.message, type: 'warn' });
 			});	
@@ -71,7 +71,7 @@ export default {
 			this.results = [];
 		},
 		fetchData() {
-			return new Promise((resolve, reject) => {
+			return new Promise((resolve, reject) => {		// Promises är det som gör att vi kan köra .then() och .catch(). resolve() -> .then() körs. reject() -> .catch() körs
 				this.$http.get(`/getElection/${this.$route.params.id}`).then(result => {
 					this.id = result.data.id;
 					this.name = result.data.name;
