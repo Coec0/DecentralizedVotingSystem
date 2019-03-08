@@ -38,9 +38,7 @@ export default {
 		return {
 			voteSubmitted: false,
 			selected: '',
-			errors: {
-				noPK: false
-			},
+			errors: {},
 			privateKey: null,
 			personalNumber: null
 		}
