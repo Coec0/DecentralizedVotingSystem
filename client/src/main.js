@@ -1,10 +1,3 @@
-/*
-	Det här är entrypointen för websidan.
-	Här skapar vi vårat Vue-objekt som vi sedan sätter fast på en div i /public/index.html med id="app".
-*/
-
-// Import är simpelt, det fungerar ungefär som i Java.
-//
 // Viktigt att tänka på dock är att när man importerar en fil så skapas en instans av den filen. Exempel: Säg att vi importerar en fil här: "import './router.js'"
 // Importerar man './router.js' från ett annat ställe i projektet så kommer man då få SAMMMA INSTANS av router.
 //
