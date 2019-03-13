@@ -1,19 +1,15 @@
 <template>
-	<div class="home grey">
-		 <section>
-		 	<div class="content">
-		 		<div id="title">
-			 		Decentralized Voting System
-			 	</div>
+	<div class="home white">
+	 	<div class="container">
+	 		<div id="title">
+		 		Decentralized Voting System
 		 	</div>
-		 </section>
-		 <section>
-		 	<div class="content">
-		 		<div id="title">
-			 		Step by step guide
-			 	</div>
+	 	</div>
+	 	<div class="container">
+	 		<div id="title">
+		 		Step by step guide
 		 	</div>
-		 </section>
+	 	</div>
 	</div>
 </template>
 
@@ -35,17 +31,6 @@ export default {
 <style scoped>
 .home {
 	width: 100%;
-}
-.content {
-	margin-left: 10%;
-	margin-right: 10%;
-	padding-top: 10px;
-	padding-bottom: 10px;
-}
-
-section {
-	width: 100%;
-	height: 200px;
 }
 
 #title {

@@ -80,6 +80,7 @@ export default {
 
 <!--
 	Här är css-delen, väldigt straight-forward om man kan css.
+	Global CSS!
 -->
 <style>
 #app {

@@ -1,5 +1,5 @@
 <template>
-	<div class="container vote gray">
+	<div class="container vote white">
 		<NetworkType></NetworkType>
 		<h1 class="text-center">{{ name }}</h1>
 		<div class="content row">
