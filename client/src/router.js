@@ -1,8 +1,3 @@
-/*
-	I denna filen sköter vi hur strukturen på vår hemsida ska se ut
-	Vi säger vilken view som ska användas på vilken address. 'localhost:8000/vote/:id -> views/Vote'
-	Inte så viktigt hur de fungerar egentligen
-*/
 import Vue from 'vue';
 import Router from 'vue-router';
 
