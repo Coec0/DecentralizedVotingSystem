@@ -94,7 +94,7 @@ export default {
 		setContract() {
 			try {
 				let parsedABI = JSON.parse(this.abi);
-				let contractInstance = this.$store.state.web3.instance.eth.Contract(parsedABI, this.smartcontract);
+				let contractInstance = this.$store.state.vote.web3.eth.Contract(parsedABI, this.smartcontract);
 				this.$store.commit('SET_SMARTCONTRACT_INSTANCE', contractInstance);
 				window.sc = contractInstance;
 			} catch (err) {
@@ -103,10 +103,10 @@ export default {
 			}
 		},
 		fetchCandidates() {
-			this.$store.state.web3.smartcontract.methods.candidateCount().call().then(count => {
+			this.$store.state.vote.smartcontract.methods.candidateCount().call().then(count => {
 				for (var i = 0; i < count; i++) {
-					this.$store.state.web3.smartcontract.methods.allCandidates(i).call().then(candidate => {
-						let name = this.$store.state.web3.instance.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name));
+					this.$store.state.vote.smartcontract.methods.allCandidates(i).call().then(candidate => {
+						let name = this.$store.state.vote.web3.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name));
 						this.candidates.push({
 							id: candidate.id,
 							name: name,

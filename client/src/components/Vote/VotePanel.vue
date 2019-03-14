@@ -51,7 +51,7 @@ export default {
 	},
 	methods: {
 		checkErrors() {
-			if(!this.$store.state.web3.instance) {
+			if(!this.$store.state.vote.web3) {
 				this.errors.noWeb3 = {
 					type: 'no_web3_instance',
 					description: 'No web3 instance'
@@ -60,7 +60,7 @@ export default {
 				Vue.delete(this.errors, 'noWeb3');
 			}
 
-			if(!this.$store.state.web3.smartcontract) {
+			if(!this.$store.state.vote.smartcontract) {
 				this.errors.noSC = {
 					type: 'no_smartcontract',
 					description: 'No smartcontract set'
@@ -77,7 +77,7 @@ export default {
 				this.enteredPK();
 			}
 
-			let web3 = this.$store.state.web3.instance;
+			let web3 = this.$store.state.vote.web3;
 			let account;
 			try {
 				account = web3.eth.accounts.privateKeyToAccount(this.privateKey);
@@ -88,7 +88,7 @@ export default {
 
 			web3.eth.getBalance(account.address).then(result => {
 				if(result > 0) {
-					this.$store.state.web3.smartcontract.methods.vote(this.selected).send({from: account.address }).then(success => {
+					this.$store.state.vote.smartcontract.methods.vote(this.selected).send({from: account.address }).then(success => {
 						this.success();
 					}).catch(error => {
 						console.log(error);
