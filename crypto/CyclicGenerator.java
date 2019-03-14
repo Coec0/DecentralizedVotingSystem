@@ -5,18 +5,16 @@ public class CyclicGenerator{
     private int q;
     private int g;
     private long[] group;
-    private List<Integer> primesList = new ArrayList<>();
-    private Deque<Integer> primes;
-    private int min;
+    //private List<Integer> primesList = new ArrayList<>();
+    private static Stack<Integer> primes;
     private int max;
 
-    public CyclicGenerator(int min, int max){
+    public CyclicGenerator(int max){
         System.out.println("Starting primesgenerator");
-        generatePrimes(min,max);
+        primes = new Stack<>();
+        generatePrimes(max);
         System.out.println("End primesgenerator");
-        Collections.shuffle(primesList);
-        primes = new ArrayDeque<>(primesList);
-        this.min = min;
+        Collections.shuffle(primes);
         this.max = max;
     }
 
@@ -26,8 +24,11 @@ public class CyclicGenerator{
             p = findP();
             g = findG(p,q);
         }while(g == -1);
-
+        System.out.println("heapsize is before groupcreate: " + Runtime.getRuntime().totalMemory()/1000000 + "MB");
+        System.out.println("freeheap is before groupcreate: " + Runtime.getRuntime().freeMemory()/1000000 + "MB");
         group = new long[q];
+        System.out.println("heapsize is after groupcreate: " + Runtime.getRuntime().totalMemory()/1000000 + "MB");
+        System.out.println("freeheap is after groupcreate: " + Runtime.getRuntime().freeMemory()/1000000 + "MB");
         generateGroup();
     }
 
@@ -66,16 +67,31 @@ public class CyclicGenerator{
        }
     }
 
-    private void generatePrimes(int min, int max){
+    private static void generatePrimes(int max){
+        boolean[] isComposite = new boolean[max+1];
+        for(int i = 2; i*i <= max; i++){
+            if(!isComposite[i]){
+                for(int j = i;i*j <= max;j++){
+                    isComposite[i*j] = true;
+                }
+            }
+        }
+        for (int i = 2; i <= max; i++) {
+            if (!isComposite [i]){
+                primes.push(i);
+            }
+        }
+    }
+    /*private void generatePrimes(int min, int max){
         for(int i = min; i < max; i++){
             if(isPrime(i)){
                 primesList.add(i);
             }
         }
-    }
+    }*/
 
     private synchronized int getRandomPrime(){
-        return primes.remove();
+        return primes.pop();
     }
 
     private int calculateP(int q){
@@ -131,7 +147,7 @@ public class CyclicGenerator{
     }
 
     public List<Integer> getPrimes() {
-        return primesList;
+        return primes;
     }
 
 }

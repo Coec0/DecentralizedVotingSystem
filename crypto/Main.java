@@ -5,14 +5,18 @@ import java.util.Set;
 public class Main {
 
     public static void main (String[] args){
-        CyclicGenerator cg = new CyclicGenerator(100000,10000000);
+        System.out.println("heapsize is: " + Runtime.getRuntime().totalMemory()/1000000 + "MB");
+        CyclicGenerator cg = new CyclicGenerator(10000000);
+        System.out.println("freeheap is: " + Runtime.getRuntime().freeMemory()/1000000 + "MB");
+        System.out.println("Generate group");
         cg.generate();
-        System.out.println(Arrays.toString(cg.getGroup()));
+        System.out.println("freeheap is: " + Runtime.getRuntime().freeMemory()/1000000 + "MB");
         System.out.println("p: " + cg.getP());
         System.out.println("q: " + cg.getQ());
         System.out.println("g: " + cg.getG());
         long[] arr = cg.getGroup();
-        Set<Long> s = new HashSet<Long>();
+        System.out.println(arr.length);
+        Set<Long> s = new HashSet<>();
         for(int i = 0; i < arr.length; i++){
             s.add(arr[i]);
         }
