@@ -4,7 +4,7 @@ public class CyclicGenerator{
     private int p;
     private int q;
     private int g;
-    private int[] group;
+    private long[] group;
     private List<Integer> primesList = new ArrayList<>();
     private Deque<Integer> primes;
     private int min;
@@ -27,15 +27,33 @@ public class CyclicGenerator{
             g = findG(p,q);
         }while(g == -1);
 
-        group = new int[q];
+        group = new long[q];
         generateGroup();
     }
 
 
     private void generateGroup(){
-        for(int a = 0; a < q; a++){
-            group[a] = (int) Math.pow(g,a) % p;
+        for(int a  = 0; a < q; a++){
+            group[a] = modularPower(g, a, p);
         }
+    }
+
+    //calculate x^y mod p
+    private long modularPower(long x, long y, long p){
+        long res = 1;
+        x = x % p;
+
+        while(y > 0) {
+            //if odd
+            if((y & 1) == 1){
+                res = (res*x) % p;
+            }
+
+            y = y>>1;
+            x = x*x % p;
+        }
+
+        return res;
     }
 
     private int findP(){
@@ -65,14 +83,19 @@ public class CyclicGenerator{
     }
 
     private int findG(int p, int q){
-        int x;
-        for(int g = 2; g < p; g++){
-            x = (int) (Math.pow(g, q) % p);
-            if(x == 1){
-                return g;
-            }
-        }
-        return -1;
+        int h;
+        long a;
+        int b;
+        int g;
+        do{
+            g = (int) (Math.random()*(p-2) + 3);
+            //g = (int) (Math.pow(h, ((p-1)) / q) % p);
+            //g = modularPower(,(p-1)/q,p);
+            a = modularPower(g,q,p);
+            b = g*g % p;
+
+        }while(a != 1 && b == 1);
+        return g;
     }
 
     private boolean isPrime(int number){
@@ -103,7 +126,7 @@ public class CyclicGenerator{
         return g;
     }
 
-    public int[] getGroup() {
+    public long[] getGroup() {
         return group;
     }
 
