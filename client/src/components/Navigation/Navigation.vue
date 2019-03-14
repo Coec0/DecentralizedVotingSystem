@@ -26,7 +26,7 @@ export default {
 <style scoped>
 .logo {
 	height: 50px;
-	width: 75px;
+	width: 50px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -59,7 +59,7 @@ export default {
 	transition-property: color, background-color;
 }
 
-.hvr-fade:hover, .hvr-fade:focus, .hvr-fade:active {
+.hvr-fade:hover, .hvr-fade:focus, .hvr-fade:active, .router-link-exact-active {
 	background-color: #2c3e50;
 	color: white;
 }
