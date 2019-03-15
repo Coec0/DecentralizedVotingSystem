@@ -23,6 +23,8 @@ contract VotingSystem {
     
     uint[][] public votedfor; //Who is voted for in with 'one' an 'zeroes'
     mapping(address => uint) public votedForPos;
+    mapping(address => uint) public controlDigit;
+    
     
     uint private blockStopNumber; //when the block.number reaches this stop the voting
     mapping(uint => uint) public idToIndexMap; //Gets the position of the candidate in allCandidates
@@ -106,12 +108,25 @@ contract VotingSystem {
     */
 
 
-    function vote (uint[] memory candidates) public {
+    function vote (uint[] memory candidates, uint sum) public {
         require(isVotingOpen(), "Voting is closed!");
-        //require(doesCandidateExist(id), "Not a valid ID");
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
+        require(candidates.length == allCandidates.length, "You have not voted for everyone!");
+        
+        /* START, Change this for "OR proof" when el gamal or remove */
+        
+        uint controlAdd = 0;
+        for(uint i=0; i<candidates.length; i++){
+            controlAdd += candidates[i];
+            require(candidates[i] == 0 || candidates[i] == 1, "Not 1 or 0 somewhere");
+        }
+        require(controlAdd == sum && sum == 1, "Sum doesn't add up");
+        
+        /* END */
+        
         
         votedForPos[msg.sender] = votedfor.length;
+        controlDigit[msg.sender] = sum;
         votedfor.push(candidates);
     }
 
@@ -125,9 +140,9 @@ contract VotingSystem {
        for(uint i=0; i<allCandidates.length; i++){
            votes[pos] = 0; //Set all to zero
        }
-       votes[pos] = 1; //Set the candidate votedfor to one;
+       votes[pos] = 1; //Set the candidate voted for to one;
        
-       vote(votes); //Vote with the list
+       vote(votes, 1); //Vote with the list
     }
     
 /*************************** ONLY DEBUG FUNCTIONS BELOW ****************************/
@@ -155,7 +170,6 @@ contract VotingSystem {
     
         record.enableWhitelist();
     }
-
 
 
     //with pure you cannot access the contract storage
