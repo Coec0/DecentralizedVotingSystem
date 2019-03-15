@@ -10,7 +10,9 @@ export const state = { ...initialState };
 
 export const actions = {
 	FETCH_CANDIDATES({ context, state }) {
-		
+		return new Promise(async (resolve, reject) => {
+			await console.log('asd')
+		});
 	},
 	RESET_CANDIDATES(context) {
 		context.commit('SET_CANDIDATES', []);

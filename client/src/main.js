@@ -11,6 +11,7 @@ import axios from 'axios'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import '@babel/polyfill'
 
 Vue.use(BootstrapVue);	// Lägg till stöd för bootstrap i vår app.
 

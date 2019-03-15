@@ -52,6 +52,7 @@ export default {
 	},
 	methods: {
 		init() {
+			this.$store.dispatch('FETCH_CANDIDATES');
 			this.fetchData().then(() => {	// .then() tar in en funktion som körs när this.fetchData() har kört klart.
 				this.connectToNode();
 				this.setContract();
