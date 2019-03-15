@@ -11,6 +11,9 @@ export const actions = { };
 export const mutations = {
 	ADD_NOTIFICATION(state, notification) {
 		state.notifications.push(notification);
+	},
+	CLEAR_NOTIFICATIONS(state) {
+		state.notifications = [];
 	}
 };
 
