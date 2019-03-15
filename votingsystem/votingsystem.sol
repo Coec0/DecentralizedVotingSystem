@@ -10,17 +10,20 @@ interface Record {
 
 contract VotingSystem {
     
-    mapping(address => uint) public votedOn;
+    
 
     struct Candidate {
         uint id; //A hash of the candidate
         bytes32 name; //The candidates name
-        uint votecount; //The amount of votes
     }
 
      bytes32 private constant NOT_INSTANTIATED = 0x0000000000000000000000000000000000000000000000000000000000000000;
 
     Candidate[] public allCandidates; //All the candidates
+    
+    uint[][] public votedfor; //Who is voted for in with 'one' an 'zeroes'
+    mapping(address => uint) public votedForPos;
+    
     uint private blockStopNumber; //when the block.number reaches this stop the voting
     mapping(uint => uint) public idToIndexMap; //Gets the position of the candidate in allCandidates
     //bool enableWhitelist = false; //Disable the whitlist (röstlängd) until someone is added to it
@@ -50,7 +53,7 @@ contract VotingSystem {
     }
     
     //Creates a candidate from the name of the candidate and adds it to allCandidates[].
-    function addCandidate(bytes32 candidate) public{
+    function addCandidate(bytes32 candidate) private{
         require(isVotingOpen(), "Voting is closed!");
         require(candidate != NOT_INSTANTIATED, "A candidate may not have 0x00.. as name");
         uint hash = uint( keccak256(abi.encodePacked(candidate,allCandidates.length)));
@@ -59,8 +62,7 @@ contract VotingSystem {
             
         allCandidates.push(Candidate({
               id: hash,
-              name: candidate,
-              votecount: 0
+              name: candidate
         }));
     }
     
@@ -88,6 +90,9 @@ contract VotingSystem {
 
     //Currently Loops through all candidates (o(n)).
     //Get the candidate thats in lead
+    /*
+    DEPRECATED. Wont be able to see until woting is finished
+    
     function getCandidateInLead() public view returns
         (uint id, bytes32 name, uint votes){
             for(uint i = 0; i < allCandidates.length ; i++){
@@ -98,24 +103,31 @@ contract VotingSystem {
                 }
             }
         }
+    */
+
+
+    function vote (uint[] memory candidates) public {
+        require(isVotingOpen(), "Voting is closed!");
+        //require(doesCandidateExist(id), "Not a valid ID");
+        require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
+        
+        votedForPos[msg.sender] = votedfor.length;
+        votedfor.push(candidates);
+    }
 
     //msg.sender is the address of person or
     //other contract that is interacting with
     //contract right now
     //This function votes
-    function vote (uint id) public {
-        require(isVotingOpen(), "Voting is closed!");
-        require(doesCandidateExist(id), "Not a valid ID");
-        require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
-
-        if(votedOn[msg.sender] == 0){ //Have not voted before
-            votedOn[msg.sender] = id;
-            allCandidates[idToIndexMap[id]].votecount++;
-        } else if (votedOn[msg.sender] != id){
-            allCandidates[idToIndexMap[votedOn[msg.sender]]].votecount--;
-            votedOn[msg.sender] = id;
-            allCandidates[idToIndexMap[id]].votecount++;
-        }
+    function easyVote (uint id) public {
+       uint pos = idToIndexMap[id];
+       uint[] memory votes = new uint[](allCandidates.length); 
+       for(uint i=0; i<allCandidates.length; i++){
+           votes[pos] = 0; //Set all to zero
+       }
+       votes[pos] = 1; //Set the candidate votedfor to one;
+       
+       vote(votes); //Vote with the list
     }
     
 /*************************** ONLY DEBUG FUNCTIONS BELOW ****************************/
