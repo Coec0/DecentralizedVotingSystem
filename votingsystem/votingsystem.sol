@@ -108,7 +108,7 @@ contract VotingSystem {
     */
 
 
-    function vote (uint[] memory candidates, uint sum) public {
+    function vote (uint[] memory candidates) public {
         require(isVotingOpen(), "Voting is closed!");
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
         require(candidates.length == allCandidates.length, "You have not voted for everyone!");
@@ -120,17 +120,17 @@ contract VotingSystem {
             controlAdd += candidates[i];
             require(candidates[i] == 0 || candidates[i] == 1, "Not 1 or 0 somewhere");
         }
-        require(controlAdd == sum && sum == 1, "Sum doesn't add up");
+        require(controlAdd ==  1, "Sum doesn't add up");
         
         /* END */
         
         if(controlDigit[msg.sender] == 0){
             votedForPos[msg.sender] = votedfor.length;
-            controlDigit[msg.sender] = sum;
+            controlDigit[msg.sender] = controlAdd;
             votedfor.push(candidates);
         } else {
             votedfor[votedForPos[msg.sender]] = candidates;
-            controlDigit[msg.sender] = sum;
+            controlDigit[msg.sender] = controlAdd;
         }
     }
 
@@ -146,7 +146,7 @@ contract VotingSystem {
        }
        votes[pos] = 1; //Set the candidate voted for to one;
        
-       vote(votes, 1); //Vote with the list
+       vote(votes); //Vote with the list
     }
     
 /*************************** ONLY DEBUG FUNCTIONS BELOW ****************************/
