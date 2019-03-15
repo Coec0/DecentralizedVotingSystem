@@ -10,13 +10,36 @@ const initialState = {
 export const state = { ...initialState };
 
 export const actions = {
-	FETCH_CANDIDATES({ context, state }) {
+	FETCH_CANDIDATES({ commit, state }) {
 		return new Promise(async (resolve, reject) => {
-			await console.log('asd')
+			// Error checking
+			if (!state.$web3) return reject('Tried FETCH_CANDIDATES without web3 set');
+			if (!state.$smartcontract) return reject('Tried FETCH_CANDIDATES without smartcontract set');
+			const candidates = [];
+
+			try {
+				const candidateCount = await state.smartcontract.methods.candidateCount().call();
+
+				for (var i = 0; i < candidateCount; i++) {
+					const candidate = await state.smartcontract.methods.allCandidates(i).call();
+
+					candidates.push({
+						id: candidate.id,
+						name: state.web3.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name))
+					});
+				}
+			} catch (error) {
+				return reject(error);
+			}
+
+			// Push candidate list to state
+			commit('SET_CANDIDATES', candidates);
+			// Tell caller we succeeded
+			resolve();
 		});
 	},
-	RESET_CANDIDATES(context) {
-		context.commit('SET_CANDIDATES', []);
+	RESET_CANDIDATES({ commit }) {
+		commit('SET_CANDIDATES', []);
 	}
 };
 
