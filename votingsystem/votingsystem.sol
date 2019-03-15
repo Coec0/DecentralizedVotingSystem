@@ -124,10 +124,14 @@ contract VotingSystem {
         
         /* END */
         
-        
-        votedForPos[msg.sender] = votedfor.length;
-        controlDigit[msg.sender] = sum;
-        votedfor.push(candidates);
+        if(controlDigit[msg.sender] == 0){
+            votedForPos[msg.sender] = votedfor.length;
+            controlDigit[msg.sender] = sum;
+            votedfor.push(candidates);
+        } else {
+            votedfor[votedForPos[msg.sender]] = candidates;
+            controlDigit[msg.sender] = sum;
+        }
     }
 
     //msg.sender is the address of person or
