@@ -15,6 +15,7 @@ contract VotingSystem {
     struct Candidate {
         uint id; //A hash of the candidate
         bytes32 name; //The candidates name
+        uint votecount; //This should be encrypted elgamal in future
     }
 
      bytes32 private constant NOT_INSTANTIATED = 0x0000000000000000000000000000000000000000000000000000000000000000;
@@ -64,7 +65,8 @@ contract VotingSystem {
             
         allCandidates.push(Candidate({
               id: hash,
-              name: candidate
+              name: candidate,
+              votecount: 0
         }));
     }
     
@@ -92,9 +94,7 @@ contract VotingSystem {
 
     //Currently Loops through all candidates (o(n)).
     //Get the candidate thats in lead
-    /*
-    DEPRECATED. Wont be able to see until woting is finished
-    
+    //Mostly for debugging and shouldn't be used in future
     function getCandidateInLead() public view returns
         (uint id, bytes32 name, uint votes){
             for(uint i = 0; i < allCandidates.length ; i++){
@@ -105,33 +105,33 @@ contract VotingSystem {
                 }
             }
         }
-    */
 
 
     function vote (uint[] memory candidates) public {
         require(isVotingOpen(), "Voting is closed!");
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
         require(candidates.length == allCandidates.length, "You have not voted for everyone!");
+        require(controlDigit[msg.sender] == 0, "You can only vote once"); //Have like this until el gamal is implemented
         
         /* START, Change this for "OR proof" when el gamal or remove */
         
         uint controlAdd = 0;
+        uint candidatePos; // The candidate voted for (its pos in candidates[])
         for(uint i=0; i<candidates.length; i++){
             controlAdd += candidates[i];
+            if(candidates[i] == 1){
+                candidatePos = i;
+            }
             require(candidates[i] == 0 || candidates[i] == 1, "Not 1 or 0 somewhere");
         }
         require(controlAdd ==  1, "Sum doesn't add up");
         
         /* END */
         
-        if(controlDigit[msg.sender] == 0){
-            votedForPos[msg.sender] = votedfor.length;
-            controlDigit[msg.sender] = controlAdd;
-            votedfor.push(candidates);
-        } else {
-            votedfor[votedForPos[msg.sender]] = candidates;
-            controlDigit[msg.sender] = controlAdd;
-        }
+        votedForPos[msg.sender] = votedfor.length;
+        controlDigit[msg.sender] = controlAdd;
+        allCandidates[candidatePos].votecount += 1; //In the future use homomorphic property
+        votedfor.push(candidates);
     }
 
     //msg.sender is the address of person or
