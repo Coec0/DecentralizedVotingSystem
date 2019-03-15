@@ -3,7 +3,8 @@ import Vue from "vue";
 const initialState = {
 	$web3: null,
 	$smartcontract: null,
-	candidates: []
+	candidates: [],
+	privateKey: ''
 };
 
 export const state = { ...initialState };
@@ -38,6 +39,9 @@ export const mutations = {
 	SET_CANDIDATES(state, candidates) {
 		console.log('Candidates set');
 		state.candidates = candidates;
+	},
+	SET_PRIVATEKEY(state, key) {
+		state.privateKey = key;
 	}
 };
 
