@@ -47,6 +47,13 @@ parser.addArgument(
 	}
 );
 
+parser.addArgument(
+	'--fo',
+	{
+		help: 'Specify filename for output file'
+	}
+);
+
 let args = parser.parseArgs();
 
 const buildPath = path.resolve('build');
@@ -216,6 +223,37 @@ const deploy = function() {
 				}
 				if(args.output.includes('address')) console.log(`${deployedContract.options.address}`);
 				if(args.output.includes('abi')) console.log(`${JSON.stringify(contract.abi)}`);
+
+				if(args.fo) {	// File output
+					let output = {
+						port: 8000,
+						contracts: [
+							{
+								id: 1,
+								name: 'Kommunalval',
+								nodeAddr: null,
+								bcAddr: null,
+								abi: null
+							},
+							{
+								id: 2,
+								name: 'Landstingsval',
+								nodeAddr: null,
+								bcAddr: null,
+								abi: null
+							},
+							{
+								id: 3,
+								name: 'Riksdagsval',
+								nodeAddr: args.node,
+								bcAddr: deployedContract.options.address,
+								abi: contract.abi
+							}
+						]
+					};
+
+					fs.writeFileSync(args.fo, JSON.stringify(output));
+				}
 			
 			} catch (err) {
 				console.error(err.message);
