@@ -1,7 +1,6 @@
 package cth.dvs.server
 
-import cth.dvs.server.cli.AddCommand
-import cth.dvs.server.cli.PortCommand
+import cth.dvs.server.cli.SettingsCommand
 import cth.dvs.server.gui.GUIApp
 import spark.kotlin.Http
 import spark.kotlin.ignite
@@ -9,16 +8,13 @@ import tornadofx.launch
 
 object Main {
 
-    const val DEFAULT_PORT  = 8080
+    const val DEFAULT_PORT = 8080
 
     @JvmStatic
     fun main(args: Array<String>) {
 
 
-        //PortCommand().main(args)
-
-
-        AddCommand().main(args)
+        SettingsCommand().main(args)
 
         println("Running Server on port ${SettingsBundle.PORT}")
 
@@ -28,9 +24,9 @@ object Main {
 
         DatabaseSupplier.init()
 
-        http.get("/hello") {
+        http.get("/ping") {
             makeCORS()
-            "Hello world from the server!\n"
+            "Up and running!\n"
         }
 
 
@@ -57,16 +53,16 @@ object Main {
 
         }
 
-        http.post("/api/add","application/json"){
+        http.post("/api/add", "application/json") {
             makeCORS()
 
-            val result = DatabaseSupplier.addFromJson( request.queryParams().first() ?:"")
+            val result = DatabaseSupplier.addFromJson(request.queryParams().first() ?: "")
 
             if (result) {
 
                 response.status(200)
                 return@post "Added"
-            }else{
+            } else {
                 response.status(400)
                 return@post "Invalid JSON object"
             }

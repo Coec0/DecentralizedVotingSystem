@@ -70,38 +70,9 @@ object DatabaseSupplier {
             db.createCollection(Election::class.java)
 
 
-            // Seeding the db
-
-            repeat(10) {
-                val e = Election()
-                db.insert<Election>(e.randomize())
-            }
-
-
         } catch (e: InvalidJsonDbApiUsageException) {
             // The collection is already existing
         }
-
-
-
-
-
-        try{
-            val temp = Election()
-            temp.id = "9090"
-            db.remove(temp,temp::class.java)
-        }
-        catch (e:Exception){}
-        try {
-
-
-
-            if (SettingsBundle.ELECTION.name != null)
-                db.insert<Election>(SettingsBundle.ELECTION)
-        } catch (e: Exception) {
-
-        }
-
 
     }
 

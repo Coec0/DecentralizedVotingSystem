@@ -226,7 +226,7 @@ const deploy = function() {
 
 				if(args.fo) {	// File output
 					let output = {
-						port: 8000,
+						port: 8080,
 						contracts: [
 							{
 								id: 1,

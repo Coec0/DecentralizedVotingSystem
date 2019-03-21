@@ -100,6 +100,6 @@ node src/app.js --node "$NODE" --key "$PRIVATE_KEY" --args "$CONTRACT_ARGS" --fi
 
 echo "Starting server..."
 cd ../server
-bash run.sh --settings="./../elections.json"
+bash run.sh --settings="./../../elections.json"
 
 exit
