@@ -96,7 +96,7 @@ sleep 1
 cp votingsystem/votingsystem.sol compile-deploy-smartcontract/contracts
 cd compile-deploy-smartcontract
 echo 'Deploying votingsystem.sol...'
-node src/app.js --node "$NODE" --key "$PRIVATE_KEY" --args "$CONTRACT_ARGS" --file "votingsystem" --fo="./../elections.json"
+node src/app.js --node "$NODE" --key "$PRIVATE_KEY" --args "$CONTRACT_ARGS" --file "votingsystem" --output "" --fo="./../elections.json"
 
 echo "Starting server..."
 cd ../server
