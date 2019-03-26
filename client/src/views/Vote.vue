@@ -22,20 +22,21 @@ export default {
 	},
 	methods: {
 		init() {
-			this.$http.get(`/getElection/${this.$route.params.id}`).then(result => {
+			this.$http.get(`/getElection/${this.$route.params.id}`).then(async (result) => {
 				this.name = result.data.name;
 
-				this.$store.dispatch('CREATE_WEB3', result.data.nodeAddr).then((web3) => {
-					this.$store.dispatch('CREATE_SMARTCONTRACT', { abi: result.data.abi, scAddr: result.data.bcAddr });
-					this.$store.dispatch('FETCH_CANDIDATES');
-				});
+				await this.$store.dispatch('CREATE_WEB3', result.data.nodeAddr);
+				await this.$store.dispatch('CREATE_SMARTCONTRACT', { abi: result.data.abi, scAddr: result.data.bcAddr });
+				await this.$store.dispatch('FETCH_CANDIDATES');
+
 			}).catch((err) => {
 				console.error(err);
-				this.$store.commit('ADD_NOTIFICATION', { message: 'Error', type: 'warn' })
+				this.$store.commit('ADD_NOTIFICATION', { message: err, type: 'warn' })
 			});
 		},
 		reset() {
 			this.name = null;
+			this.$store.dispatch('RESET_VOTE');
 		}
 	},
 	watch: {

@@ -12,7 +12,9 @@ export default new Vuex.Store({
 	state,
 	mutations: {
 		ADD_NOTIFICATION(state, notification) {
-			state.notifications.push(notification);
+			if (!state.notifications.some(n => n.message === notification.message)) {
+				state.notifications.push(notification);
+			}
 		},
 		CLEAR_NOTIFICATIONS(state) {
 			state.notifications = [];
@@ -30,8 +32,8 @@ export default new Vuex.Store({
 			console.log('SmartContract instance set');
 		},
 		SET_CANDIDATES(state, candidates) {
-			console.log(`Candidates set (${candidates.map(c => ' ' + c.name)})`);
 			state.candidates = candidates;
+			console.log(`Candidates set (${candidates.map(c => ' ' + c.name)})`);
 		},
 		SET_PRIVATEKEY(state, key) {
 			state.privateKey = key;
@@ -40,6 +42,8 @@ export default new Vuex.Store({
 	actions: {
 		CREATE_WEB3({ commit, state }, node) {
 			return new Promise(async (resolve, reject) => {
+				if (!node) return reject('Tried CREATE_WEB3 without node passed as parameter');
+
 				try {
 					let instance = new Web3(node);
 					commit('SET_WEB3', instance);
@@ -107,7 +111,7 @@ export default new Vuex.Store({
 				resolve();
 			});
 		},
-		CLEAR_VOTE({ commit, state }) {
+		RESET_VOTE({ commit, state }) {
 			commit('SET_CANDIDATES', []);
 			commit('SET_PRIVATEKEY', null);
 			commit('SET_WEB3', null);
