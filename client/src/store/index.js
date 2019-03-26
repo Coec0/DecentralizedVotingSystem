@@ -36,7 +36,10 @@ export default new Vuex.Store({
 			console.log(`Candidates set (${candidates.map(c => ' ' + c.name)})`);
 		},
 		SET_PRIVATEKEY(state, key) {
-			state.privateKey = key;
+			state.privatekey = key;
+		},
+		SET_PASSWORD(state, pw) {
+			state.password = pw;
 		}
 	},
 	actions: {

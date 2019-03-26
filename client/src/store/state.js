@@ -1,7 +1,8 @@
 let state = {
 	notifications: [],
 	candidates: [],
-	privateKey: null,
+	privatekey: null,
+	password: null,
 	web3: null,
 	smartcontract: null
 }
