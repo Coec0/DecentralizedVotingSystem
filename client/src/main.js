@@ -25,6 +25,12 @@ Vue.prototype.$http = axios.create({
 
 Vue.config.productionTip = false;
 
+// Ensure we checked auth before each page load.
+router.beforeEach((to, from, next) => {
+	store.commit('CLEAR_NOTIFICATIONS');
+	next();
+});
+
 new Vue({	// Alla saker som vi ger in här agerar som plugins i vår Vue app. Dessa plugins ändrar hur Vue fungerar
 	router,	// Lägg till router-plugin. Detta gör att vi kan gå mellan olika sidor utan att behöva ladda om bland annat
 	store,	// Lägg till store-plugin. Denna plugin gör att vi kan ha en gemensam state i hela vår app. Man skulle kunna säga att store blir som ett globalt objekt.
