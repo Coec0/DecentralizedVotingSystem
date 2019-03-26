@@ -42,6 +42,9 @@ export default {
 	},
 	mounted() {
 		this.init();
+
+		// For debugging
+		window.results = () => this.$store.dispatch('PRINT_RESULTS');
 	},
 	methods: {
 		async pkSubmit() {

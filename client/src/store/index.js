@@ -119,6 +119,38 @@ export default new Vuex.Store({
 			commit('SET_PRIVATEKEY', null);
 			commit('SET_WEB3', null);
 			commit('SET_SMARTCONTRACT', null);	
+		},
+		async PRINT_RESULTS({ commit, state }) {
+			// Error checking
+			if (!state.web3) return reject('Tried PRINT_RESULTS without web3 set');
+			if (!state.smartcontract) return reject('Tried PRINT_RESULTS without smartcontract set');
+			const candidates = [];
+			let totalVotes = 0;
+
+			try {
+				const candidateCount = await state.smartcontract.methods.candidateCount().call();
+
+				for (var i = 0; i < candidateCount; i++) {
+					const candidate = await state.smartcontract.methods.allCandidates(i).call();
+					let votecount = parseInt(candidate.votecount, 10);
+
+					totalVotes += votecount;
+
+					candidates.push({
+						votecount,
+						name: state.web3.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name))
+					});
+				}
+			} catch (err) {
+				console.error(err);
+			}
+
+			console.log('Results:');
+			console.log('--------------------------------------------------');
+			candidates.forEach(candidate => {
+				console.log(`${candidate.name} - ${candidate.votecount} (${(candidate.votecount/totalVotes).toFixed(3)})`);
+			});
+			console.log('--------------------------------------------------');
 		}
 	}
 });
