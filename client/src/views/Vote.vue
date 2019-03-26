@@ -84,9 +84,11 @@ export default {
 				this.state.privatekey = true;
 			}
 		},
-		async selectSubmit() {
-			console.log('Vote::selectSubmit')
-			// Todo
+		async selectSubmit(selection) {
+			// Error checking
+			if (!selection) return console.error('selection is not valid');
+
+			await this.$store.dispatch('SUBMIT_VOTE', selection);
 		},
 		init() {
 			// Fetch info about vote

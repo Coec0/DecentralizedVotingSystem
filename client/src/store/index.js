@@ -122,8 +122,8 @@ export default new Vuex.Store({
 		},
 		async PRINT_RESULTS({ commit, state }) {
 			// Error checking
-			if (!state.web3) return reject('Tried PRINT_RESULTS without web3 set');
-			if (!state.smartcontract) return reject('Tried PRINT_RESULTS without smartcontract set');
+			if (!state.web3) return console.error('Tried PRINT_RESULTS without web3 set');
+			if (!state.smartcontract) return console.error('Tried PRINT_RESULTS without smartcontract set');
 			const candidates = [];
 			let totalVotes = 0;
 
@@ -148,9 +148,20 @@ export default new Vuex.Store({
 			console.log('Results:');
 			console.log('--------------------------------------------------');
 			candidates.forEach(candidate => {
-				console.log(`${candidate.name} - ${candidate.votecount} (${(candidate.votecount/totalVotes).toFixed(3)})`);
+				console.log(`${candidate.name} - ${candidate.votecount} (${((candidate.votecount/totalVotes)*100).toFixed(2)}%)`);
 			});
 			console.log('--------------------------------------------------');
+		},
+		SUBMIT_VOTE({ commit, state }, selection) {
+			return new Promise(async (resolve, reject) => {
+				if (!state.web3) return reject('Tried SUBMIT_VOTE without web3 set');
+				if (!state.smartcontract) return reject('Tried SUBMIT_VOTE without smartcontract set');
+
+				state.smartcontract.methods.vote(selection).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address }).then(success => {
+					console.log('Vote placed');
+					resolve();
+				}).catch(reject);
+			});
 		}
 	}
 });
