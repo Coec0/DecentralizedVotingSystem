@@ -11,7 +11,7 @@ import utils from '../utils/utils.js';
 const Web3 = require('web3');
 
 export default {
-	name: 'vote',
+	name: 'Vote',
 	data() {
 		return {
 			name: null
