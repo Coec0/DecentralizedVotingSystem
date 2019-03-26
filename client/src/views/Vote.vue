@@ -1,50 +1,20 @@
 <template>
-	<div class="container vote white">
-		<NetworkType></NetworkType>
+	<div class="container vote">
 		<h1 class="text-center">{{ name }}</h1>
-		<div class="content row">
-			<div class="container">
-				<VotePanel v-bind:candidates="candidates"></VotePanel>
-			</div>
-			<div class="container">
-				<ResultPanel v-bind:results="results"></ResultPanel>
-			</div>
-			<div class="container">
-				<InfoPanel v-bind:id="id" v-bind:name="name" v-bind:bc="node" v-bind:sc="smartcontract" v-bind:abi="abi"></InfoPanel>
-			</div>
-		</div>
+
 	</div>
 </template>
 
 <script>
 // @ is an alias to /src
-import NetworkType from '@/components/Vote/NetworkType.vue';
-import VotePanel from '@/components/Vote/VotePanel.vue';
-import ResultPanel from '@/components/Vote/ResultPanel.vue';
-import InfoPanel from '@/components/Vote/InfoPanel.vue';
 import utils from '../utils/utils.js';
 const Web3 = require('web3');
 
 export default {
 	name: 'vote',
-	components: {
-		NetworkType,
-		VotePanel,
-		ResultPanel,
-		InfoPanel
-	},
 	data() {
 		return {
-			id: null,
-			name: null,
-			node: null,
-			smartcontract: null,
-			abi: null,
-			candidates: [],
-			results: [],
-			dev: {
-				log: []
-			}
+			name: null
 		};
 	},
 	mounted() {
@@ -52,75 +22,20 @@ export default {
 	},
 	methods: {
 		init() {
-			this.$store.dispatch('FETCH_CANDIDATES');
-			this.fetchData().then(() => {	// .then() tar in en funktion som körs när this.fetchData() har kört klart.
-				this.connectToNode();
-				this.setContract();
-				this.fetchCandidates();
-			}).catch(err => {				// .catch() tar in en funktion som körs när this.fetchData() har kört klart men det blev ett fel.
+			this.$http.get(`/getElection/${this.$route.params.id}`).then(result => {
+				this.name = result.data.name;
+
+				this.$store.dispatch('CREATE_WEB3', result.data.nodeAddr).then((web3) => {
+					this.$store.dispatch('CREATE_SMARTCONTRACT', { abi: result.data.abi, scAddr: result.data.bcAddr });
+					this.$store.dispatch('FETCH_CANDIDATES');
+				});
+			}).catch((err) => {
 				console.error(err);
-				this.$store.commit('ADD_NOTIFICATION', { message: err.message, type: 'warn' });
-			});	
-		},
-		reset() {
-			this.id = null;
-			this.name = null;
-			this.node = null;
-			this.smartcontract = null;
-			this.abi = null;
-			this.candidates = [];
-			this.results = [];
-		},
-		fetchData() {
-			return new Promise((resolve, reject) => {		// Promises är det som gör att vi kan köra .then() och .catch(). resolve() -> .then() körs. reject() -> .catch() körs
-				this.$http.get(`/getElection/${this.$route.params.id}`).then(result => {
-					this.id = result.data.id;
-					this.name = result.data.name;
-					this.node = 'ws://localhost:7545';
-					this.smartcontract = result.data.bcAddr;
-					this.abi = result.data.abi;
-					resolve();
-				}).catch((err) => reject(err));
+				this.$store.commit('ADD_NOTIFICATION', { message: 'Error', type: 'warn' })
 			});
 		},
-		connectToNode() {
-			try {
-				let web3Instance = new Web3(this.node);
-				this.$store.commit('SET_WEB3_INSTANCE', web3Instance);
-			} catch (err) {
-				console.log(err);
-				this.$store.commit('SET_WEB3_INSTANCE', null);
-			}
-		},
-		setContract() {
-			try {
-				let parsedABI = JSON.parse(this.abi);
-				let contractInstance = this.$store.state.vote.web3.eth.Contract(parsedABI, this.smartcontract);
-				this.$store.commit('SET_SMARTCONTRACT_INSTANCE', contractInstance);
-				window.sc = contractInstance;
-			} catch (err) {
-				console.log(err);
-				this.$store.commit('SET_SMARTCONTRACT_INSTANCE', null);
-			}
-		},
-		fetchCandidates() {
-			this.$store.state.vote.smartcontract.methods.candidateCount().call().then(count => {
-				for (var i = 0; i < count; i++) {
-					this.$store.state.vote.smartcontract.methods.allCandidates(i).call().then(candidate => {
-						let name = this.$store.state.vote.web3.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name));
-						this.candidates.push({
-							id: candidate.id,
-							name: name,
-							votecount: parseInt(candidate.votecount)
-						});
-
-						this.results.push({
-							name: name,
-							y: parseInt(candidate.votecount)
-						})
-					});
-				}
-			}).catch(console.error);
+		reset() {
+			this.name = null;
 		}
 	},
 	watch: {
@@ -144,7 +59,7 @@ export default {
 }
 
 h1 {
-	font-size: 3rem;
+	font-size: 5rem;
 	margin-top: 2em;
 	margin-bottom: 2em;
 }

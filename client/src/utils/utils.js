@@ -6,6 +6,15 @@ class Utils {
 
 		return str;
 	}
+
+	// Makes the user wait X ms before continuing (if using await)
+	sleep(ms) {
+		return new Promise(resolve => {
+			setTimeout(() => {
+				resolve();
+			}, ms);
+		});
+	}
 }
 
 export default new Utils();
