@@ -10,6 +10,8 @@
 
 -- OUTPUT: one line representing the result of (x,y)^n 
 
+
+module EllipticAlgebra (Point (..), Curve, pointMul, pointAdd, getOrderOfGenerator,isPointOnCurve) where
 import Data.List
 import Data.Bits
 
@@ -28,6 +30,8 @@ instance Show Point where
     show (Coord x y) = "("++ show x ++","++ show y ++")"
     show Identity  = "Identity"
 
+isPointOnCurve :: Curve -> Point -> Bool
+isPointOnCurve c p = p `elem` findPtsOnCurve c
 
 -- Used to check the integer solutions for y^2 = x^3 + a*x + b (mod p)
 findSolutionsonX :: Integer -> Curve -> [Point]
@@ -49,6 +53,9 @@ isInverse _ Identity _ = False
 isInverse _ _ Identity = False
 isInverse (a,b,p) (Coord x1 y1) (Coord x2 y2) | x1 /= x2 = False
                                               | otherwise = y2 == ((-y1) `mod` p)
+
+
+
 
 -- Given two points and a curve, returns the result of P+Q
 pointAdd :: Curve -> Point -> Point -> Point
