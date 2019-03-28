@@ -214,7 +214,7 @@ const deploy = function() {
 				})
 				.send({
 					from: account.address,
-					gas: '2000000'
+					gas: '6721975'
 				});
 
 				if(args.debug) {
