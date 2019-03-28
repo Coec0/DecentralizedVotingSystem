@@ -1,46 +1,30 @@
 <template>
-  <div class="home">
-  	<Navigation></Navigation>
-  	<div class="content">
-  		<DataBox v-for="box in boxes" v-bind:title="box.title" v-bind:value="box.value" />
-  	</div>
-  </div>
+	<div class="home white">
+	 	<div class="container">
+	 		<div id="title">
+		 		Decentralized Voting System
+		 	</div>
+	 	</div>
+	 	<div class="container">
+	 		<div id="title">
+		 		Step by step guide
+		 	</div>
+	 	</div>
+	</div>
 </template>
 
 <script>
-// @ is an alias to /src
-import DataBox from "@/components/DataBox.vue";
-import Navigation from "@/components/Navigation/Navigation.vue";
-const Web3 = require('web3');
-const web3 = new Web3(Web3.givenProvider);
-
 export default {
-  name: "home",
-  components: {
-    DataBox,
-    Navigation
-  },
-  data () {
-  	return {
-  		boxes: [
-  		{ title: "Network Type", value: null },
-  		{ title: "", value: null },
-  		{ title: "", value: null },
-  		{ title: "", value: null },
-  		{ title: "", value: null },
-  		{ title: "", value: null }]
-  	}
-  },
-  created () {
-  	this.fetchData();
-  },
-  methods: {
-  	fetchData() {
-  		web3.eth.net.getNetworkType().then(type => {
-  			this.boxes[0].value = type;
-  		});
-  	}
-  }
+	name: 'Home',
+	data() {
+		return {};
+	},
+	created() {
+		this.fetchData();
+	},
+	methods: {
+		fetchData() {}
+	}
 };
 </script>
 
@@ -48,11 +32,10 @@ export default {
 .home {
 	width: 100%;
 }
-.content {
-	display: flex;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	margin-left: 10%;
-	margin-right: 10%;
+
+#title {
+	font-size: 32px;
+	text-align: center;
+	height: 15em;
 }
 </style>
