@@ -1,3 +1,5 @@
+const Web3 = require('web3');
+
 class Utils {
 	removeTrailingZeroes(str) {
 		while(str.charAt(str.length - 1) === '0') {
@@ -30,46 +32,37 @@ class Utils {
 		return balance > 0;
 	}
 
-	// Decrypts using One Time Pad and password padding
-	decryptPK(pk, pw) {
-		console.warn('THIS METHOD HASN\'T IMPLEMENTED YET');
+	// Decrypts using XOR and password padding
+	decryptPK(privatekey, password) {
+		// Error checking
+		if (!privatekey) throw new Error('privatekey is not given!');
+		if (!password) throw new Error('password is not given!');
 
-		// This is where the actual decryption happens
-		const decrypt = function decrypt(pk, pw) {
-			console.log(`utils::decrypt Decrypting ${pk} with password ${pw}`);
+		// Remove '0x' because we can't have it when doing bitwise operations
+		const pk = privatekey.replace('0x', '');
+		// Do keccak-256 on password
+		const pwHash = Web3.utils.sha3(password).replace('0x', '');
 
-			return null;
+		// Create buffers so we can do bitwise operation
+		let pkBuffer = Buffer.from(pk, '');
+		let pwBuffer = Buffer.from(pwHash, 'hex');
+		
+
+		// More error checking
+		if (pkBuffer.length !== 32) throw new Error(`pkBuffer length is ${pkBuffer.length} (should be 32)`);
+		if (pwBuffer.length !== 32) throw new Error(`pwBuffer length is ${pwBuffer.length} (should be 32)`);
+
+		// Create buffer where we store result
+		let resultBuffer = new Buffer.alloc(32);
+
+		// Where the magic happens
+		for (var i = 0; i < 32; i++) {
+			resultBuffer[i] = pwBuffer[i] ^ pkBuffer[i];
 		}
 
-
-		// Do password padding if neccessary
-		const pkLength = pk.length;
-		const pwLength = pw.length;
-
-		if (pkLength > pwLength) {
-			// Do password padding
-			// Repeat password until it is same length as pk
-			let paddedPW = pw;
-			let fills = Math.floor(pkLength / paddedPW.length);
-
-			for (let i = 0; i < fills - 1; i++) {
-				paddedPW += pw;
-			}
-
-			let diff = pk.length - paddedPW.length;
-
-			paddedPW += pw.slice(0, diff);
-
-			return decrypt(pk, paddedPW);
-		} else if (pkLength < pwLength) {
-			// Slice password
-			let slicedPW = pw.slice(0, pkLength);
-
-			return decrypt(pk, slicedPW);
-		} else {
-			// Same length, just decrypt
-			return decrypt(pk, pw);
-		}
+		console.log('pwBuffer: ' + pwBuffer);
+		console.log('pkBuffer: ' + pkBuffer);
+		console.log('resultBuffer: ' + resultBuffer);
 	}
 }
 

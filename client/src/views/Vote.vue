@@ -23,6 +23,8 @@ import Selection from '@/components/Vote/Selection.vue';
 import Spinner from '@/components/Spinner.vue';
 import utils from '../utils/utils.js';
 
+window.decrypt = utils.decryptPK;
+
 // Keep a constant for initialstate so it's easier to go back when we reset
 const initialState = {
 	showSpinner: false,
