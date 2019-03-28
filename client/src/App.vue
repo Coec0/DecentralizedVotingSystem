@@ -89,7 +89,7 @@ export default {
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
 	background-color: #fafafa;
-	min-height: 900px;
+	min-height: 100vh;
 }
 
 .white {
