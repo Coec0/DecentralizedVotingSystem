@@ -118,15 +118,20 @@ export default new Vuex.Store({
 		},
 		SUBMIT_VOTE({ commit, state }, selection) {
 			throw new Error('SUBMIT_VOTE not implemented');
-			// return new Promise(async (resolve, reject) => {
-			// 	if (!state.web3) return reject('Tried SUBMIT_VOTE without web3 set');
-			// 	if (!state.smartcontract) return reject('Tried SUBMIT_VOTE without smartcontract set');
 
-			// 	state.smartcontract.methods.vote(selection).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address }).then(success => {
-			// 		console.log('Vote placed');
-			// 		resolve();
-			// 	}).catch(reject);
-			// });
+			return new Promise(async (resolve, reject) => {
+				if (!state.web3) return reject('Tried SUBMIT_VOTE without web3 set');
+				if (!state.smartcontract) return reject('Tried SUBMIT_VOTE without smartcontract set');
+
+				const pubkey = await state.smartcontract.methods.getPublicKey().call();
+
+				// Encryption will happen here
+
+				state.smartcontract.methods.vote(/* ENCRYPTED DATA */).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address }).then(success => {
+					console.log('Vote placed');
+					resolve();
+				}).catch(reject);
+			});
 		}
 	}
 });
