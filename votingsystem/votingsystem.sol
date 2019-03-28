@@ -23,14 +23,22 @@ contract VotingSystem {
     mapping(address => uint) public votedForPos;
     
     uint private blockStopNumber; //when the block.number reaches this stop the voting
+    uint private blockStartNumber;
     mapping(uint => uint) public idToIndexMap; //Gets the position of the candidate in allCandidates
+    mapping(address => bool) private adminMap;
     //bool enableWhitelist = false; //Disable the whitlist (röstlängd) until someone is added to it
     Record private record;
     
-    constructor(bytes32[] memory candidates, uint blockamount, address store) public{ //blockamount = amount of blocks
-
+    constructor(bytes32[] memory candidates, uint blocksUntilStart, uint blocksUntilEnd, address voterecordAddress, address[] memory admins) public{ //blockamount = amount of blocks
+        
+        for(uint i = 0; i < admins.length; i++){
+            adminMap[admins[i]] = true;
+        }
+        
         //Sets the block number where to voting will stop
-        blockStopNumber = blockamount + block.number;
+        blockStopNumber = blocksUntilEnd + block.number;
+        blockStartNumber = blocksUntilStart + block.number;
+
 
         //Add BlankVote
         addCandidate(0x426c616e6b566f74650000000000000000000000000000000000000000000000);
@@ -40,7 +48,8 @@ contract VotingSystem {
             addCandidate(candidates[i]);
         }
         
-        record = Record(store);
+        record = Record(voterecordAddress);
+        
         
     }
 
@@ -50,8 +59,9 @@ contract VotingSystem {
     }
     
     //Creates a candidate from the name of the candidate and adds it to allCandidates[].
-    function addCandidate(bytes32 candidate) private{
-        require(isVotingOpen(), "Voting is closed!");
+    function addCandidate(bytes32 candidate) public{
+        require(adminMap[msg.sender], "You are not admin");
+        require(!isVotingOpen(), "Voting is closed!");
         require(candidate != NOT_INSTANTIATED, "A candidate may not have 0x00.. as name");
         uint hash = uint( keccak256(abi.encodePacked(candidate,allCandidates.length)));
         
@@ -70,11 +80,11 @@ contract VotingSystem {
 
     //Checks if the voting is open
     function isVotingOpen () public view returns (bool){
-        return !(blocksLeft() <= 0);
+        return block.number <= blockStopNumber && block.number >= blockStartNumber;
     }
 
     //Checks if a candidate exists
-    function doesCandidateExist (uint id) private view returns (bool){
+    function doesCandidateExist (uint id) public view returns (bool){
         return allCandidates[idToIndexMap[id]].id == id;
     }
 
