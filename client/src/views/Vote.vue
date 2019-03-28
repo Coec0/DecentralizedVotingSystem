@@ -8,7 +8,10 @@
 			<private-key v-if="loaded && state.privatekey" :submit="pkSubmit"></private-key>
 			<password v-if="loaded && state.password" :submit="pwSubmit"></password>
 			<selection  v-if="loaded && state.selection" :submit="selectSubmit"></selection>
-		</transition>		
+
+			<!-- Spinners -->
+			<spinner v-if="state.showSpinner && state.spinnerText" v-bind:text="state.spinnerText"></spinner>
+		</transition>
 	</div>
 </template>
 
@@ -17,10 +20,13 @@
 import PrivateKey from '@/components/Vote/PrivateKey.vue';
 import Password from '@/components/Vote/Password.vue';
 import Selection from '@/components/Vote/Selection.vue';
+import Spinner from '@/components/Spinner.vue';
 import utils from '../utils/utils.js';
 
 // Keep a constant for initialstate so it's easier to go back when we reset
 const initialState = {
+	showSpinner: false,
+	spinnerText: null,
 	privatekey: true,
 	password: false,
 	selection: false
@@ -29,6 +35,7 @@ const initialState = {
 export default {
 	name: 'Vote',
 	components: {
+		'spinner': Spinner,
 		'private-key': PrivateKey,
 		'password': Password,
 		'selection': Selection
@@ -48,20 +55,37 @@ export default {
 	},
 	methods: {
 		async pkSubmit() {
+			// Set the state to loading
+			this.state.privatekey = false;
+			this.state.showSpinner = true;
+			this.state.spinnerText = 'Hämtar wallet';
+
 			// Check if valid key
 			const validKey = await utils.isValidPK(this.$store.state.web3, this.$store.state.privatekey);
 
-			// Add sleep so that it seemes we are working hard to solve problem
-			await utils.sleep(1000);
+			// Sleep so user can follow along
+			await utils.sleep(2000);
 
 			if (validKey) {
 				// If yes, go to selection phase
+
+				// Add sleep so that it seemes we are working hard to solve problem
+				this.state.spinnerText = 'Wallet hittades!';
+				await utils.sleep(1000);
+
 				console.log('Valid key')
+				this.state.showSpinner = false;
 				this.state.privatekey = false;
 				this.state.selection = true;
 			} else {
 				// If no, go to password phase
+
+				// Add sleep so that it seemes we are working hard to solve problem
+				this.state.spinnerText = 'Wallet hittades ej';
+				await utils.sleep(1000);
+
 				console.log('Invalid key')
+				this.state.showSpinner = false;
 				this.state.privatekey = false;
 				this.state.password = true;
 			}
@@ -88,7 +112,21 @@ export default {
 			// Error checking
 			if (!selection) return console.error('selection is not valid');
 
-			await this.$store.dispatch('SUBMIT_VOTE', selection);
+			this.state.selection = false;
+			this.state.spinnerText = 'Lägger röst';
+			this.state.showSpinner = true;
+			await utils.sleep(2000);
+
+			try {
+				await this.$store.dispatch('SUBMIT_VOTE', selection);
+				this.state.spinnerText = 'Röst lagd';
+			} catch (error) {
+				console.error(error);
+				this.state.spinnerText = 'Fel uppstod, se konsol';
+			} finally {
+				await utils.sleep(2000);
+				this.state.showSpinner = false;
+			}
 		},
 		init() {
 			// Fetch info about vote
