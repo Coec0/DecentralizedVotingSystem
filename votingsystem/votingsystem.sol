@@ -21,8 +21,6 @@ contract VotingSystem {
     
     uint[][] public votedfor; //Who is voted for in with 'one' an 'zeroes'
     mapping(address => uint) public votedForPos;
-    mapping(address => uint) public controlDigit;
-    
     
     uint private blockStopNumber; //when the block.number reaches this stop the voting
     mapping(uint => uint) public idToIndexMap; //Gets the position of the candidate in allCandidates

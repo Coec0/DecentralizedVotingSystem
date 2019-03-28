@@ -5,20 +5,26 @@ contract VoterRecord {
     address public owner;
     
     mapping(address => bool) public whitelist; //The accounts that are allowed to vote
-
-    constructor() public {        
-    }
+    mapping(address => bool) private adminMap;
     
     bool private isWhitelistEnabled;
     
+    constructor(address[] memory admins) public{
+        for(uint i = 0; i < admins.length; i++){
+            adminMap[admins[i]] = true;
+        }
+    }
+
     //Adds a voter to the whitelist (röstlängd), allowing it to vote.
     //If no voter is added, the whitelist is disabled
     function addVoterToWhitelist(address adr) public {
+        require(adminMap[msg.sender], "You are not admin");
         whitelist[adr] = true;
     }
     
     //Removes a voter from the whitelist(röstlängd), disallowing it to vote
     function removeVoterFromWhitelist(address adr) public{
+        require(adminMap[msg.sender], "You are not admin");
         whitelist[adr]= false;
     }
     
@@ -30,10 +36,12 @@ contract VoterRecord {
     }
     
     function enableWhitelist () public {
+        require(adminMap[msg.sender], "You are not admin");
         isWhitelistEnabled = true;
     }
     
     function disableWhitelist () public {
+        require(adminMap[msg.sender], "You are not admin");
         isWhitelistEnabled = false;
     }
 }
