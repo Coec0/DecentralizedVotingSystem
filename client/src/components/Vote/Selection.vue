@@ -2,6 +2,7 @@
 	<div class="container d-flex flex-column">
 		<h3>Select a candidate</h3>
 		<select v-model="selected">
+			<option value="0" selected disabled>Gör ett val</option>
 			<option v-for="candidate in candidates" v-bind:key="candidate.id" :value="candidate.id">{{ candidate.name }}</option>
 		</select>
 		<button v-on:click="submit(selected)">Submit</button>
@@ -16,7 +17,7 @@ export default {
 	},
 	data() {
 		return {
-			selected: null
+			selected: '0'
 		}
 	},
 	computed: {
