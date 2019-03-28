@@ -5,7 +5,7 @@ set -e
 PORT="7545"
 NODE="ws://localhost:$PORT"
 PRIVATE_KEY="0xed75458862753c6cb536343a4e7d9cb3e3fffc5d0069720e0489c7cb27bafb9e"
-CANDIDATES='["Reinfeldt", "någon annan"]'
+CANDIDATES='["Latiif", "Sarah", "Kevin", "Eric", "Zack", "Oscar"]'
 BLOCKAMOUNT="120"
 
 PLATFORM=""
