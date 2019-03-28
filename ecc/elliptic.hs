@@ -11,7 +11,7 @@
 -- OUTPUT: one line representing the result of (x,y)^n 
 
 
-module EllipticAlgebra (Point (..), Curve, pointMul, pointAdd, getOrderOfGenerator,isPointOnCurve) where
+module EllipticAlgebra (Point (..), Curve,getGenerators, pointMul, pointAdd, getOrderOfGenerator,isPointOnCurve) where
 import Data.List
 import Data.Bits
 
@@ -101,6 +101,13 @@ modExp b 0 m = 1
 modExp b e m = t * modExp ((b * b) `mod` m) (shiftR e 1) m `mod` m
     where t = if testBit e 0 then b `mod` m else 1
 
+-- generate possible generators
+getGenerators :: Curve -> [Point]
+getGenerators c = filter (\p -> isPrime $ getOrderOfGenerator c p) allPoints
+    where 
+        allPoints = findPtsOnCurve c
+
+isPrime k = null [ x | x <- [2..k - 1], k `mod` x == 0]
 -- The main program
 main :: IO ()    
 main = do

@@ -1,3 +1,5 @@
+module Elgamal where
+
 import EllipticAlgebra
 import System.Random
 import Data.Maybe
@@ -6,30 +8,32 @@ import Data.Binary.Get
 import qualified Data.ByteString.Lazy as B
  
 
-type EncryptionInfo = (Curve,Point)
-type Secret = (EncryptionInfo, Integer)
+--                  G    ord(g)  g     beta=d.g
+type PublicKey = (Curve,Integer,Point,Point)
 
-
-buildElgamal :: Curve -> Point -> Maybe EncryptionInfo
-buildElgamal c g = if isPointOnCurve c g && isPrime (getOrderOfGenerator c g) then Just (c,g) else Nothing
-
-
-
-
-generateSecret :: EncryptionInfo -> Integer -> Secret
-generateSecret info@(c@(a,b,p),g) d = (info, d `mod` p)
+--                d
+type SecretKey = Integer
 
 
 
-isPrime k = null [ x | x <- [2..k - 1], k `mod` x == 0]
+generateKeys :: Curve -> Integer -> (PublicKey,SecretKey)
+generateKeys c@(a,b,p) seed = (pk,d)
+    where 
+        pk :: PublicKey
+        lstOfG = (getGenerators c)
+        g = lstOfG <> (seed `mod` (sizeOf lstOfG))
+        d = (seed `mod` p) :: Integer
+        pk = (c,fromIntegral $ getOrderOfGenerator c g,g,pointMul c g d)
 
-main :: IO
-main = do
-  d <- randomGen getStdGen 17
-  putStrLn("Private key: " ++ show(d))
+
+(<>) :: [a] -> Integer -> a
+(<>) [] _ = error "Empty list"
+(<>) (x:_) 0 = x
+(<>) (_:xs) n = xs <> (n-1)
+
+sizeOf :: [a] -> Integer
+sizeOf [] = 0
+sizeOf (x:xs) = 1 + sizeOf(xs)
 
 
-randomGen :: StdGen -> (Int,Int)
-randomGen gen ord = i
-  where
-    (i,g0) = randomR (1,ord-1) gen
+
