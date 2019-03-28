@@ -1,5 +1,4 @@
 import EllipticAlgebra
-
 import System.Random
 import Data.Maybe
 import System.Entropy
@@ -23,3 +22,14 @@ generateSecret info@(c@(a,b,p),g) d = (info, d `mod` p)
 
 
 isPrime k = null [ x | x <- [2..k - 1], k `mod` x == 0]
+
+main :: IO
+main = do
+  d <- randomGen getStdGen 17
+  putStrLn("Private key: " ++ show(d))
+
+
+randomGen :: StdGen -> (Int,Int)
+randomGen gen ord = i
+  where
+    (i,g0) = randomR (1,ord-1) gen
