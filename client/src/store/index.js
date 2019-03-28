@@ -23,10 +23,6 @@ export default new Vuex.Store({
 			state.web3 = instance;
 			console.log('Web3 instance set');
 		},
-		SET_WEB3_DEFAULT_ACCOUNT(state, account) {
-			// console.log('Web3 default account set');
-			// state.web3.eth.defaultAccount = account;
-		},
 		SET_SMARTCONTRACT(state, instance) {
 			state.smartcontract = instance;
 			console.log('SmartContract instance set');
@@ -120,48 +116,17 @@ export default new Vuex.Store({
 			commit('SET_WEB3', null);
 			commit('SET_SMARTCONTRACT', null);	
 		},
-		async PRINT_RESULTS({ commit, state }) {
-			// Error checking
-			if (!state.web3) return console.error('Tried PRINT_RESULTS without web3 set');
-			if (!state.smartcontract) return console.error('Tried PRINT_RESULTS without smartcontract set');
-			const candidates = [];
-			let totalVotes = 0;
-
-			try {
-				const candidateCount = await state.smartcontract.methods.candidateCount().call();
-
-				for (var i = 0; i < candidateCount; i++) {
-					const candidate = await state.smartcontract.methods.allCandidates(i).call();
-					let votecount = parseInt(candidate.votecount, 10);
-
-					totalVotes += votecount;
-
-					candidates.push({
-						votecount,
-						name: state.web3.utils.hexToAscii(utils.removeTrailingZeroes(candidate.name))
-					});
-				}
-			} catch (err) {
-				console.error(err);
-			}
-
-			console.log('Results:');
-			console.log('--------------------------------------------------');
-			candidates.forEach(candidate => {
-				console.log(`${candidate.name} - ${candidate.votecount} (${((candidate.votecount/totalVotes)*100).toFixed(2)}%)`);
-			});
-			console.log('--------------------------------------------------');
-		},
 		SUBMIT_VOTE({ commit, state }, selection) {
-			return new Promise(async (resolve, reject) => {
-				if (!state.web3) return reject('Tried SUBMIT_VOTE without web3 set');
-				if (!state.smartcontract) return reject('Tried SUBMIT_VOTE without smartcontract set');
+			throw new Error('SUBMIT_VOTE not implemented');
+			// return new Promise(async (resolve, reject) => {
+			// 	if (!state.web3) return reject('Tried SUBMIT_VOTE without web3 set');
+			// 	if (!state.smartcontract) return reject('Tried SUBMIT_VOTE without smartcontract set');
 
-				state.smartcontract.methods.vote(selection).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address }).then(success => {
-					console.log('Vote placed');
-					resolve();
-				}).catch(reject);
-			});
+			// 	state.smartcontract.methods.vote(selection).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address }).then(success => {
+			// 		console.log('Vote placed');
+			// 		resolve();
+			// 	}).catch(reject);
+			// });
 		}
 	}
 });
