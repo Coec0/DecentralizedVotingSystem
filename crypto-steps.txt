@@ -1,0 +1,15 @@
+Filen innehåller steg för steg beskrivningar för kryptering/avkryptering de olika krypteringsalgoritmer vi använder oss av.
+
+Algoritm för wallet och dess private key:
+Kryptering:	
+	1. Få en hash genom att köra SHA-256 på lösenordet angivet av användare
+	2. Få ny nyckel genom bitwise-XOR mellan hashen och den privata nyckeln för walleten
+	3. Skriv ut denna nya nyckel till användare
+
+Dekryptering:
+	1. Få nyckel och lösenord av användare
+	2. Få en hash genom att köra SHA-256 på lösenordet
+	3. Få privat nyckel genom bitwise-XOR mellan hashen och nyckeln
+	4. Kolla om ny privat nyckel leder till en giltig wallet
+
+Lite info om nycklar i ethereum: https://ethereum.stackexchange.com/questions/3542/how-are-ethereum-addresses-generated
