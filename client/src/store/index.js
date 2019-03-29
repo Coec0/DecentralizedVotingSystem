@@ -37,7 +37,7 @@ export default new Vuex.Store({
 		},
 		SET_CANDIDATES(state, candidates) {
 			state.candidates = candidates;
-			if (instance) {
+			if (candidates.length) {
 				console.log(`Candidates set (${candidates.map(c => c.name).join(', ')})`);
 			} else {
 				console.log('Candidates removed');
