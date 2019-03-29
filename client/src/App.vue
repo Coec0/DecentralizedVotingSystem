@@ -68,7 +68,7 @@ export default {
 		// Hämta vilken elections som finns och lägg dem i vår 'votes' variabel som skapades i data()-metoden.
 		this.$http.get('/getElections').then(result => {
 			this.votes = result.data;
-		});
+		}).catch(console.error);
 
 		// Kolla om Web3 hittar MetaMask
 		if (Web3.givenProvider) {
