@@ -8,7 +8,8 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '@babel/polyfill'
 
-Vue.use(BootstrapVue);	// Lägg till stöd för bootstrap i vår app.
+// Lägg till stöd för bootstrap i vår app
+Vue.use(BootstrapVue);
 
 // Add axios to Vue instance
 Vue.prototype.$http = axios.create({
@@ -18,7 +19,7 @@ Vue.prototype.$http = axios.create({
 
 Vue.config.productionTip = false;
 
-// Ensure we clear notifications before each page load.
+// Clear notifications before each page load.
 router.beforeEach((to, from, next) => {
 	store.commit('CLEAR_NOTIFICATIONS');
 	next();

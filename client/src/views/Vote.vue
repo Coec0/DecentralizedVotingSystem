@@ -140,9 +140,7 @@ export default {
 
 				// Show components
 				this.loaded = true;
-			}).catch((err) => {
-				console.error(err);
-			});
+			}).catch(console.error);
 		},
 		reset() {
 			this.name = null;
