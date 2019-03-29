@@ -21,11 +21,19 @@ generateKeys :: Curve -> Integer -> (PublicKey,SecretKey)
 generateKeys c@(a,b,p) seed = (pk,d)
     where 
         pk :: PublicKey
-        lstOfG = (getGenerators c)
-        g = lstOfG <> (seed `mod` (sizeOf lstOfG))
+        lstOfG = getGenerators c
+        g = lstOfG <> (seed `mod` sizeOf lstOfG)
         d = (seed `mod` p) :: Integer
         pk = (c,fromIntegral $ getOrderOfGenerator c g,g,pointMul c g d)
 
+
+--           Pk of the recepient  random    message  ciphertext
+encryptMessage :: PublicKey -> Integer -> Integer ->(Point,Point)
+encryptMessage pk@(c,q,g,beta) rand  m = (r,t)
+    where 
+        k = rand `mod` q
+        r = pointMul c g k 
+        t = pointAdd c (pointMul c g m) (pointMul c beta k)
 
 (<>) :: [a] -> Integer -> a
 (<>) [] _ = error "Empty list"
@@ -33,8 +41,8 @@ generateKeys c@(a,b,p) seed = (pk,d)
 (<>) (_:xs) n = xs <> (n-1)
 
 sizeOf :: [a] -> Integer
-sizeOf [] = 0
-sizeOf (x:xs) = 1 + sizeOf(xs)
+sizeOf = foldr (\x -> (+) 1) 0
+
 
 
 
