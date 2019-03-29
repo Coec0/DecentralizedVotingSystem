@@ -44,9 +44,8 @@ class Utils {
 		const pwHash = Web3.utils.sha3(password).replace('0x', '');
 
 		// Create buffers so we can do bitwise operation
-		let pkBuffer = Buffer.from(pk, '');
+		let pkBuffer = Buffer.from(pk, 'hex');
 		let pwBuffer = Buffer.from(pwHash, 'hex');
-		
 
 		// More error checking
 		if (pkBuffer.length !== 32) throw new Error(`pkBuffer length is ${pkBuffer.length} (should be 32)`);
@@ -60,9 +59,7 @@ class Utils {
 			resultBuffer[i] = pwBuffer[i] ^ pkBuffer[i];
 		}
 
-		console.log('pwBuffer: ' + pwBuffer);
-		console.log('pkBuffer: ' + pkBuffer);
-		console.log('resultBuffer: ' + resultBuffer);
+		return resultBuffer.toString('hex');
 	}
 }
 
