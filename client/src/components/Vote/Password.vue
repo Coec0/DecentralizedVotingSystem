@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="container d-flex flex-column">
 		<h3>Password</h3>
 		<input type="text" style="width: 400px;" @input="updatePW">
 		<button v-on:click="submit">Next</button>
