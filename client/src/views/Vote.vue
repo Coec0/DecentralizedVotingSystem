@@ -1,5 +1,5 @@
 <template>
-	<div class="container vote">
+	<div class="container vote ">
 		<transition name="fade" appear>
 			<h1 v-if="loaded" class="text-center">{{ name }}</h1>
 		</transition>
@@ -22,8 +22,6 @@ import Password from '@/components/Vote/Password.vue';
 import Selection from '@/components/Vote/Selection.vue';
 import Spinner from '@/components/Spinner.vue';
 import utils from '../utils/utils.js';
-
-window.decrypt = utils.decryptPK;
 
 // Keep a constant for initialstate so it's easier to go back when we reset
 const initialState = {
@@ -57,7 +55,7 @@ export default {
 			// Set the state to loading
 			this.state.privatekey = false;
 			this.state.showSpinner = true;
-			this.state.spinnerText = 'Hämtar wallet';
+			this.state.spinnerText = 'Retreiving wallet';
 
 			// Check if valid key
 			const validKey = await utils.isValidPK(this.$store.state.web3, this.$store.state.privatekey);
@@ -69,10 +67,10 @@ export default {
 				// If yes, go to selection phase
 
 				// Add sleep so that it seemes we are working hard to solve problem
-				this.state.spinnerText = 'Wallet hittades!';
+				this.state.spinnerText = 'Wallet found!';
+				console.log('Valid key')
 				await utils.sleep(1000);
 
-				console.log('Valid key')
 				this.state.showSpinner = false;
 				this.state.privatekey = false;
 				this.state.selection = true;
@@ -80,10 +78,10 @@ export default {
 				// If no, go to password phase
 
 				// Add sleep so that it seemes we are working hard to solve problem
-				this.state.spinnerText = 'Wallet hittades ej';
+				this.state.spinnerText = 'Wallet was not found';
+				console.log('Invalid key')
 				await utils.sleep(1000);
 
-				console.log('Invalid key')
 				this.state.showSpinner = false;
 				this.state.privatekey = false;
 				this.state.password = true;
@@ -119,12 +117,13 @@ export default {
 			try {
 				await this.$store.dispatch('SUBMIT_VOTE', selection);
 				this.state.spinnerText = 'Röst lagd';
+				await utils.sleep(2000);
+				this.state.showSpinner = false;
 			} catch (error) {
 				console.error(error);
 				this.state.spinnerText = 'Fel uppstod, se konsol';
-			} finally {
 				await utils.sleep(2000);
-				this.state.showSpinner = false;
+				this.state = { ...initialState }
 			}
 		},
 		init() {
@@ -172,8 +171,8 @@ export default {
 
 h1 {
 	font-size: 5rem;
-	margin-top: 2em;
-	margin-bottom: 2em;
+	margin-top: 1em;
+	margin-bottom: 1em;
 }
 
 .container {
