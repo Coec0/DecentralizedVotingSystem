@@ -61,6 +61,7 @@ isInverse (a,b,p) (Coord x1 y1) (Coord x2 y2) | x1 /= x2 = False
 pointAdd :: Curve -> Point -> Point -> Point
 pointAdd _ Identity q = q
 pointAdd _ p Identity = p
+pointAdd c p q | p == q = pointDouble c p
 pointAdd c p q | isInverse c p q = Identity
 pointAdd (a,b,p) (Coord x1 y1) (Coord x2 y2) = Coord rx ry
     where
