@@ -34,11 +34,10 @@ contract VotingSystem {
         for(uint i = 0; i < admins.length; i++){
             adminMap[admins[i]] = true;
         }
-        
-        //Sets the block number where to voting will stop
-        blockStopNumber = blocksUntilEnd + block.number;
-        blockStartNumber = blocksUntilStart + block.number;
 
+
+        //Temp blockstartnumber to allow adding candidates when startnumber=0
+        blockStartNumber = 1;
 
         //Add BlankVote
         addCandidate(0x426c616e6b566f74650000000000000000000000000000000000000000000000);
@@ -47,6 +46,12 @@ contract VotingSystem {
         for(uint i=0; i < candidates.length; i++){
             addCandidate(candidates[i]);
         }
+        
+                
+        //Sets the block number where to voting will stop
+        blockStopNumber = blocksUntilEnd + block.number;
+        blockStartNumber = blocksUntilStart + block.number;
+
         
         record = Record(voterecordAddress);
         
