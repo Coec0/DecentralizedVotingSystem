@@ -50,7 +50,7 @@ button {
 
 button:hover {
   background:#fff;
-  color:#1AAB8A;
+  color:#2c3e50;
 }
 
 button:before,button:after {
@@ -60,7 +60,7 @@ button:before,button:after {
   right:0;
   height:2px;
   width:0;
-  background: #1AAB8A;
+  background: #2c3e50;
   transition:400ms ease all;
 }
 button:after {
