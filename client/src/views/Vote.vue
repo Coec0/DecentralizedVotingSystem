@@ -88,7 +88,7 @@ export default {
 				// Add sleep so that it seemes we are working hard to solve problem
 				this.state.spinnerText = 'Wallet was not found';
 				console.log('Invalid key')
-				await utils.sleep(1000);
+				await utils.sleep(2000);
 
 				// Set next state
 				this.state.showSpinner = false;
@@ -100,16 +100,24 @@ export default {
 			const pk = utils.decryptPK(this.$store.state.privatekey, this.$store.state.password);
 			this.$store.commit('SET_PASSWORD', pk);
 
+			this.state.showSpinner = true;
+			this.state.spinnerText = 'Retreiving wallet';
 			const validKey = await utils.isValidPK(this.$store.state.web3, this.$store.state.privatekey);
 
 			if (validKey) {
 				// If yes, go to selection phase
 				console.log('Valid key')
+				this.state.spinnerText = 'Wallet found!';
+				await utils.sleep(2000);
+				this.state.showSpinner = false;
 				this.state.password = false;
 				this.state.selection = true;
 			} else {
 				// If no, go back to privatekey phas
 				console.log('Invalid key')
+				this.state.spinnerText = 'Wallet was not found';
+				await utils.sleep(2000);
+				this.state.showSpinner = false;
 				this.state.password = false;
 				this.state.privatekey = true;
 			}
@@ -119,18 +127,18 @@ export default {
 			if (!selection) return console.error('selection is not valid');
 
 			this.state.selection = false;
-			this.state.spinnerText = 'Lägger röst';
+			this.state.spinnerText = 'Placing vote';
 			this.state.showSpinner = true;
 			await utils.sleep(2000);
 
 			try {
 				await this.$store.dispatch('SUBMIT_VOTE', selection);
-				this.state.spinnerText = 'Röst lagd';
+				this.state.spinnerText = 'Vote placed!';
 				await utils.sleep(2000);
 				this.state.showSpinner = false;
 			} catch (error) {
 				console.error(error);
-				this.state.spinnerText = 'Fel uppstod, se konsol';
+				this.state.spinnerText = 'Error occurred, see console';
 				await utils.sleep(2000);
 				this.state = { ...initialState }
 			}
