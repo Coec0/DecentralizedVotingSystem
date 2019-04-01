@@ -1,17 +1,23 @@
 <template>
 	<div class="container vote ">
-		<transition name="fade" appear>
-			<h1 v-if="loaded" class="text-center">{{ name }}</h1>
-		</transition>
+		<div class="error" v-if="error">
+			<h2>Vote hasn't opened yet!</h2>
+		</div>
 
-		<transition name="fade" mode="out-in" appear>
-			<private-key v-if="loaded && state.privatekey" :submit="pkSubmit"></private-key>
-			<password v-if="loaded && state.password" :submit="pwSubmit"></password>
-			<selection  v-if="loaded && state.selection" :submit="selectSubmit"></selection>
+		<div v-else>
+			<transition name="fade" appear>
+				<h1 v-if="loaded" class="text-center">{{ name }}</h1>
+			</transition>
 
-			<!-- Spinners -->
-			<spinner v-if="state.showSpinner && state.spinnerText" v-bind:text="state.spinnerText"></spinner>
-		</transition>
+			<transition name="fade" mode="out-in" appear>
+				<private-key v-if="loaded && state.privatekey" :submit="pkSubmit"></private-key>
+				<password v-if="loaded && state.password" :submit="pwSubmit"></password>
+				<selection  v-if="loaded && state.selection" :submit="selectSubmit"></selection>
+
+				<!-- Spinner -->
+				<spinner v-if="state.showSpinner && state.spinnerText" v-bind:text="state.spinnerText"></spinner>
+			</transition>
+		</div>
 	</div>
 </template>
 
@@ -44,6 +50,7 @@ export default {
 		return {
 			name: null,
 			loaded: false,
+			error: false,
 			state: { ...initialState }
 		};
 	},
@@ -71,6 +78,7 @@ export default {
 				console.log('Valid key')
 				await utils.sleep(1000);
 
+				// Set next state
 				this.state.showSpinner = false;
 				this.state.privatekey = false;
 				this.state.selection = true;
@@ -82,6 +90,7 @@ export default {
 				console.log('Invalid key')
 				await utils.sleep(1000);
 
+				// Set next state
 				this.state.showSpinner = false;
 				this.state.privatekey = false;
 				this.state.password = true;
@@ -129,6 +138,12 @@ export default {
 		init() {
 			// Fetch info about vote
 			this.$http.get(`/getElection/${this.$route.params.id}`).then(async (result) => {
+				// Error handling
+				if (!result.data.nodeAddr || !result.data.abi || !result.data.bcAddr) {
+					this.error = true;
+					return;
+				}
+
 				// Store name so we can show it
 				this.name = result.data.name;
 
@@ -144,6 +159,7 @@ export default {
 		reset() {
 			this.name = null;
 			this.loaded = false;
+			this.error = false;
 			this.state = { ...initialState };
 			this.$store.dispatch('RESET_VOTE');
 		}
