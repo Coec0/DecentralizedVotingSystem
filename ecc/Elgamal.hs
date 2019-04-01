@@ -2,6 +2,7 @@ module Elgamal where
 
 import EllipticAlgebra
 
+import Test.QuickCheck
 import System.Random
 import Data.Maybe
 import System.Entropy
@@ -23,9 +24,13 @@ generateKeys c@(a,b,p) seed = (pk,d)
         pk :: PublicKey
         lstOfG = getGenerators c
         g = lstOfG <> (seed `mod` sizeOf lstOfG)
-        d = (seed `mod` p) :: Integer
-        pk = (c,fromIntegral $ getOrderOfGenerator c g,g,pointMul c g d)
+        q = getOrderOfGenerator c g
+        d = (pickSecret q p seed `mod` p) :: Integer
+        pk = (c,q,g,pointMul c g d)
 
+pickSecret :: Integer -> Integer -> Integer -> Integer
+pickSecret q p s | (s `mod` q /= 0) && (s `mod` p /= 0) = s
+                 | otherwise  = pickSecret q p (s+1)
 
 --           Pk of the recepient  random    message  ciphertext
 encryptMessage :: PublicKey -> Integer -> Integer ->(Point,Point)
@@ -34,6 +39,13 @@ encryptMessage pk@(c,q,g,beta) rand  m = (r,t)
         k = rand `mod` q
         r = pointMul c g k 
         t = pointAdd c (pointMul c g m) (pointMul c beta k)
+
+--               pk recepient   sk recepient  ciphertext     point
+decryptMessage :: PublicKey -> SecretKey -> (Point,Point) -> Integer       
+decryptMessage pk@(c,q,g,beta) d (r,t) = fst $ head $ filter (\candidate -> snd candidate == point) $ map (\n -> (n,pointMul c g n)) [0..]
+    where
+         point = pointAdd c t (pointInvert c (pointMul c r d))
+
 
 (<>) :: [a] -> Integer -> a
 (<>) [] _ = error "Empty list"
@@ -45,4 +57,12 @@ sizeOf = foldr (\x -> (+) 1) 0
 
 
 
+testKeys :: (PublicKey,SecretKey)
+testKeys = generateKeys (1,1,109) 4
 
+
+
+simpleD :: PublicKey -> SecretKey -> (Point,Point) -> Point       
+simpleD pk@(c,q,g,beta) d (r,t) = point
+    where
+         point = pointAdd c t (pointInvert c (pointMul c r d))
