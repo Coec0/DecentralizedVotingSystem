@@ -20,28 +20,28 @@ export default new Vuex.Store({
 			state.notifications = [];
 		},
 		SET_WEB3(state, instance) {
-			state.web3 = instance;
 			if (instance) {
 				console.log('Web3 instance set');
-			} else {
+			} else if (!instance && state.web3) {
 				console.log('Web3 removed')
 			}
+			state.web3 = instance;
 		},
 		SET_SMARTCONTRACT(state, instance) {
-			state.smartcontract = instance;
 			if (instance) {
 				console.log('SmartContract instance set');
-			} else {
+			} else if (state.smartcontract && !instance) {
 				console.log('SmartContract removed');
 			}
+			state.smartcontract = instance;
 		},
 		SET_CANDIDATES(state, candidates) {
-			state.candidates = candidates;
 			if (candidates.length) {
 				console.log(`Candidates set (${candidates.map(c => c.name).join(', ')})`);
-			} else {
+			} else if (state.candidates.length && !candidates.length) {
 				console.log('Candidates removed');
 			}
+			state.candidates = candidates;
 		},
 		SET_PRIVATEKEY(state, key) {
 			state.privatekey = key;
