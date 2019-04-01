@@ -19,8 +19,11 @@ contract VotingSystem {
 
     Candidate[] public allCandidates; //All the candidates
     
-    uint[][] public votedfor; //Who is voted for in with 'one' an 'zeroes'
-    mapping(address => uint) public votedForPos;
+    //uint[][] public votedfor; //Who is voted for in with 'one' an 'zeroes'
+    //mapping(address => uint) public votedForPos;
+    
+    address[] public voters;
+    mapping(address => uint[]) public votedFor;
     
     uint private blockStopNumber; //when the block.number reaches this stop the voting
     uint private blockStartNumber;
@@ -94,8 +97,8 @@ contract VotingSystem {
     }
     
     //Get the amount of votes
-    function getNumberOfVotes() public view returns (uint){
-        return votedfor.length;
+    function getNumberOfVoters() public view returns (uint){
+        return voters.length;
     }
 
     function vote (uint[] memory candidates) public {
@@ -103,13 +106,9 @@ contract VotingSystem {
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
         require(candidates.length == allCandidates.length, "You have not voted for everyone!");
         
-        if(votedForPos[msg.sender] = 0 && votedfor.length == 0){
-            votedfor.push(candidates);
-        } else {
-            voted
-        }
-        
-        votedForPos[msg.sender] = votedfor.length;
-        
+      if(votedFor[msg.sender].length == 0){
+          voters.push(msg.sender);
+      }
+      votedFor[msg.sender] = candidates;
     }
 }
