@@ -92,13 +92,24 @@ contract VotingSystem {
     function doesCandidateExist (uint id) public view returns (bool){
         return allCandidates[idToIndexMap[id]].id == id;
     }
+    
+    //Get the amount of votes
+    function getNumberOfVotes() public view returns (uint){
+        return votedfor.length;
+    }
 
     function vote (uint[] memory candidates) public {
         require(isVotingOpen(), "Voting is closed!");
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
         require(candidates.length == allCandidates.length, "You have not voted for everyone!");
         
+        if(votedForPos[msg.sender] = 0 && votedfor.length == 0){
+            votedfor.push(candidates);
+        } else {
+            voted
+        }
+        
         votedForPos[msg.sender] = votedfor.length;
-        votedfor.push(candidates);
+        
     }
 }
