@@ -57,8 +57,11 @@ sizeOf = foldr (\x -> (+) 1) 0
 
 
 
+testCurve :: (Integer,Integer,Integer)
+testCurve = (1,1,109)
+
 testKeys :: (PublicKey,SecretKey)
-testKeys = generateKeys (1,1,109) 4
+testKeys = generateKeys testCurve 4
 
 
 
@@ -66,3 +69,15 @@ simpleD :: PublicKey -> SecretKey -> (Point,Point) -> Point
 simpleD pk@(c,q,g,beta) d (r,t) = point
     where
          point = pointAdd c t (pointInvert c (pointMul c r d))
+
+
+prop_encryptDecrypt :: Integer -> Integer -> Integer -> Bool
+prop_encryptDecrypt keySeed' pointSeed' messageSeed' = m == m'
+    where
+        keySeed = 3
+        pointSeed = 1+13*  abs pointSeed'
+        messageSeed = 1 +  abs messageSeed'
+        (pk,sk) = generateKeys testCurve keySeed
+        m = messageSeed `mod` 41
+        cipher = encryptMessage pk pointSeed m
+        m' = decryptMessage pk sk cipher
