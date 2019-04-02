@@ -91,7 +91,7 @@ contract VotingSystem {
      */
     function addCandidate(bytes32 candidate) public{
         require(adminMap[msg.sender], "You are not admin");
-        require(!isVotingOpen(), "Voting is closed!");
+        require(!isVotingOpen(), "Voting is open!");
         require(candidate != NOT_INSTANTIATED, "A candidate may not have 0x00.. as name");
         uint hash = uint( keccak256(abi.encodePacked(candidate,allCandidates.length)));
         
@@ -147,10 +147,12 @@ contract VotingSystem {
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
         require(candidates.length == allCandidates.length, "You have not voted for everyone!");
         
-      if(votedFor[msg.sender].length == 0){ //If the voter hans't voted before, add to list
+        //If the voter hans't voted before, add to list
+      if(votedFor[msg.sender].length == 0){ 
           voters.push(msg.sender);
       }
       
-      votedFor[msg.sender] = candidates; //Connects this address to the encrypted votes it cast
+      //Connects this address to the encrypted votes it cast
+      votedFor[msg.sender] = candidates; 
     }
 }
