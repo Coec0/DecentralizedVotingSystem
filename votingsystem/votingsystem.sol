@@ -8,6 +8,14 @@ interface Record {
     function enableWhitelist () external;
 }
 
+/**
+ * @title This contract should be used for voting and adding candidates for the
+ * voting system.
+ * @notice  It requires a 'Record' contract which handles all the persons
+ * that are allowed to vote. The votes should also be encrypted on the front end
+ * with homomorphic elgamal to ensure confidentiality.
+ * @dev The private key for elgamal must be kept secret!
+ */
 contract VotingSystem {
 
     struct Candidate {
@@ -19,19 +27,25 @@ contract VotingSystem {
 
     Candidate[] public allCandidates; //All the candidates
     
-    //uint[][] public votedfor; //Who is voted for in with 'one' an 'zeroes'
-    //mapping(address => uint) public votedForPos;
-    
-    address[] public voters;
-    mapping(address => uint[]) public votedFor;
+    address[] public voters; //All who has voted
+    mapping(address => uint[]) public votedFor; //See the encrypted values that an address has voted for
     
     uint private blockStopNumber; //when the block.number reaches this stop the voting
-    uint private blockStartNumber;
+    uint private blockStartNumber; //when the block.number reaches this start the voting
     mapping(uint => uint) public idToIndexMap; //Gets the position of the candidate in allCandidates
-    mapping(address => bool) private adminMap;
-    //bool enableWhitelist = false; //Disable the whitlist (röstlängd) until someone is added to it
-    Record private record;
+    mapping(address => bool) private adminMap; //Gets if an address is an admin
+
+    Record private record; //The voterrecord.sol contract, fed to the constructor
     
+    
+    /**
+     * @dev You can add more candidates later as long as the voting hasn't started.
+     * @param candidates An array of names in bytes32 of the candidates you can vote for.
+     * @param blocksUntilStart The amount of blocks until the voting starts, calculated from current block
+     * @param blocksUntilEnd The amount of blocks until the voting ends, calculated from current block
+     * @param voterecordAddress The address where the voterecord (whitelist) is
+     * @param admins The addresses (persons) that can add more candidates to vote for
+     */
     constructor(bytes32[] memory candidates, uint blocksUntilStart, uint blocksUntilEnd, address voterecordAddress, address[] memory admins) public{ //blockamount = amount of blocks
         
         for(uint i = 0; i < admins.length; i++){
@@ -51,7 +65,7 @@ contract VotingSystem {
         }
         
                 
-        //Sets the block number where to voting will stop
+        //Sets the block number where to voting will stop and start
         blockStopNumber = blocksUntilEnd + block.number;
         blockStartNumber = blocksUntilStart + block.number;
 
@@ -61,12 +75,20 @@ contract VotingSystem {
         
     }
 
-    //Returns amount of candidates
+    /**
+     * @return The amount of candidates
+     */
     function candidateCount() public view returns (uint){
         return allCandidates.length;
     }
     
-    //Creates a candidate from the name of the candidate and adds it to allCandidates[].
+    /**
+     * @notice You can only add a candidate if you are an admin and the voting is closed
+     * @dev Creates a canidate and its personal 'hash'. Adds the candidate to
+     * 'allCandidates' list and maps the 'hash (id)' to the right place in the
+     * array using 'idToIndexMap'
+     * @param candidate Name of the candidate in bytes32 that should be added
+     */
     function addCandidate(bytes32 candidate) public{
         require(adminMap[msg.sender], "You are not admin");
         require(!isVotingOpen(), "Voting is closed!");
@@ -81,34 +103,54 @@ contract VotingSystem {
         }));
     }
 
-    //Returns the amounts of blocks left until the vote is over
+    /**
+     * @return The amount of blocks lef until the vote is over
+     */
     function blocksLeft () public view returns (uint){
          return blockStopNumber - block.number;
     }
 
-    //Checks if the voting is open
+    /**
+     * @return True or False corresponding to whether the voting is open or not
+     */
     function isVotingOpen () public view returns (bool){
         return block.number <= blockStopNumber && block.number >= blockStartNumber;
     }
-
-    //Checks if a candidate exists
+    
+    /**
+     * @notice Checks if a candidate exists
+     * @param id The id (hash) of the candidate to shuld be checked
+     * @return True or False whether the candidate exists or not
+     */
     function doesCandidateExist (uint id) public view returns (bool){
         return allCandidates[idToIndexMap[id]].id == id;
     }
     
-    //Get the amount of votes
+    /**
+     * @return The number of people who has voted.
+     */
     function getNumberOfVoters() public view returns (uint){
         return voters.length;
     }
 
+    /**
+     * @notice Takes the encrypted votes and publish them to the blockchain. All votes should
+     * be encrypted with elgamal before published. The votes needs to sum up to '1' to be
+     * considered a legal vote. This means that the person you vote for should get an
+     * encrypted '1', and the rest should get encrypted '0's.
+     * @dev The front end should handle the encryption for the client side
+     * @param candidates The candidates voted for encrypted with elgamal. The array should
+     * be the same length as the amount of candidates
+     */
     function vote (uint[] memory candidates) public {
         require(isVotingOpen(), "Voting is closed!");
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
         require(candidates.length == allCandidates.length, "You have not voted for everyone!");
         
-      if(votedFor[msg.sender].length == 0){
+      if(votedFor[msg.sender].length == 0){ //If the voter hans't voted before, add to list
           voters.push(msg.sender);
       }
-      votedFor[msg.sender] = candidates;
+      
+      votedFor[msg.sender] = candidates; //Connects this address to the encrypted votes it cast
     }
 }
