@@ -17,6 +17,17 @@ interface Record {
  * @dev The private key for elgamal must be kept secret!
  */
 contract VotingSystem {
+    
+    //Variables for the Elgamal public key:
+    uint private constant a=0;  // Constant on the curve
+    uint private constant b=0;  // Constant on the curve
+    uint private constant p=0;  // Constant on the curve
+    uint private constant q=0;  // Ordo on the generator
+    uint private constant gx=0; // Point x on the generator
+    uint private constant gy=0; // Point y on the generator
+    uint private constant bx=0; // Secret key * gen x
+    uint private constant by=0; // Secret key * gen y
+    
 
     struct Candidate {
         uint id; //A hash of the candidate
@@ -73,6 +84,13 @@ contract VotingSystem {
         record = Record(voterecordAddress);
         
         
+    }
+    
+    /**
+     * @return Returns the public key, consisting of 8 constants (a,b,p,q,gx,gy,bx,by)
+     */
+    function getPublicKey() public pure returns (uint, uint, uint, uint, uint, uint, uint, uint){
+        return (a,b,p,q,gx,gy,bx,by);
     }
 
     /**
