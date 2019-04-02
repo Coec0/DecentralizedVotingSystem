@@ -74,10 +74,17 @@ simpleD pk@(c,q,g,beta) d (r,t) = point
 prop_encryptDecrypt :: Integer -> Integer -> Integer -> Bool
 prop_encryptDecrypt keySeed' pointSeed' messageSeed' = m == m'
     where
-        keySeed = 3
-        pointSeed = 1+13*  abs pointSeed'
+        keySeed = 1 + keySeed' 
+        pointSeed = 1 +  abs pointSeed'
         messageSeed = 1 +  abs messageSeed'
-        (pk,sk) = generateKeys testCurve keySeed
-        m = messageSeed `mod` 41
+        (pk@(_,q,_,_),sk) = generateKeys testCurve keySeed
+        m = messageSeed `mod` q
         cipher = encryptMessage pk pointSeed m
         m' = decryptMessage pk sk cipher
+
+
+
+decryptSumOfMessages :: PublicKey -> SecretKey -> [(Point,Point)] -> Integer
+decryptSumOfMessages pk@(c,_,_,_) sk ciphers = decryptMessage pk sk summation 
+        where
+            summation = foldr (\c1@(r1,t1) c2@(r2,t2) -> (pointAdd c r1 r2,pointAdd c t1 t2) ) (Identity,Identity) ciphers
