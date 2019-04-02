@@ -58,11 +58,10 @@ sizeOf = foldr (\x -> (+) 1) 0
 
 
 testCurve :: (Integer,Integer,Integer)
-testCurve = (1,1,109)
+testCurve = (49,109,541)
 
 testKeys :: (PublicKey,SecretKey)
-testKeys = generateKeys testCurve 4
-
+testKeys = (((49,109,541),61,(Coord 153 308),(Coord 419 248)),19)
 
 
 simpleD :: PublicKey -> SecretKey -> (Point,Point) -> Point       
@@ -77,7 +76,7 @@ prop_encryptDecrypt keySeed' pointSeed' messageSeed' = m == m'
         keySeed = 1 + keySeed' 
         pointSeed = 1 +  abs pointSeed'
         messageSeed = 1 +  abs messageSeed'
-        (pk@(_,q,_,_),sk) = generateKeys testCurve keySeed
+        (pk@(_,q,_,_),sk) = testKeys
         m = messageSeed `mod` q
         cipher = encryptMessage pk pointSeed m
         m' = decryptMessage pk sk cipher
@@ -88,3 +87,13 @@ decryptSumOfMessages :: PublicKey -> SecretKey -> [(Point,Point)] -> Integer
 decryptSumOfMessages pk@(c,_,_,_) sk ciphers = decryptMessage pk sk summation 
         where
             summation = foldr (\c1@(r1,t1) c2@(r2,t2) -> (pointAdd c r1 r2,pointAdd c t1 t2) ) (Identity,Identity) ciphers
+
+--                     message   random k
+prop_homomorphism :: [(Integer,Integer)] -> Bool
+prop_homomorphism nums = expectedResult == calculatedResult
+    where
+        (pk@(_,q,_,_),sk) = testKeys
+        numsSanitized = map (\(n,rand) -> (((abs n) `mod` q),abs rand)) nums 
+        expectedResult = (sum (map (fst) numsSanitized)) `mod` q
+        encryptedMessages = map (\(m,rand) -> encryptMessage pk rand m) numsSanitized    :: [(Point,Point)]
+        calculatedResult = decryptSumOfMessages pk sk encryptedMessages
