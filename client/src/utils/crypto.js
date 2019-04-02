@@ -1,39 +1,34 @@
-const Web3 = require('web3');
+const web3 = require('web3');
+const bigInt = require("big-integer");
 
-let P = { x: 1, y: 60 }
-let Q = { x: 6, y: 21 }
-let m = 109;
+function encrypt(message, ordG, G, B) {
+	const k = web3.utils.randomHex(ordG);
 
-console.time('EEA');
-console.log(modularInverse(3453453453453451, 12312312));
-console.timeEnd('EEA');
 
-function pointAddition(P, Q, m) {
-	const add = function add(P, Q) {
-		const a = (Q.y - P.y) * modularInverse((Q.x - P.x), m);
-		return mod(a, m);
-	}
 
-	const double = function double(P, Q) {
-		
-	}
 
-	const firstThing = P.x === Q.x
-	const otherThing = Q.y === mod(-1*P.y, m);
+}
 
-	if (firstThing && otherThing) {
+
+// Calculates n * P, where P is a point
+function doubleAndAdd(P, n) {
+	if (!k) return 0;
+	if (k === 1) return P;
+
+	if (mod(n, 2) === 1) return 
+	return
+}
+
+function pointAdd(P, Q, m) {
+	const hasSameX = P.x === Q.x
+	const hasOppositeY = Q.y === mod(-1*P.y, m);
+
+	if (hasSameX && hasOppositeY) {
+		// Is inverse => no point intersects => return Infinity
 		return Infinity;
 	}
 
-	// Check if same point
-	let s;
-	if (P.x === Q.x && P.y === Q.y) {
-		// Do multiplication
-		s = double(P, Q);
-	} else {
-		// Do addition
-		s = add(P, Q);
-	}
+	let s = add(P, Q, m);
 
 	const x = mod((Math.pow(s, 2) - P.x - Q.x), m);
 	const y = mod((s * (P.x - x) - P.y), m);
@@ -41,44 +36,76 @@ function pointAddition(P, Q, m) {
 	return { x, y };
 }
 
+function pointDouble(P, Q, m) {
+	const hasSameX = P.x === Q.x
+	const hasOppositeY = Q.y === mod(-1*P.y, m);
+
+	if (hasSameX && hasOppositeY) {
+		// Is inverse => no point intersects => return Infinity
+		return Infinity;
+	}
+
+	let s = double(P, Q, m);
+
+	const x = mod((Math.pow(s, 2) - P.x - Q.x), m);
+	const y = mod((s * (P.x - x) - P.y), m);
+
+	return { x, y };
+}
+
+function findNextPoint(P, Q, m) {
+	// Check if same point
+	if (P.x === Q.x && P.y === Q.y) {
+		// Do multiplication
+		return pointDouble(P, Q, m);
+	} else {
+		// Do addition
+		return pointAdd(P, Q, m);
+	}
+}
+
 /* Helper Functions */
+
+// Point addition
+function add(P, Q, m) {
+	const a = (Q.y - P.y) * modInv((Q.x - P.x), m);
+	return mod(a, m);
+}
+
+// Point doubling
+function double(P, Q, m) {
+	const a = 3 * Math.pow(P.x, 2) + 1 * modInv(2 * P.y, m);
+	return mod(a, m);
+}
 
 // Real modulo function which supports negative numbers
 function mod(x, n) {
-	return (x % n + n) % n;
+	// Error check
+	if (x === null || x === undefined || n === null || n === undefined) throw new ReferenceError('missing arguments');
+	// Check if both parameters are of same type
+	if (typeof x !== typeof n) {
+		throw new TypeError('x and n must be same type');
+	}
+
+	// They are both objects because of previous check
+	if (typeof x === 'object') {
+		// Check if both are bigInt
+		if (!(x instanceof bigInt) || !(n instanceof bigInt)) throw new TypeError('x and n are not bigInt');
+
+		return x.mod(n).plus(n).mod(n);
+	} else {
+		return (x % n + n) % n;
+	}
 } 
 
-// Use EEA to compute modular inverse
-// https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
-function modularInverse(a, m) {
-	// Validate input
-	[a, m] = [Number(a), Number(m)];
-	if (Number.isNaN(a) || Number.isNaN(m)) {
-		return NaN;
-	}
-	a = mod(a, m);
-	if (!a || m < 2) {
-		return NaN;
-	}
+function modInv(x, n) {
+	// Error check
+	if (x === null || x === undefined || n === null || n === undefined) throw new ReferenceError('missing arguments');
+	// Type checking
+	if (!(x instanceof bigInt)) console.warn('Warning! x is not a bigInt, but it probably should be?');
+	if (!(n instanceof bigInt)) console.warn('Warning! n is not a bigInt, but it probably should be?');
 
-	// Find GCD
-	const s = [];
-	let b = m;
-	while(b) {
-		[a, b] = [b, a % b];
-		s.push({a, b});
-	}
-	if (a !== 1) {
-		return NaN; // inverse does not exists
-	}
-	// find the inverse
-	let x = 1;
-	let y = 0;
-	for(let i = s.length - 2; i >= 0; --i) {
-		[x, y] = [y,  x - y * Math.floor(s[i].a / s[i].b)];
-	}
-
-	return mod(y, m);
+	return bigInt(x).modInv(bigInt(n));
 }
 
-module.exports = { pointAddition }
+module.exports = { findNextPoint, mod, modInv }
