@@ -113,11 +113,11 @@ modExp b e m = t * modExp ((b * b) `mod` m) (shiftR e 1) m `mod` m
 
 -- generate possible generators
 getGenerators :: Curve -> [Point]
-getGenerators c = map snd $ filter (\p -> largestOrder == (fst p)) possibleCandidates
+getGenerators c = map snd $ filter (\p -> largestOrder == fst p) possibleCandidates
     where 
         allPoints = map (\p -> (getOrderOfGenerator c p,p)) (findPtsOnCurve c)
-        possibleCandidates = filter (\p -> isPrime (fst p)) allPoints
-        largestOrder = maximum $ map (fst) possibleCandidates 
+        possibleCandidates = filter (isPrime . fst) allPoints
+        largestOrder = maximum $ map fst possibleCandidates 
 
 isPrime k = null [ x | x <- [2..k - 1], k `mod` x == 0]
 -- The main program
