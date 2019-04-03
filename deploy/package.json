@@ -1,18 +1,18 @@
 {
-  "name": "compile-deploy-smartcontract",
+  "name": "deploy",
   "version": "1.0.0",
   "description": "Compile and deploy smart contracts to an ethereum blockchain",
-  "main": "src/app.js",
+  "main": "src/main.js",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "node src/main.js",
+    "dev": "nodemon src/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "argparse": "^1.0.10",
-    "fs-extra": "^7.0.1",
-    "solc": "^0.5.4",
-    "web3": "^1.0.0-beta.46"
+    "ganache-cli": "6.4.1",
+    "solc": "0.5.7",
+    "web3": "1.0.0-beta.47"
   }
 }
