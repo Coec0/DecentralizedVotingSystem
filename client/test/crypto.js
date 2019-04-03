@@ -159,12 +159,43 @@ describe('#findNextPoint()', function() {
 		});
 
 		it('should return correct next point', () => {
-			let P = { x: 12, y: 18 };
-			let Q = { x: 5, y: 26 };
+			let P = { x: 1, y: 60 };
+			let Q = { x: 1, y: 60 };
 			let m = 109;
-			let R = { x: 11, y: 12 };
+			let R = { x: 72, y: 43 };
 
 			expect(crypto.findNextPoint(P, Q, m)).to.deep.equal(R);
+		});
+	});
+});
+
+describe('#doubleAndAdd()', function() {	
+	context('with valid arguments', () => {
+		it('should return correct point', () => {
+			let P = { x: 18, y: 40 };
+			let n = 10;
+			let m = 109;
+			let R = { x: 75, y: 11 };
+
+			expect(crypto.doubleAndAdd(P, n, m)).to.deep.equal(R);
+		});
+
+		it('should return correct point', () => {
+			let P = { x: 3, y: 24 };
+			let n = 400;
+			let m = 109;
+			let R = { x: 50, y: 79 };
+
+			expect(crypto.doubleAndAdd(P, n, m)).to.deep.equal(R);
+		});
+
+		it('should return correct point', () => {
+			let P = { x: 3, y: 24 };
+			let n = 1298370031;
+			let m = 109;
+			let R = { x: 33, y: 1 };
+
+			expect(crypto.doubleAndAdd(P, n, m)).to.deep.equal(R);
 		});
 	});
 });
