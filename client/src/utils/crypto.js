@@ -156,5 +156,27 @@ function modInv(x, n) {
 	return bigInt(x).modInv(n);
 }
 
+// This functions takes any amount of arguments and check if they are either bigInts or objects which contain bigInts
+// Will throw an error if something that is not a bigInt is found
+// Not fully tested for now
+function checkBigInts(...args) {
+	console.log(args)
+
+	for (var i = args.length - 1; i >= 0; i--) {
+		let arg = args[i];
+
+		if (arg instanceof bigInt) {
+			continue;
+		}
+
+		if (typeof arg === 'object') {
+			checkBigInts(...Object.values(arg));
+			continue;
+		}
+
+		throw new TypeError('Object contains something that is not a bigInt');
+	}
+}
+
 // Functions added here are exposed to the outside
 module.exports = { doubleAndAdd, findNextPoint, mod, modInv }
