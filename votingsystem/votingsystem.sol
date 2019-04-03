@@ -8,35 +8,74 @@ interface Record {
     function enableWhitelist () external;
 }
 
+/**
+ * @title This contract should be used for voting and adding candidates for the
+ * voting system.
+ * @notice  It requires a 'Record' contract which handles all the persons
+ * that are allowed to vote. The votes should also be encrypted on the front end
+ * with homomorphic elgamal to ensure confidentiality.
+ * @dev The private key for elgamal must be kept secret!
+ */
 contract VotingSystem {
     
+    //Variables for the Elgamal public key:
+    uint private a;  // Constant on the curve
+    uint private b;  // Constant on the curve
+    uint private p;  // Constant on the curve
+    uint private q;  // Ordo on the generator
+    uint private gx; // Point x on the generator
+    uint private gy; // Point y on the generator
+    uint private bx; // Secret key * gen x
+    uint private by; // Secret key * gen y
     
 
     struct Candidate {
         uint id; //A hash of the candidate
         bytes32 name; //The candidates name
-        uint votecount; //This should be encrypted elgamal in future
     }
 
      bytes32 private constant NOT_INSTANTIATED = 0x0000000000000000000000000000000000000000000000000000000000000000;
 
     Candidate[] public allCandidates; //All the candidates
     
-    uint[][] public votedfor; //Who is voted for in with 'one' an 'zeroes'
-    mapping(address => uint) public votedForPos;
-    mapping(address => uint) public controlDigit;
-    
+    address[] public voters; //All who has voted
+    mapping(address => uint[4][]) public votedFor; //See the encrypted values that an address has voted for
     
     uint private blockStopNumber; //when the block.number reaches this stop the voting
+    uint private blockStartNumber; //when the block.number reaches this start the voting
     mapping(uint => uint) public idToIndexMap; //Gets the position of the candidate in allCandidates
-    //bool enableWhitelist = false; //Disable the whitlist (röstlängd) until someone is added to it
-    Record private record;
+    mapping(address => bool) private adminMap; //Gets if an address is an admin
+
+    Record private record; //The voterrecord.sol contract, fed to the constructor
     
-    constructor(bytes32[] memory candidates, uint blockamount, address store) public{ //blockamount == amount of blocks
     
-    
-        //Sets the block number where to voting will stop
-        blockStopNumber = blockamount + block.number;
+    /**
+     * @dev You can add more candidates later as long as the voting hasn't started.
+     * @param candidates An array of names in bytes32 of the candidates you can vote for.
+     * @param blocksUntilStart The amount of blocks until the voting starts, calculated from current block
+     * @param blocksUntilEnd The amount of blocks until the voting ends, calculated from current block
+     * @param voterecordAddress The address where the voterecord (whitelist) is
+     * @param admins The addresses (persons) that can add more candidates to vote for
+     */
+    constructor(bytes32[] memory candidates, uint blocksUntilStart, uint blocksUntilEnd, address voterecordAddress, address[] memory admins,
+    uint _a, uint _b, uint _p, uint _q, uint _gx, uint _gy, uint _bx, uint _by) public{ //blockamount = amount of blocks
+        
+        for(uint i = 0; i < admins.length; i++){
+            adminMap[admins[i]] = true;
+        }
+
+        //Instantiating the public key variables
+        a = _a;
+        b = _b;
+        p = _p;
+        q = _q;
+        gx = _gx;
+        gy = _gy;
+        bx = _bx;
+        by = _by;
+
+        //Temp blockstartnumber to allow adding candidates when startnumber=0
+        blockStartNumber = 1;
 
         //Add BlankVote
         addCandidate(0x426c616e6b566f74650000000000000000000000000000000000000000000000);
@@ -46,18 +85,41 @@ contract VotingSystem {
             addCandidate(candidates[i]);
         }
         
-        record = Record(store);
+                
+        //Sets the block number where to voting will stop and start
+        blockStopNumber = blocksUntilEnd + block.number;
+        blockStartNumber = blocksUntilStart + block.number;
+
+        
+        record = Record(voterecordAddress);
+        
         
     }
+    
+    /**
+     * @return Returns the public key, consisting of 8 constants (a,b,p,q,gx,gy,bx,by)
+     */
+    function getPublicKey() public view returns (uint, uint, uint, uint, uint, uint, uint, uint){
+        return (a,b,p,q,gx,gy,bx,by);
+    }
 
-    //Returns amount of candidates
+    /**
+     * @return The amount of candidates
+     */
     function candidateCount() public view returns (uint){
         return allCandidates.length;
     }
     
-    //Creates a candidate from the name of the candidate and adds it to allCandidates[].
-    function addCandidate(bytes32 candidate) private{
-        require(isVotingOpen(), "Voting is closed!");
+    /**
+     * @notice You can only add a candidate if you are an admin and the voting is closed
+     * @dev Creates a canidate and its personal 'hash'. Adds the candidate to
+     * 'allCandidates' list and maps the 'hash (id)' to the right place in the
+     * array using 'idToIndexMap'
+     * @param candidate Name of the candidate in bytes32 that should be added
+     */
+    function addCandidate(bytes32 candidate) public{
+        require(adminMap[msg.sender], "You are not admin");
+        require(!isVotingOpen(), "Voting is open!");
         require(candidate != NOT_INSTANTIATED, "A candidate may not have 0x00.. as name");
         uint hash = uint( keccak256(abi.encodePacked(candidate,allCandidates.length)));
         
@@ -65,148 +127,60 @@ contract VotingSystem {
             
         allCandidates.push(Candidate({
               id: hash,
-              name: candidate,
-              votecount: 0
+              name: candidate
         }));
     }
-    
-    
-    
-   
-    //Returns the amounts of blocks left until the vote is over
+
+    /**
+     * @return The amount of blocks lef until the vote is over
+     */
     function blocksLeft () public view returns (uint){
          return blockStopNumber - block.number;
     }
 
-    //Checks if the voting is open
+    /**
+     * @return True or False corresponding to whether the voting is open or not
+     */
     function isVotingOpen () public view returns (bool){
-        if(blocksLeft() <= 0)
-            return false;
-        return true;
+        return block.number <= blockStopNumber && block.number >= blockStartNumber;
     }
     
-   
-
-    //Checks if a candidate exists
-    function doesCandidateExist (uint id) private view returns (bool){
+    /**
+     * @notice Checks if a candidate exists
+     * @param id The id (hash) of the candidate to shuld be checked
+     * @return True or False whether the candidate exists or not
+     */
+    function doesCandidateExist (uint id) public view returns (bool){
         return allCandidates[idToIndexMap[id]].id == id;
     }
+    
+    /**
+     * @return The number of people who has voted.
+     */
+    function getNumberOfVoters() public view returns (uint){
+        return voters.length;
+    }
 
-    //Currently Loops through all candidates (o(n)).
-    //Get the candidate thats in lead
-    //Mostly for debugging and shouldn't be used in future
-    function getCandidateInLead() public view returns
-        (uint id, bytes32 name, uint votes){
-            for(uint i = 0; i < allCandidates.length ; i++){
-                if(allCandidates[i].votecount >= votes){
-                    votes = allCandidates[i].votecount;
-                    name = allCandidates[i].name;
-                    id = allCandidates[i].id;
-                }
-            }
-        }
-
-
-    function vote (uint[] memory candidates) public {
+    /**
+     * @notice Takes the encrypted votes and publish them to the blockchain. All votes should
+     * be encrypted with elgamal before published. The votes needs to sum up to '1' to be
+     * considered a legal vote. This means that the person you vote for should get an
+     * encrypted '1', and the rest should get encrypted '0's.
+     * @dev The front end should handle the encryption for the client side
+     * @param candidates The candidates voted for encrypted with elgamal. The array should
+     * be the same length as the amount of candidates
+     */
+    function vote (uint[4][] memory candidates) public {
         require(isVotingOpen(), "Voting is closed!");
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
         require(candidates.length == allCandidates.length, "You have not voted for everyone!");
-        require(controlDigit[msg.sender] == 0, "You can only vote once"); //Have like this until el gamal is implemented
         
-        /* START, Change this for "OR proof" when el gamal or remove */
-        
-        uint controlAdd = 0;
-        uint candidatePos; // The candidate voted for (its pos in candidates[])
-        for(uint i=0; i<candidates.length; i++){
-            controlAdd += candidates[i];
-            if(candidates[i] == 1){
-                candidatePos = i;
-            }
-            require(candidates[i] == 0 || candidates[i] == 1, "Not 1 or 0 somewhere");
-        }
-        require(controlAdd ==  1, "Sum doesn't add up");
-        
-        /* END */
-        
-        votedForPos[msg.sender] = votedfor.length;
-        controlDigit[msg.sender] = controlAdd;
-        allCandidates[candidatePos].votecount += 1; //In the future use homomorphic property
-        votedfor.push(candidates);
+        //If the voter hans't voted before, add to list
+      if(votedFor[msg.sender].length == 0){ 
+          voters.push(msg.sender);
+      }
+      
+      //Connects this address to the encrypted votes it cast
+      votedFor[msg.sender] = candidates; 
     }
-
-    //msg.sender is the address of person or
-    //other contract that is interacting with
-    //contract right now
-    //This function votes
-    function easyVote (uint id) public {
-       uint pos = idToIndexMap[id];
-       uint[] memory votes = new uint[](allCandidates.length); 
-       for(uint i=0; i<allCandidates.length; i++){
-           votes[pos] = 0; //Set all to zero
-       }
-       votes[pos] = 1; //Set the candidate voted for to one;
-       
-       vote(votes); //Vote with the list
-    }
-    
-/*************************** ONLY DEBUG FUNCTIONS BELOW ****************************/
-
-//from ethereum.stackexchange.com. Author ismael
-    //Should only be used for debugging
-    function bytes32ToString (bytes32 data) internal pure returns (string memory) {
-        bytes memory bytesString = new bytes(32);
-        for (uint j=0; j<32; j++) {
-            byte char = byte(bytes32(uint(data) * 2 ** (8 * j)));
-            if (char != 0) {
-                bytesString[j] = char;
-            }
-        }
-        return string(bytesString);
-    }
-
-    //Adds some accounts to the whitelist. Theese accounts are the first three
-    //accounts in the "remix" IDE.
-    function debugAddTestWhitelistVoters() public {
-        //Add some default accounts that are allowed to vote:
-        record.addVoterToWhitelist(0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c);
-        record.addVoterToWhitelist(0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160C);
-        record.addVoterToWhitelist(0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB);
-    
-        record.enableWhitelist();
-    }
-
-
-    //with pure you cannot access the contract storage
-    //Gets the candidate string name from index in array position
-    function debugGetCandidateStringNameIdx(uint index) public view returns (string memory){
-        if(index >= allCandidates.length){
-            return "Candidate not found";
-        }
-
-        Candidate memory c = allCandidates[index];
-        return bytes32ToString(c.name);
-    }
-
-    //Get candidate string name from its ID.
-    function debugGetCandidateStringNameID(uint id) public view returns (string memory){
-        if(!doesCandidateExist(id)){
-            return "Candidate not found";
-        }
-        uint index = debugGetCandidateIndex(id);
-        Candidate memory c = allCandidates[index];
-        return bytes32ToString(c.name);
-    }
-
-
-    //Helper function for debugGetCandidateStringNameID
-    function debugGetCandidateIndex(uint id) private view returns (uint idx){
-        require(doesCandidateExist(id),"Error candidate doesent exist");
-        for(uint i = 0; i < allCandidates.length ; i++){
-            if(allCandidates[i].id == id){
-                idx = i;
-            }
-        }
-    }
-
-    
 }
