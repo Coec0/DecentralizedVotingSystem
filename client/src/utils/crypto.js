@@ -4,55 +4,32 @@ const bigInt = require("big-integer");
 function encrypt(message, ordG, G, B) {
 	const k = web3.utils.randomHex(ordG);
 
-
-
-
 }
 
+/**
+ * Calculates n * P using double-and-add method
+ * https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add
+ * @param  {Point} P   The point to be mutlipled
+ * @param  {Integer} n The scalar value
+ * @param  {Integer} m The modulo of the current curve
+ * @return {Point}     The resulting point
+ */
+function doubleAndAdd(P, n, m) {
+	if (!n) return 0;
+	if (n === 1) return P;
 
-// Calculates n * P, where P is a point
-function doubleAndAdd(P, n) {
-	if (!k) return 0;
-	if (k === 1) return P;
+	if (mod(n, 2) === 1) return pointAdd(P, doubleAndAdd(P, n-1, m), m);
 
-	if (mod(n, 2) === 1) return 
-	return
+	return doubleAndAdd(pointDouble(P, P, m), n/2, m);
 }
 
-function pointAdd(P, Q, m) {
-	const hasSameX = P.x === Q.x
-	const hasOppositeY = Q.y === mod(-1*P.y, m);
-
-	if (hasSameX && hasOppositeY) {
-		// Is inverse => no point intersects => return Infinity
-		return Infinity;
-	}
-
-	let s = add(P, Q, m);
-
-	const x = mod((Math.pow(s, 2) - P.x - Q.x), m);
-	const y = mod((s * (P.x - x) - P.y), m);
-
-	return { x, y };
-}
-
-function pointDouble(P, Q, m) {
-	const hasSameX = P.x === Q.x
-	const hasOppositeY = Q.y === mod(-1*P.y, m);
-
-	if (hasSameX && hasOppositeY) {
-		// Is inverse => no point intersects => return Infinity
-		return Infinity;
-	}
-
-	let s = double(P, Q, m);
-
-	const x = mod((Math.pow(s, 2) - P.x - Q.x), m);
-	const y = mod((s * (P.x - x) - P.y), m);
-
-	return { x, y };
-}
-
+/**
+ * Finds next point given two arbitrary points using either point addition or point doubling
+ * @param  {Point} P   The first point
+ * @param  {Point} Q   The second point
+ * @param  {Integer} m The modulo of the current curve
+ * @return {Point}     The resulting point
+ */
 function findNextPoint(P, Q, m) {
 	// Check if same point
 	if (P.x === Q.x && P.y === Q.y) {
@@ -64,21 +41,86 @@ function findNextPoint(P, Q, m) {
 	}
 }
 
-/* Helper Functions */
+/**
+ * Finds next point from two distinguished points (including reflection)
+ * @param  {Point} P The first point
+ * @param  {Point} Q The second point
+ * @param  {Integer} m The modulo of the current curve
+ * @return {Point} Resulting point
+ */
+function pointAdd(P, Q, m) {
+	const hasSameX = P.x === Q.x
+	const hasOppositeY = Q.y === mod(-1*P.y, m);
 
-// Point addition
-function add(P, Q, m) {
+	if (hasSameX && hasOppositeY) {
+		// Is inverse => no point intersects => return Infinity
+		return Infinity;
+	}
+
+	const lamba = calcAddLambda(P, Q, m);
+	const x = mod((Math.pow(lamba, 2) - P.x - Q.x), m);
+	const y = mod((lamba * (P.x - x) - P.y), m);
+
+	return { x, y };
+}
+
+/**
+ * Finds the next point from two identical points point (including reflection)
+ * @param  {Point} P The only point which is doubled to get the next point
+ * @param  {Point} Q  This is only included for some testing support. Should be identical to P
+ * @param  {Integer} a The a-value of the current curve
+ * @param  {Integer} m The modulo of the current curve
+ * @return {Point} Resulting point
+ */
+function pointDouble(P, Q, a, m) {
+	// Do some minor parameter checking first
+	if (!(P.x === Q.x && P.y === Q.y)) console.warn('pointDouble called with two NOT IDENTICAL points, is this really intended?');
+
+	const lamba = calcDoubleLambda(P, a, m);
+	const x = mod((Math.pow(lamba, 2) - P.x - Q.x), m);
+	const y = mod((lamba * (P.x - x) - P.y), m);
+
+	return { x, y };
+}
+
+
+/*
+	-----------------------------------------------------
+					Helper Functions
+	-----------------------------------------------------
+ */
+
+
+/**
+ * Calculates the lambda used in calculating point addition
+ * @param  {Point} P   The first point
+ * @param  {Point} Q   The second point
+ * @param  {Integer} m The modulo of the current curve
+ * @return {Integer}   The lambda value for the two points
+ */
+function calcAddLambda(P, Q, m) {
 	const a = (Q.y - P.y) * modInv((Q.x - P.x), m);
 	return mod(a, m);
 }
 
-// Point doubling
-function double(P, Q, m) {
-	const a = 3 * Math.pow(P.x, 2) + 1 * modInv(2 * P.y, m);
-	return mod(a, m);
+/**
+ * Calculates the lambda used for point doubling
+ * @param  {Point} P   The first point
+ * @param  {Integer} a The 'a'-value for the curve used
+ * @param  {Integer} m The modulo of the current curve
+ * @return {Integer}   The lambda value for the point
+ */
+function calcDoubleLambda(P, a, m) {
+	const lambda = (3 * Math.pow(P.x, 2) + a) * modInv(2 * P.y, m);
+	return mod(lambda, m);
 }
 
-// Real modulo function which supports negative numbers
+/**
+ * Real modulo function which supports negative numbers
+ * @param  {Integer} x The value to be modulo-ed
+ * @param  {Integer} n The modulo value
+ * @return {Integer}   The result
+ */
 function mod(x, n) {
 	// Error check
 	if (x === null || x === undefined || n === null || n === undefined) throw new ReferenceError('missing arguments');
@@ -98,6 +140,12 @@ function mod(x, n) {
 	}
 } 
 
+/**
+ * Finds the modulo inverse for x (x^-1 mod n)
+ * @param  {Integer} x The value to be inverse-modulo-ed
+ * @param  {Integer} n The modulo value
+ * @return {Integer}   The modulo inverse
+ */
 function modInv(x, n) {
 	// Error check
 	if (x === null || x === undefined || n === null || n === undefined) throw new ReferenceError('missing arguments');
@@ -105,7 +153,8 @@ function modInv(x, n) {
 	if (!(x instanceof bigInt)) console.warn('Warning! x is not a bigInt, but it probably should be?');
 	if (!(n instanceof bigInt)) console.warn('Warning! n is not a bigInt, but it probably should be?');
 
-	return bigInt(x).modInv(bigInt(n));
+	return bigInt(x).modInv(n);
 }
 
-module.exports = { findNextPoint, mod, modInv }
+// Functions added here are exposed to the outside
+module.exports = { doubleAndAdd, findNextPoint, mod, modInv }
