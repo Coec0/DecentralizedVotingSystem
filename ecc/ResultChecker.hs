@@ -18,19 +18,18 @@ parseRegister :: String -> Register
 parseRegister raw = parseVoters p c (drop 2 rawlines)
     where
         rawlines = lines raw :: [String]
-        p = read (rawlines !! 0) :: Int
+        p = read (head rawlines) :: Int
         c = read (rawlines !! 1) :: Int
 
 --      nCandidates  rawvotes    (parsedVote)
 parseVoter :: Int -> [String] -> Vote
 parseVoter n (addr:rawVotes) = (addr,rawToCiphers rawCiphers)
     where
-        rawCiphers = map (map read) (map words rawVotes) :: [[Integer]]
+        rawCiphers = map (map read . words) rawVotes :: [[Integer]]
 
 -- raw ciphers to cipher
 rawToCiphers :: [[Integer]] -> [Cipher]
-rawToCiphers [] = []
-rawToCiphers (rawVote:rawVotes) =  ((Coord (rawVote !! 0) (rawVote !! 1) ),(Coord (rawVote !! 2) (rawVote !! 3))): rawToCiphers rawVotes
+rawToCiphers = map (\rawVote -> (Coord (rawVote !! 0) (rawVote !! 1) ,Coord (rawVote !! 2) (rawVote !! 3) ))
 
 readElectoralRegister :: String -> IO Register
 readElectoralRegister path = do
@@ -48,7 +47,7 @@ isValidVote pk sk (addr,ciphers) = 1 ==  decryptSumOfMessages pk sk ciphers
 
 --                 pk            sk         all votes      good      invalid
 separateVotes :: PublicKey -> SecretKey -> Register -> (Register,Register)
-separateVotes pk sk register = partition (isValidVote pk sk) register 
+separateVotes pk sk  = partition (isValidVote pk sk)  
 
 
 

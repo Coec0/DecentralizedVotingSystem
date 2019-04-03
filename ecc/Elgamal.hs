@@ -94,7 +94,7 @@ prop_homomorphism :: [(Integer,Integer)] -> Bool
 prop_homomorphism nums = expectedResult == calculatedResult
     where
         (pk@(_,q,_,_),sk) = testKeys
-        numsSanitized = map (\(n,rand) -> (((abs n) `mod` q),abs rand)) nums 
-        expectedResult = (sum (map (fst) numsSanitized)) `mod` q
+        numsSanitized = map (\(n,rand) -> (abs n `mod` q,abs rand)) nums 
+        expectedResult = sum (map fst numsSanitized) `mod` q
         encryptedMessages = map (\(m,rand) -> encryptMessage pk rand m) numsSanitized    :: [(Point,Point)]
         calculatedResult = decryptSumOfMessages pk sk encryptedMessages
