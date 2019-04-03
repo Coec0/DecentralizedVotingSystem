@@ -19,14 +19,14 @@ interface Record {
 contract VotingSystem {
     
     //Variables for the Elgamal public key:
-    uint private constant a=0;  // Constant on the curve
-    uint private constant b=0;  // Constant on the curve
-    uint private constant p=0;  // Constant on the curve
-    uint private constant q=0;  // Ordo on the generator
-    uint private constant gx=0; // Point x on the generator
-    uint private constant gy=0; // Point y on the generator
-    uint private constant bx=0; // Secret key * gen x
-    uint private constant by=0; // Secret key * gen y
+    uint private a;  // Constant on the curve
+    uint private b;  // Constant on the curve
+    uint private p;  // Constant on the curve
+    uint private q;  // Ordo on the generator
+    uint private gx; // Point x on the generator
+    uint private gy; // Point y on the generator
+    uint private bx; // Secret key * gen x
+    uint private by; // Secret key * gen y
     
 
     struct Candidate {
@@ -57,12 +57,22 @@ contract VotingSystem {
      * @param voterecordAddress The address where the voterecord (whitelist) is
      * @param admins The addresses (persons) that can add more candidates to vote for
      */
-    constructor(bytes32[] memory candidates, uint blocksUntilStart, uint blocksUntilEnd, address voterecordAddress, address[] memory admins) public{ //blockamount = amount of blocks
+    constructor(bytes32[] memory candidates, uint blocksUntilStart, uint blocksUntilEnd, address voterecordAddress, address[] memory admins,
+    uint _a, uint _b, uint _p, uint _q, uint _gx, uint _gy, uint _bx, uint _by) public{ //blockamount = amount of blocks
         
         for(uint i = 0; i < admins.length; i++){
             adminMap[admins[i]] = true;
         }
 
+        //Instantiating the public key variables
+        a = _a;
+        b = _b;
+        p = _p;
+        q = _q;
+        gx = _gx;
+        gy = _gy;
+        bx = _bx;
+        by = _by;
 
         //Temp blockstartnumber to allow adding candidates when startnumber=0
         blockStartNumber = 1;
@@ -89,7 +99,7 @@ contract VotingSystem {
     /**
      * @return Returns the public key, consisting of 8 constants (a,b,p,q,gx,gy,bx,by)
      */
-    function getPublicKey() public pure returns (uint, uint, uint, uint, uint, uint, uint, uint){
+    function getPublicKey() public view returns (uint, uint, uint, uint, uint, uint, uint, uint){
         return (a,b,p,q,gx,gy,bx,by);
     }
 
