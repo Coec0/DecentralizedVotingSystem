@@ -29,44 +29,6 @@ describe('#mod()', function() {
 			}).to.throw(ReferenceError, 'missing arguments');
 		});
 	});	
-
-	context('with different argument types', () => {
-		it('should throw error', () => {
-			expect(() => {
-				crypto.mod(123, bigInt(123));
-			}).to.throw(TypeError, 'x and n must be same type');
-
-			expect(() => {
-				crypto.mod({}, 123);
-			}).to.throw(TypeError, 'x and n must be same type');
-
-			expect(() => {
-				crypto.mod({}, bigInt(123));
-			}).to.throw(TypeError, 'x and n are not bigInt');
-
-			expect(() => {
-				crypto.mod(bigInt(123), {});
-			}).to.throw(TypeError, 'x and n are not bigInt');
-
-			expect(() => {
-				crypto.mod(123, bigInt(123));
-			}).to.throw(TypeError, 'x and n must be same type');
-		});
-	});
-	
-	context('with number arguments', () => {
-		it('should return correct number', () => {
-			expect(crypto.mod(98712367, 78321)).to.equal(27907);
-
-			expect(crypto.mod(74238, 12)).to.equal(6);
-
-			expect(crypto.mod(74231238798, 2321789)).to.equal(1322679);
-
-			expect(crypto.mod(0, 123)).to.equal(0);
-
-			expect(crypto.mod(321789, 1)).to.equal(0);
-		});
-	});
 	
 	context('with bigInt arguments', () =>  {
 		it('should return correct bigInt', () => {
@@ -83,68 +45,24 @@ describe('#mod()', function() {
 	});
 });
 
-describe('#modInv()', function() {
-	context('with missing argument', () => {
-		it('should throw error', () => {
-			expect(() => {
-				crypto.modInv(null, undefined);
-			}).to.throw(ReferenceError, 'missing arguments');
-
-			expect(() => {
-				crypto.modInv(null);
-			}).to.throw(ReferenceError, 'missing arguments');
-
-			expect(() => {
-				crypto.modInv();
-			}).to.throw(ReferenceError, 'missing arguments');
-		});
-	});	
-
-	context('with different argument types', () => {
-		it('should return correct bigInt', () => {
-			expect(crypto.modInv(bigInt(98712367), 78321).toString()).to.equal('68995');
-		});
-	});
-	
-	context('with number arguments', () => {
-		it('should return correct bigInt', () => {
-			expect(crypto.modInv(98712367, 78321).toString()).to.equal('68995');
-		});
-	});
-
-	context('with bigInt arguments', () =>  {
-		it('should return correct bigInt', () => {
-			expect(crypto.modInv(bigInt('987123673122487'), bigInt('718321')).toString()).to.equal('430863');
-		});
-	});
-	
-	context('with not co-prime arguments', () =>  {
-		it('should throw error', () => {
-			expect(() => {
-				crypto.modInv(bigInt('123872498'), bigInt('213798'));
-			}).to.throw(Error, 'are not co-prime');
-		});
-	});
-});
-
 describe('#findNextPoint()', function() {	
 	context('with two different points in argument', () => {
 		it('should return correct next point', () => {
-			let P = { x: 3, y: 24 };
-			let Q = { x: 5, y: 83 };
-			let a = 1;
-			let m = 109;
-			let R = { x: 72, y: 66 };
+			let P = { x: bigInt(3), y: bigInt(24) };
+			let Q = { x: bigInt(5), y: bigInt(83) };
+			let a = bigInt(1);
+			let m = bigInt(109);
+			let R = { x: bigInt(72), y: bigInt(66) };
 
 			expect(crypto.findNextPoint(P, Q, a, m)).to.deep.equal(R);
 		});
 
 		it('should return correct next point', () => {
-			let P = { x: 11, y: 12 };
-			let Q = { x: 17, y: 74 };
-			let a = 1;
-			let m = 109;
-			let R = { x: 103, y: 91 };
+			let P = { x: bigInt(11), y: bigInt(12) };
+			let Q = { x: bigInt(17), y: bigInt(74) };
+			let a = bigInt(1);
+			let m = bigInt(109);
+			let R = { x: bigInt(103), y: bigInt(91) };
 
 			expect(crypto.findNextPoint(P, Q, a, m)).to.deep.equal(R);
 		});
@@ -152,21 +70,21 @@ describe('#findNextPoint()', function() {
 
 	context('with two identical points in argument', () => {
 		it('should return correct next point', () => {
-			let P = { x: 0, y: 108 };
-			let Q = { x: 0, y: 108 	};
-			let a = 1;
-			let m = 109;
-			let R = { x: 82, y: 42 };
+			let P = { x: bigInt(0), y: bigInt(108) };
+			let Q = { x: bigInt(0), y: bigInt(108) 	};
+			let a = bigInt(1);
+			let m = bigInt(109);
+			let R = { x: bigInt(82), y: bigInt(42) };
 
 			expect(crypto.findNextPoint(P, Q, a, m)).to.deep.equal(R);
 		});
 
 		it('should return correct next point', () => {
-			let P = { x: 1, y: 60 };
-			let Q = { x: 1, y: 60 };
-			let a = 1;
-			let m = 109;
-			let R = { x: 72, y: 43 };
+			let P = { x: bigInt(1), y: bigInt(60) };
+			let Q = { x: bigInt(1), y: bigInt(60) };
+			let a = bigInt(1);
+			let m = bigInt(109);
+			let R = { x: bigInt(72), y: bigInt(43) };
 
 			expect(crypto.findNextPoint(P, Q, a, m)).to.deep.equal(R);
 		});
@@ -176,31 +94,31 @@ describe('#findNextPoint()', function() {
 describe('#doubleAndAdd()', function() {	
 	context('with valid arguments', () => {
 		it('should return correct point', () => {
-			let P = { x: 18, y: 40 };
-			let n = 10;
-			let a = 1;
-			let m = 109;
-			let R = { x: 75, y: 11 };
+			let P = { x: bigInt(18), y: bigInt(40) };
+			let n = bigInt(10);
+			let a = bigInt(1);
+			let m = bigInt(109);
+			let R = { x: bigInt(75), y: bigInt(11) };
 
 			expect(crypto.doubleAndAdd(P, n, a, m)).to.deep.equal(R);
 		});
 
 		it('should return correct point', () => {
-			let P = { x: 3, y: 24 };
-			let n = 400;
-			let a = 1;
-			let m = 109;
-			let R = { x: 50, y: 79 };
+			let P = { x: bigInt(3), y: bigInt(24) };
+			let n = bigInt(400);
+			let a = bigInt(1);
+			let m = bigInt(109);
+			let R = { x: bigInt(50), y: bigInt(79) };
 
 			expect(crypto.doubleAndAdd(P, n, a, m)).to.deep.equal(R);
 		});
 
 		it('should return correct point', () => {
-			let P = { x: 3, y: 24 };
-			let n = 1298370031;
-			let a = 1;
-			let m = 109;
-			let R = { x: 33, y: 1 };
+			let P = { x: bigInt(3), y: bigInt(24) };
+			let n = bigInt(1298370031);
+			let a = bigInt(1);
+			let m = bigInt(109);
+			let R = { x: bigInt(33), y: bigInt(1) };
 
 			expect(crypto.doubleAndAdd(P, n, a, m)).to.deep.equal(R);
 		});
