@@ -3,6 +3,7 @@ module ResultChecker where
 import Elgamal
 import EllipticAlgebra
 import Data.List.Split
+import Data.List
 
 type Vote = (String,[Cipher])
 
@@ -40,6 +41,44 @@ readElectoralRegister path = do
 slice :: Int -> Int -> [a] -> [a]
 slice from to xs = take (to - from + 1) (drop from xs)
 
-{-
-["MyAddr","6 303 343 283","7 301 219 229","305 249 199 296","MyAddr","6 303 343 283","7 301 219 229","305 249 199 296","MyAddr","6 303 343 283","7 301 219 229","305 249 199 296","MyAddr","6 303 343 283","7 301 219 229","305 249 199 296"]
--}
+
+isValidVote :: PublicKey -> SecretKey -> Vote -> Bool
+isValidVote pk sk (addr,ciphers) = 1 ==  decryptSumOfMessages pk sk ciphers 
+
+
+--                 pk            sk         all votes      good      invalid
+separateVotes :: PublicKey -> SecretKey -> Register -> (Register,Register)
+separateVotes pk sk register = partition (isValidVote pk sk) register 
+
+
+
+-- tally results
+tallyVotes :: PublicKey -> SecretKey -> Register -> [Integer]
+tallyVotes _ _ [] = []
+tallyVotes pk sk (p@(_,votes):ps) = aggregate (getPersonVotes pk sk votes) (tallyVotes pk sk ps)
+
+getPersonVotes :: PublicKey -> SecretKey -> [Cipher] -> [Integer]
+getPersonVotes _ _ [] = []
+getPersonVotes pk sk (c:cs) = decryptMessage pk sk c:getPersonVotes pk sk cs
+
+
+testKeys :: (PublicKey,SecretKey)
+testKeys = (((49,109,541),61,(Coord 153 308),(Coord 419 248)),19)
+
+pK = fst testKeys
+sK = snd testKeys
+
+
+getElectionResult :: String -> IO ()
+getElectionResult path = do
+    register <- readElectoralRegister path
+    print ("Total pepople voted is " ++ show (length register))
+    let  (valid,invalid) = separateVotes pK sK register
+    print ("Number of invalid votes is " ++ show (length invalid) )
+    print (tallyVotes pK sK valid)
+
+
+aggregate :: Num a => [a] -> [a] -> [a]
+aggregate [] y = y 
+aggregate x [] = x
+aggregate x y = zipWith (+) x y
