@@ -37,6 +37,8 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ## Crypto functions (utils/crypto.js)
 
 <dl>
+<dt><a href="#encrypt">encrypt(message, ordG, G, B, p, A)</a> ⇒ <code>Point</code></dt>
+<dd></dd>
 <dt><a href="#doubleAndAdd">doubleAndAdd(P, n, m)</a> ⇒ <code>Point</code></dt>
 <dd><p>Calculates n * P using double-and-add method
 <a href="https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add">https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add</a></p>
@@ -57,12 +59,24 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 <dd><p>Calculates the lambda used for point doubling</p>
 </dd>
 <dt><a href="#mod">mod(x, n)</a> ⇒ <code>Integer</code></dt>
-<dd><p>Real modulo function which supports negative numbers</p>
-</dd>
-<dt><a href="#modInv">modInv(x, n)</a> ⇒ <code>Integer</code></dt>
-<dd><p>Finds the modulo inverse for x (x^-1 mod n)</p>
+<dd><p>Real modulo function which supports negative numbers (Supports both bigInts and Integers)</p>
 </dd>
 </dl>
+
+<a name="encrypt"></a>
+
+## encrypt(message, ordG, G, B, p, A) ⇒ <code>Point</code>
+**Kind**: global function  
+**Returns**: <code>Point</code> - The point represnting the encrypted data.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| message | <code>Integer</code> | The message to be encrypted |
+| ordG | <code>Integer</code> | The order of the generator |
+| G | <code>Point</code> | The generator for the encryption |
+| B | <code>Point</code> | The public key |
+| p | <code>Integer</code> | The prime used as modulo |
+| A | <code>Integer</code> | The a-value of the curve |
 
 <a name="doubleAndAdd"></a>
 
@@ -153,7 +167,7 @@ Calculates the lambda used for point doubling
 <a name="mod"></a>
 
 ## mod(x, n) ⇒ <code>Integer</code>
-Real modulo function which supports negative numbers
+Real modulo function which supports negative numbers (Supports both bigInts and Integers)
 
 **Kind**: global function  
 **Returns**: <code>Integer</code> - The result  
@@ -161,18 +175,5 @@ Real modulo function which supports negative numbers
 | Param | Type | Description |
 | --- | --- | --- |
 | x | <code>Integer</code> | The value to be modulo-ed |
-| n | <code>Integer</code> | The modulo value |
-
-<a name="modInv"></a>
-
-## modInv(x, n) ⇒ <code>Integer</code>
-Finds the modulo inverse for x (x^-1 mod n)
-
-**Kind**: global function  
-**Returns**: <code>Integer</code> - The modulo inverse  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| x | <code>Integer</code> | The value to be inverse-modulo-ed |
 | n | <code>Integer</code> | The modulo value |
 
