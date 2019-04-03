@@ -14,13 +14,13 @@ function encrypt(message, ordG, G, B) {
  * @param  {Integer} m The modulo of the current curve
  * @return {Point}     The resulting point
  */
-function doubleAndAdd(P, n, m) {
+function doubleAndAdd(P, n, a, m) {
 	if (!n) return 0;
 	if (n === 1) return P;
 
-	if (mod(n, 2) === 1) return pointAdd(P, doubleAndAdd(P, n-1, m), m);
+	if (mod(n, 2) === 1) return pointAdd(P, doubleAndAdd(P, n-1, a, m), m);
 
-	return doubleAndAdd(pointDouble(P, P, m), n/2, m);
+	return doubleAndAdd(pointDouble(P, P, a, m), n/2, a, m);
 }
 
 /**
@@ -30,11 +30,11 @@ function doubleAndAdd(P, n, m) {
  * @param  {Integer} m The modulo of the current curve
  * @return {Point}     The resulting point
  */
-function findNextPoint(P, Q, m) {
+function findNextPoint(P, Q, a, m) {
 	// Check if same point
 	if (P.x === Q.x && P.y === Q.y) {
 		// Do multiplication
-		return pointDouble(P, Q, m);
+		return pointDouble(P, Q, a, m);
 	} else {
 		// Do addition
 		return pointAdd(P, Q, m);
@@ -116,7 +116,7 @@ function calcDoubleLambda(P, a, m) {
 }
 
 /**
- * Real modulo function which supports negative numbers
+ * Real modulo function which supports negative numbers (Supports both bigInts and Integers)
  * @param  {Integer} x The value to be modulo-ed
  * @param  {Integer} n The modulo value
  * @return {Integer}   The result

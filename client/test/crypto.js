@@ -132,19 +132,21 @@ describe('#findNextPoint()', function() {
 		it('should return correct next point', () => {
 			let P = { x: 3, y: 24 };
 			let Q = { x: 5, y: 83 };
+			let a = 1;
 			let m = 109;
 			let R = { x: 72, y: 66 };
 
-			expect(crypto.findNextPoint(P, Q, m)).to.deep.equal(R);
+			expect(crypto.findNextPoint(P, Q, a, m)).to.deep.equal(R);
 		});
 
 		it('should return correct next point', () => {
 			let P = { x: 11, y: 12 };
 			let Q = { x: 17, y: 74 };
+			let a = 1;
 			let m = 109;
 			let R = { x: 103, y: 91 };
 
-			expect(crypto.findNextPoint(P, Q, m)).to.deep.equal(R);
+			expect(crypto.findNextPoint(P, Q, a, m)).to.deep.equal(R);
 		});
 	});
 
@@ -152,19 +154,21 @@ describe('#findNextPoint()', function() {
 		it('should return correct next point', () => {
 			let P = { x: 0, y: 108 };
 			let Q = { x: 0, y: 108 	};
+			let a = 1;
 			let m = 109;
 			let R = { x: 82, y: 42 };
 
-			expect(crypto.findNextPoint(P, Q, m)).to.deep.equal(R);
+			expect(crypto.findNextPoint(P, Q, a, m)).to.deep.equal(R);
 		});
 
 		it('should return correct next point', () => {
 			let P = { x: 1, y: 60 };
 			let Q = { x: 1, y: 60 };
+			let a = 1;
 			let m = 109;
 			let R = { x: 72, y: 43 };
 
-			expect(crypto.findNextPoint(P, Q, m)).to.deep.equal(R);
+			expect(crypto.findNextPoint(P, Q, a, m)).to.deep.equal(R);
 		});
 	});
 });
@@ -174,28 +178,31 @@ describe('#doubleAndAdd()', function() {
 		it('should return correct point', () => {
 			let P = { x: 18, y: 40 };
 			let n = 10;
+			let a = 1;
 			let m = 109;
 			let R = { x: 75, y: 11 };
 
-			expect(crypto.doubleAndAdd(P, n, m)).to.deep.equal(R);
+			expect(crypto.doubleAndAdd(P, n, a, m)).to.deep.equal(R);
 		});
 
 		it('should return correct point', () => {
 			let P = { x: 3, y: 24 };
 			let n = 400;
+			let a = 1;
 			let m = 109;
 			let R = { x: 50, y: 79 };
 
-			expect(crypto.doubleAndAdd(P, n, m)).to.deep.equal(R);
+			expect(crypto.doubleAndAdd(P, n, a, m)).to.deep.equal(R);
 		});
 
 		it('should return correct point', () => {
 			let P = { x: 3, y: 24 };
 			let n = 1298370031;
+			let a = 1;
 			let m = 109;
 			let R = { x: 33, y: 1 };
 
-			expect(crypto.doubleAndAdd(P, n, m)).to.deep.equal(R);
+			expect(crypto.doubleAndAdd(P, n, a, m)).to.deep.equal(R);
 		});
 	});
 });
