@@ -1,4 +1,4 @@
-module Elgamal where
+module Elgamal(PublicKey,SecretKey,Cipher,decryptMessage,decryptSumOfMessages) where
 
 import EllipticAlgebra
 
@@ -16,6 +16,7 @@ type PublicKey = (Curve,Integer,Point,Point)
 --                d
 type SecretKey = Integer
 
+type Cipher = (Point,Point)
 
 
 generateKeys :: Curve -> Integer -> (PublicKey,SecretKey)
