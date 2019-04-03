@@ -5,11 +5,23 @@ set -e
 PORT="7545"
 NODE="ws://localhost:$PORT"
 PRIVATE_KEY="0xed75458862753c6cb536343a4e7d9cb3e3fffc5d0069720e0489c7cb27bafb9e"
+
+
 CANDIDATES='["Latiif", "Sarah", "Kevin", "Eric", "Zack", "Oscar"]'
-BLOCKAMOUNT="120"
+BLOCKS_UNTIL_START=0
+BLOCKS_UNTIL_END=100
+# Voterecord should be here
+ADMINS='[$PRIVATE_KEY]'
+A=0
+B=0
+p=0
+q=0
+gx=0
+gy=0
+bx=0
+by=0
 
 PLATFORM=""
-
 if [ "$(uname)" == "Darwin" ]; then
 	# Do something under Mac OS X platform  
 	echo "Mac OS X detected"
@@ -96,7 +108,7 @@ sleep 1
 cp votingsystem/votingsystem.sol compile-deploy-smartcontract/contracts
 cd compile-deploy-smartcontract
 echo 'Deploying votingsystem.sol...'
-node src/app.js --node "$NODE" --key "$PRIVATE_KEY" --args "$CONTRACT_ARGS" --file "votingsystem" --output "" --fo="./../elections.json"
+node src/app.js --node "$NODE" --key "$PRIVATE_KEY" --debug 'true' --args "$CONTRACT_ARGS" --file "votingsystem" --output "" --fo="./../elections.json"
 
 echo "Starting server..."
 cd ../server
