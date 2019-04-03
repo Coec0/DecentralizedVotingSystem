@@ -39,7 +39,7 @@ contract VotingSystem {
     Candidate[] public allCandidates; //All the candidates
     
     address[] public voters; //All who has voted
-    mapping(address => uint[]) public votedFor; //See the encrypted values that an address has voted for
+    mapping(address => uint[4][]) public votedFor; //See the encrypted values that an address has voted for
     
     uint private blockStopNumber; //when the block.number reaches this stop the voting
     uint private blockStartNumber; //when the block.number reaches this start the voting
@@ -170,7 +170,7 @@ contract VotingSystem {
      * @param candidates The candidates voted for encrypted with elgamal. The array should
      * be the same length as the amount of candidates
      */
-    function vote (uint[] memory candidates) public {
+    function vote (uint[4][] memory candidates) public {
         require(isVotingOpen(), "Voting is closed!");
         require(record.isOnWhiteList(msg.sender), "You are not allowed to vote!");
         require(candidates.length == allCandidates.length, "You have not voted for everyone!");
