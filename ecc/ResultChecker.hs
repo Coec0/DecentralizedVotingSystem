@@ -46,8 +46,8 @@ isValidVote pk sk (addr,ciphers) = 1 ==  decryptSumOfMessages pk sk ciphers
 
 
 --                 pk            sk         all votes      good      invalid
-separateVotes :: PublicKey -> SecretKey -> Register -> (Register,Register)
-separateVotes pk sk  = partition (isValidVote pk sk)  
+separateVotes :: PublicKey -> SecretKey -> Register -> IO (Register,Register)
+separateVotes pk sk register  = return $ partition (isValidVote pk sk) register
 
 
 
@@ -71,9 +71,10 @@ sK = snd testKeys
 getElectionResult :: String -> IO ()
 getElectionResult path = do
     register <- readElectoralRegister path
-    print ("Total pepople voted is " ++ show (length register))
-    let  (valid,invalid) = separateVotes pK sK register
-    print ("Number of invalid votes is " ++ show (length invalid) )
+    putStrLn ("Total pepople voted is " ++ show (length register))
+    putStrLn "Filtering out invalid ballots"
+    (valid,invalid) <- separateVotes pK sK register
+    putStrLn (show (length invalid) ++ " invalid ballots found.")
     print (tallyVotes pK sK valid)
 
 
