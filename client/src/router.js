@@ -26,7 +26,7 @@ export default new Router({
 			path: '/results',
 			name: 'results',
 			component: () => import(/* webpackChunkName: "home" */ '@/views/Results')
-		}
+		},
 		{ path: '*', redirect: '/' }
 	]
 });
