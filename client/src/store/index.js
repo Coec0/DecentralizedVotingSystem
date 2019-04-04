@@ -151,16 +151,22 @@ export default new Vuex.Store({
 					return candidate.id === selection ? 1 : 0;
 				});
 
-				encryptionArray.forEach(value => {
-					value = crypto.encrypt(bigInt(value), pk.q, pk.G, pk.B, pk.p, pk.a);
-				});
+				for (let i = 0; i < encryptionArray.length; i++) {
+					encryptionArray[i] = crypto.encrypt(bigInt(encryptionArray[i]), pk.q, pk.G, pk.B, pk.p, pk.a)
+				}
 
 				console.log(encryptionArray)
 
-				// state.smartcontract.methods.vote(/* ENCRYPTED DATA */).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address }).then(success => {
-				// 	console.log('Vote placed');
-				// 	resolve();
-				// }).catch(reject);
+				const data = encryptionArray.map(item => {
+					return [ item[0].x.toString(), item[0].y.toString(), item[1].x.toString(), item[1].y.toString() ];
+				});
+
+				console.log(data);
+
+				state.smartcontract.methods.vote(data).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address, gas: 6721975 }).then((receipt) => {
+					console.log(receipt);
+					resolve();
+				}).catch(reject);
 			});
 		},
 		FETCH_PUBLICKEY({ commit, state }) {
@@ -179,9 +185,6 @@ export default new Vuex.Store({
 					let B = { x: bigInt(pk[6]), y: bigInt(pk[7]) };
 
 					commit('SET_PUBLICKEY', { a, b, p, q, G, B });
-
-					console.log(state.publickey)
-
 					resolve();
 				} catch (error) {
 					reject(err);
