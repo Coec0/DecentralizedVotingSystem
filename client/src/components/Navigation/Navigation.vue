@@ -6,7 +6,8 @@
 			</router-link>
 		</div>
 		<NavButton class="nav-button hvr-fade" v-for="item in items" :key="item.id" :text="item.name" :to="'/vote/' + item.id.toString()"></NavButton>
-		<NavButton class="nav-button hvr-fade tools" text="Tools" to="/tools"></NavButton>
+		<NavButton class="nav-button hvr-fade results" text="Results" to="/results"></NavButton>
+		<NavButton class="nav-button hvr-fade" text="Tools" to="/tools"></NavButton>
 	</div>
 </template>
 
@@ -33,9 +34,8 @@ export default {
 	align-items: center;
 }
 
-.tools {
+.results {
 	margin-left: auto;
-	width: 100px;
 }
 
 .container-fluid {
