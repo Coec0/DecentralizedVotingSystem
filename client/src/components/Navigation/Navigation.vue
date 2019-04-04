@@ -48,6 +48,10 @@ export default {
 	width: 150px;
 }
 
+.nav-button:nth-child(2) {
+	border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
 .nav-button:last-child {
 	border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
