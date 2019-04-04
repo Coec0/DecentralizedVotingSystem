@@ -38,24 +38,8 @@
 		"contracts": [
 			{
 				"id": 1,
-				"set": false,
-				"name": "Kommunalval",
-				"nodeAddr": null,
-				"bcAddr": null,
-				"abi": null
-			},
-			{
-				"id": 2,
-				"set": false,
-				"name": "Landstingsval",
-				"nodeAddr": null,
-				"bcAddr": null,
-				"abi": null
-			},
-			{
-				"id": 3,
 				"set": true,
-				"name": "Riksdagsval",
+				"name": "Election",
 				"nodeAddr": null,
 				"bcAddr": null,
 				"abi": null
