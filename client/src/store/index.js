@@ -1,5 +1,6 @@
 const Web3 = require('web3');
-const bigInt = require("big-integer");
+const bigInt = require('big-integer');
+const crypto = require('./../utils/crypto.js');
 import Vue from 'vue';
 import Vuex from 'vuex';
 
@@ -139,20 +140,27 @@ export default new Vuex.Store({
 			commit('SET_PUBLICKEY', null);
 		},
 		SUBMIT_VOTE({ commit, state }, selection) {
-			throw new Error('SUBMIT_VOTE not implemented');
-
-			return new Promise(async (resolve, reject) => {
+			return new Promise((resolve, reject) => {
 				if (!state.web3) return reject('Tried SUBMIT_VOTE without web3 set');
 				if (!state.smartcontract) return reject('Tried SUBMIT_VOTE without smartcontract set');
 
-				const pubkey = await state.smartcontract.methods.getPublicKey().call();
+				const pk = state.publickey;
 
 				// Encryption will happen here
+				const encryptionArray = state.candidates.map(candidate => {
+					return candidate.id === selection ? 1 : 0;
+				});
 
-				state.smartcontract.methods.vote(/* ENCRYPTED DATA */).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address }).then(success => {
-					console.log('Vote placed');
-					resolve();
-				}).catch(reject);
+				encryptionArray.forEach(value => {
+					value = crypto.encrypt(bigInt(value), pk.q, pk.G, pk.B, pk.p, pk.a);
+				});
+
+				console.log(encryptionArray)
+
+				// state.smartcontract.methods.vote(/* ENCRYPTED DATA */).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address }).then(success => {
+				// 	console.log('Vote placed');
+				// 	resolve();
+				// }).catch(reject);
 			});
 		},
 		FETCH_PUBLICKEY({ commit, state }) {

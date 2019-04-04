@@ -1,5 +1,5 @@
 <template>
-	<div class="container vote ">
+	<div class="container vote">
 		<div class="error" v-if="error">
 			<h2>Vote hasn't opened yet!</h2>
 		</div>

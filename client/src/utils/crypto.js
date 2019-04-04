@@ -29,7 +29,7 @@ function encrypt(message, ordG, G, B, p, A) {
 	const B2_2 = doubleAndAdd(B, random, A, p);
 	const B2 = findNextPoint(B2_1, B2_2, A, p);
 
-	return { x: B1, y: B2 };
+	return [ B1, B2 ];
 }
 
 /**
@@ -195,4 +195,4 @@ function checkBigInts(...args) {
 }
 
 // Functions added here are exposed to the outside
-module.exports = { doubleAndAdd, findNextPoint, mod }
+module.exports = { encrypt, doubleAndAdd, findNextPoint, mod }
