@@ -15,8 +15,18 @@ export default new Router({
 		{
 			path: '/vote/:id',
 			name: 'vote',
-			component: () => import(/* webpackChunkName: "admin" */ '@/views/Vote')
+			component: () => import(/* webpackChunkName: "home" */ '@/views/Vote')
 		},
+		{
+			path: '/tools',
+			name: 'tools',
+			component: () => import(/* webpackChunkName: "home" */ '@/views/Tools')
+		},
+		{
+			path: '/results',
+			name: 'results',
+			component: () => import(/* webpackChunkName: "home" */ '@/views/Results')
+		}
 		{ path: '*', redirect: '/' }
 	]
 });

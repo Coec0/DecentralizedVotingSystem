@@ -6,6 +6,7 @@
 			</router-link>
 		</div>
 		<NavButton class="nav-button hvr-fade" v-for="item in items" :key="item.id" :text="item.name" :to="'/vote/' + item.id.toString()"></NavButton>
+		<NavButton class="nav-button hvr-fade tools" text="Tools" to="/tools"></NavButton>
 	</div>
 </template>
 
@@ -30,6 +31,11 @@ export default {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.tools {
+	margin-left: auto;
+	width: 100px;
 }
 
 .container-fluid {
