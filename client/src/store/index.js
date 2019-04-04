@@ -1,4 +1,5 @@
 const Web3 = require('web3');
+const bigInt = require("big-integer");
 import Vue from 'vue';
 import Vuex from 'vuex';
 
@@ -43,11 +44,19 @@ export default new Vuex.Store({
 			}
 			state.candidates = candidates;
 		},
-		SET_PRIVATEKEY(state, key) {
-			state.privatekey = key;
+		SET_PRIVATEKEY(state, sk) {
+			state.privatekey = sk;
 		},
 		SET_PASSWORD(state, pw) {
 			state.password = pw;
+		},
+		SET_PUBLICKEY(state, pk) {
+			state.publickey = pk;
+			if (pk) {
+				console.log(`Public key set`);
+			} else {
+				console.log(`Public key removed`);
+			}
 		}
 	},
 	actions: {
@@ -126,7 +135,8 @@ export default new Vuex.Store({
 			commit('SET_CANDIDATES', []);
 			commit('SET_PRIVATEKEY', null);
 			commit('SET_WEB3', null);
-			commit('SET_SMARTCONTRACT', null);	
+			commit('SET_SMARTCONTRACT', null);
+			commit('SET_PUBLICKEY', null);
 		},
 		SUBMIT_VOTE({ commit, state }, selection) {
 			throw new Error('SUBMIT_VOTE not implemented');
@@ -143,6 +153,31 @@ export default new Vuex.Store({
 					console.log('Vote placed');
 					resolve();
 				}).catch(reject);
+			});
+		},
+		FETCH_PUBLICKEY({ commit, state }) {
+			return new Promise(async (resolve, reject) => {
+				if (!state.web3) return reject('Tried FETCH_PUBLICKEY without web3 set');
+				if (!state.smartcontract) return reject('Tried FETCH_PUBLICKEY without smartcontract set');
+
+				try {
+					const pk = Object.values(await state.smartcontract.methods.getPublicKey().call());
+
+					let a = bigInt(pk[0]);
+					let b = bigInt(pk[1]);
+					let p = bigInt(pk[2]);
+					let q = bigInt(pk[3]);
+					let G = { x: bigInt(pk[4]), y: bigInt(pk[5]) };
+					let B = { x: bigInt(pk[6]), y: bigInt(pk[7]) };
+
+					commit('SET_PUBLICKEY', { a, b, p, q, G, B });
+
+					console.log(state.publickey)
+
+					resolve();
+				} catch (error) {
+					reject(err);
+				}
 			});
 		}
 	}
