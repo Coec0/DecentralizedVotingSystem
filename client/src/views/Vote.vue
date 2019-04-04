@@ -159,6 +159,7 @@ export default {
 				await this.$store.dispatch('CREATE_WEB3', result.data.nodeAddr);
 				await this.$store.dispatch('CREATE_SMARTCONTRACT', { abi: result.data.abi, scAddr: result.data.bcAddr });
 				await this.$store.dispatch('FETCH_CANDIDATES');
+				await this.$store.dispatch('FETCH_PUBLICKEY');
 
 				// Show components
 				this.loaded = true;

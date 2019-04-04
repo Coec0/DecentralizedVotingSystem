@@ -4,7 +4,8 @@ let state = {
 	privatekey: null,
 	password: null,
 	web3: null,
-	smartcontract: null
+	smartcontract: null,
+	publickey: null
 }
 
 export default state;
