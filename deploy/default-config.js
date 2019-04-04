@@ -1,5 +1,4 @@
 {
-	"candidates": [],
 	"ganache": {
 		"port": 7545,
 		"accounts": [

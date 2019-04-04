@@ -1,4 +1,5 @@
 const ganache = require("ganache-cli");
+const Web3 = new require('web3');
 
 function start(config) {
 	return new Promise((resolve, reject) => {
@@ -17,7 +18,17 @@ function start(config) {
 		server.listen(config.ganache.port, (err, blockchain) => {
 			if (err) return reject(err);
 
+			const web3 = new Web3(`ws://localhost:${config.ganache.port}`);
+
 			console.log(`Ganache server up and running at ws://localhost:${config.ganache.port}`);
+			console.log('---------------------------- Accounts ---------------------------------');
+			Object.values(blockchain.unlocked_accounts).forEach((account, index) => {
+				console.log('                             Account ' + index);
+				console.log('Address:    ' + account.address);
+				console.log('Secret key: 0x' + account.secretKey.toString('hex'));
+				console.log('Balance:    ' + web3.utils.fromWei(web3.utils.toBN(account.account.balance.toString('hex'))) + ' Ether');
+			});
+			console.log('-----------------------------------------------------------------------');
 			resolve();
 		});
 		
