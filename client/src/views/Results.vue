@@ -1,5 +1,5 @@
 <template>
-	<div class="home white">
+	<div class="home">
 	 	<div class="container">
 	 		<div id="title">
 		 		Decentralized Voting System
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-	name: 'Home',
+	name: 'Results',
 	data() {
 		return {};
 	},

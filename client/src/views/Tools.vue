@@ -1,21 +1,20 @@
 <template>
-	<div class="home white">
-	 	<div class="container">
-	 		<div id="title">
-		 		Decentralized Voting System
-		 	</div>
-	 	</div>
-	 	<div class="container">
-	 		<div id="title">
-		 		Step by step guide
-		 	</div>
-	 	</div>
+	<div class="container">
+		<whitelist></whitelist>
+		<encrypt-privatekey></encrypt-privatekey>
 	</div>
 </template>
 
 <script>
+import Whitelist from '@/components/Tools/Whitelist.vue';
+import EncryptPrivateKey from '@/components/Tools/EncryptPrivateKey.vue';
+
 export default {
-	name: 'Home',
+	name: 'Tools',
+	components: {
+		'whitelist': Whitelist,
+		'encrypt-privatekey': EncryptPrivateKey
+	},
 	data() {
 		return {};
 	},
@@ -29,13 +28,4 @@ export default {
 </script>
 
 <style scoped>
-.home {
-	width: 100%;
-}
-
-#title {
-	font-size: 32px;
-	text-align: center;
-	height: 15em;
-}
 </style>
