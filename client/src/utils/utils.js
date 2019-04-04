@@ -32,23 +32,25 @@ class Utils {
 		return balance > 0;
 	}
 
-	// Decrypts using XOR and password padding
-	decryptPK(privatekey, password) {
+	// Does XOR between password hash and given data
+	XOR(data, password) {
 		// Error checking
-		if (!privatekey) throw new Error('privatekey is not given!');
+		if (!data) throw new Error('data is not given!');
 		if (!password) throw new Error('password is not given!');
+		if (!data.startsWith('0x')) throw new Error('data is not hex');
+		if (data.length !== 66) throw new Error(`invalid data length: ${data.length} (length must be 66)`);
 
 		// Remove '0x' because we can't have it when doing bitwise operations
-		const pk = privatekey.replace('0x', '');
+		data = data.replace('0x', '');
 		// Do keccak-256 on password
 		const pwHash = Web3.utils.sha3(password).replace('0x', '');
 
 		// Create buffers so we can do bitwise operation
-		let pkBuffer = Buffer.from(pk, 'hex');
+		let dataBuffer = Buffer.from(data, 'hex');
 		let pwBuffer = Buffer.from(pwHash, 'hex');
 
 		// More error checking
-		if (pkBuffer.length !== 32) throw new Error(`pkBuffer length is ${pkBuffer.length} (should be 32)`);
+		if (dataBuffer.length !== 32) throw new Error(`dataBuffer length is ${dataBuffer.length} (should be 32)`);
 		if (pwBuffer.length !== 32) throw new Error(`pwBuffer length is ${pwBuffer.length} (should be 32)`);
 
 		// Create buffer where we store result
@@ -56,10 +58,10 @@ class Utils {
 
 		// Where the magic happens
 		for (var i = 0; i < 32; i++) {
-			resultBuffer[i] = pwBuffer[i] ^ pkBuffer[i];
+			resultBuffer[i] = pwBuffer[i] ^ dataBuffer[i];
 		}
 
-		return resultBuffer.toString('hex');
+		return '0x' + resultBuffer.toString('hex');
 	}
 }
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="container vote">
+	<div class="container flex-grow-1 vote">
 		<div class="error" v-if="error">
 			<h2>Vote hasn't opened yet!</h2>
 		</div>
@@ -97,7 +97,7 @@ export default {
 			}
 		},
 		async pwSubmit() {
-			const pk = utils.decryptPK(this.$store.state.privatekey, this.$store.state.password);
+			const pk = utils.XOR(this.$store.state.privatekey, this.$store.state.password);
 			this.$store.commit('SET_PASSWORD', pk);
 
 			this.state.showSpinner = true;
@@ -202,12 +202,6 @@ h1 {
 
 .container {
 	margin-bottom: 20px;
-}
-
-.content {
-	padding: 40px;
-	margin: auto;
-	background-color: rgba(44,62,80, 0.1);
 }
 
 .fade-enter-active, .fade-leave-active {

@@ -90,14 +90,8 @@ export default {
 	text-align: center;
 	background-color: #fafafa;
 	min-height: 100vh;
-}
-
-.white {
-	background-color: #fff;
-}
-
-.gray {
-	background-color: #fafafa;
+	display: flex;
+	flex-direction: column;
 }
 
 body {
