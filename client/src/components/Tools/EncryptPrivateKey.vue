@@ -28,6 +28,7 @@ export default {
 					this.password = null;
 				} catch (err) {
 					this.result = err.message;
+					console.error(err);
 				}
 			}
 		}
