@@ -88,7 +88,7 @@ pointInvert (_,_,p) (Coord x y) = Coord x ((-y) `mod` p)
 -- The main method that returns nP
 
 pointMul :: Curve -> Point -> Integer -> Point
-pointMul c p n = pointMul' c p (n `mod` getOrderOfGenerator c p)
+pointMul c p n = pointMul' c p n
 
 pointMul' :: Curve -> Point -> Integer -> Point
 pointMul' _ _ 0 = Identity
@@ -113,11 +113,11 @@ modExp b e m = t * modExp ((b * b) `mod` m) (shiftR e 1) m `mod` m
 
 -- generate possible generators
 getGenerators :: Curve -> [Point]
-getGenerators c = map snd $ filter (\p -> largestOrder == fst p) possibleCandidates
+getGenerators c = map snd  possibleCandidates
     where 
         allPoints = map (\p -> (getOrderOfGenerator c p,p)) (findPtsOnCurve c)
         possibleCandidates = filter (isPrime . fst) allPoints
-        largestOrder = maximum $ map fst possibleCandidates 
+        --largestOrder = maximum $ map fst possibleCandidates 
 
 isPrime k = null [ x | x <- [2..k - 1], k `mod` x == 0]
 -- The main program
