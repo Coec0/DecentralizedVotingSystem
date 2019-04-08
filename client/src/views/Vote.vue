@@ -147,7 +147,7 @@ export default {
 			// Fetch info about vote
 			this.$http.get(`/getElection/${this.$route.params.id}`).then(async (result) => {
 				// Error handling
-				if (!result.data.nodeAddr || !result.data.abi || !result.data.bcAddr) {
+				if (!result.data.nodeAddr || !result.data.contracts) {
 					this.error = true;
 					return;
 				}
@@ -157,7 +157,7 @@ export default {
 
 				// Do things in store and wait for them to complete
 				await this.$store.dispatch('CREATE_WEB3', result.data.nodeAddr);
-				await this.$store.dispatch('CREATE_SMARTCONTRACT', { abi: result.data.abi, scAddr: result.data.bcAddr });
+				await this.$store.dispatch('CREATE_SMARTCONTRACTS', result.data.contracts);
 				await this.$store.dispatch('FETCH_CANDIDATES');
 				await this.$store.dispatch('FETCH_PUBLICKEY');
 
