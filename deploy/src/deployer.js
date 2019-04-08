@@ -46,7 +46,7 @@ async function deployRecord(config) {
 	});
 	console.log(`Contract ${config.record.name} successfully deployed at address: ${contract.options.address}`);
 
-	return { address: contract.options.address };
+	return { address: contract.options.address, abi: compiledContract.abi };
 }
 
 async function deploySystem(recordAddress, config) {

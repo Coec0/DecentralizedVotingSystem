@@ -14,7 +14,7 @@ async function main() {
 	let votingrecord = await deployer.deployRecord(config);
 	let votingsystem = await deployer.deploySystem(votingrecord.address, config);
 
-	await io.createBackendConfig(votingsystem, config);
+	await io.createBackendConfig(votingrecord, votingsystem, config);
 	await io.startBackend();
 	console.timeEnd('Deployed in');
 	console.log();
