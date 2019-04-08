@@ -3,10 +3,7 @@ package cth.dvs.server.pojo;
 import io.jsondb.annotation.Document;
 import io.jsondb.annotation.Id;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Document(collection = "elections", schemaVersion = "1.0")
@@ -49,9 +46,26 @@ public class Election {
         contracts.put(contractName,contract);
     }
 
-    public List<Contract> getContracts(){
-        return new LinkedList<>(contracts.values());
+    public void setContracts(Map<String,Contract> contracts){
+        this.contracts = new HashMap<>(contracts);
     }
+    public Map<String,Contract> getContracts(){
+
+
+        System.out.println("Start");
+        System.out.println(String.valueOf(contracts.size()));
+        contracts.forEach((s, contract) -> {
+            System.out.println(contract.getAbi());
+            System.out.println(contract.getBcAddr());
+        });
+
+        System.out.println("End");
+        return  contracts;
+//        Integer[] spam = new Integer[] { 1, 2, 3 };
+//        return Arrays.asList(spam);
+//        return new LinkedList<>(contracts.values());
+    }
+
 
     private String name;
 
@@ -67,6 +81,6 @@ public class Election {
 
     private String nodeAddr;
 
-    Map<String,Contract> contracts;
+    private Map<String,Contract> contracts;
 
 }

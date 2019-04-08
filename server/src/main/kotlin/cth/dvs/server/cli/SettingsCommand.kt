@@ -3,12 +3,14 @@ package cth.dvs.server.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
-import com.google.gson.*
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.google.gson.JsonPrimitive
 import cth.dvs.server.DatabaseSupplier
 import cth.dvs.server.SettingsBundle
 import cth.dvs.server.pojo.Election
 import java.io.File
-import javax.json.JsonString
 
 public class SettingsCommand : CliktCommand() {
 
@@ -29,22 +31,29 @@ public class SettingsCommand : CliktCommand() {
             root.asJsonObject["elections"].asJsonArray.forEach {
 
 
-                val sanitizedAbi = if (it.asJsonObject["abi"].isJsonNull)
-                    "null"
-                else
-                    it.asJsonObject["abi"].asJsonArray.toString();
+                it.asJsonObject["contracts"].asJsonObject.entrySet().forEach {
+                    val currContract = it.value
+                    val sanitizedAbi = if (currContract.asJsonObject["abi"].isJsonNull)
+                        "null"
+                    else
+                        currContract.asJsonObject["abi"].asJsonArray.toString();
 
-                it.asJsonObject.remove("abi")
-                it.asJsonObject.add("abi", JsonPrimitive(sanitizedAbi))
+                    currContract.asJsonObject.remove("abi")
+                    currContract.asJsonObject.add("abi", JsonPrimitive(sanitizedAbi))
+                }
+
             }
 
-            val settingsFile = Gson().fromJson(root.toString(), SettingsFile::class.java)
+            val rawElections = root.asJsonObject["elections"].asJsonArray;
 
-            SettingsBundle.PORT = settingsFile.port
+            val elections : List<Election> =  rawElections.map {
+                Gson().fromJson(it.toString(),Election::class.java)
+            }
 
 
+            SettingsBundle.PORT = root.asJsonObject["port"].asInt
 
-            settingsFile.contracts.forEach {
+            elections.forEach {
                 if (it != null) {
                     it.expirationDate = Long.MAX_VALUE
                     DatabaseSupplier.db.insert<Election>(it)
