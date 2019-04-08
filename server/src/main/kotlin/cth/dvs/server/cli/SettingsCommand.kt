@@ -12,9 +12,9 @@ import cth.dvs.server.SettingsBundle
 import cth.dvs.server.pojo.Election
 import java.io.File
 
-public class SettingsCommand : CliktCommand() {
+class SettingsCommand : CliktCommand() {
 
-    val settings: String by option(help = "Settings for the server").default("")
+    private val settings: String by option(help = "Settings for the server").default("")
 
 
     override fun run() {

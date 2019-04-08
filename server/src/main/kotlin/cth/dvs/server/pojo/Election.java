@@ -50,20 +50,7 @@ public class Election {
         this.contracts = new HashMap<>(contracts);
     }
     public Map<String,Contract> getContracts(){
-
-
-        System.out.println("Start");
-        System.out.println(String.valueOf(contracts.size()));
-        contracts.forEach((s, contract) -> {
-            System.out.println(contract.getAbi());
-            System.out.println(contract.getBcAddr());
-        });
-
-        System.out.println("End");
         return  contracts;
-//        Integer[] spam = new Integer[] { 1, 2, 3 };
-//        return Arrays.asList(spam);
-//        return new LinkedList<>(contracts.values());
     }
 
 
