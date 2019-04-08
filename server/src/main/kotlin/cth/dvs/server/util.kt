@@ -55,8 +55,12 @@ object DatabaseSupplier {
 
 
         try {
-            db.dropCollection(Election::class.java)
-            db.createCollection(Election::class.java)
+            if (db.collectionExists(Election::class.java)) {
+                db.dropCollection(Election::class.java)
+                db.createCollection(Election::class.java)
+            }else{
+                db.createCollection(Election::class.java)
+            }
 
 
         } catch (e: InvalidJsonDbApiUsageException) {
