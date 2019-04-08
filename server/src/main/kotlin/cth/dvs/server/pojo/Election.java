@@ -3,6 +3,11 @@ package cth.dvs.server.pojo;
 import io.jsondb.annotation.Document;
 import io.jsondb.annotation.Id;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 
 @Document(collection = "elections", schemaVersion = "1.0")
 public class Election {
@@ -10,6 +15,10 @@ public class Election {
     @Id
 
     private String id;
+
+    public Election(){
+        contracts = new HashMap<>();
+    }
 
     public String getId() {
         return id;
@@ -35,20 +44,13 @@ public class Election {
         this.nodeAddr = nodeAddr;
     }
 
-    public String getBcAddr() {
-        return bcAddr;
+
+    public void addContract(String contractName, Contract contract){
+        contracts.put(contractName,contract);
     }
 
-    public void setBcAddr(String bcAddr) {
-        this.bcAddr = bcAddr;
-    }
-
-    public String getAbi() {
-        return abi;
-    }
-
-    public void setAbi(String abi) {
-        this.abi = abi;
+    public List<Contract> getContracts(){
+        return new LinkedList<>(contracts.values());
     }
 
     private String name;
@@ -63,8 +65,8 @@ public class Election {
 
     private transient Long expirationDate;
 
-    private String nodeAddr, bcAddr;
+    private String nodeAddr;
 
-    private String abi;
+    Map<String,Contract> contracts;
 
 }
