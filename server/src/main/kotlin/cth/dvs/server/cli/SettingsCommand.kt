@@ -26,7 +26,8 @@ public class SettingsCommand : CliktCommand() {
 
             val parser = JsonParser()
             val root = parser.parse(rawJson)
-            root.asJsonObject["contracts"].asJsonArray.forEach {
+            root.asJsonObject["elections"].asJsonArray.forEach {
+
 
                 val sanitizedAbi = if (it.asJsonObject["abi"].isJsonNull)
                     "null"

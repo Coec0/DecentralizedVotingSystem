@@ -34,19 +34,7 @@ fun Char.repeat(n: Int): String {
     return sb.toString()
 }
 
-fun Election.randomize(): Election {
-    this.id = Faker.instance().number().digits(6)
 
-    this.name = Faker.instance().demographic().demonym() + " Election"
-    this.bcAddr = Faker.instance().internet().ipV4Address()
-    this.nodeAddr = Faker.instance().internet().ipV4Address()
-
-    this.expirationDate = Faker.instance().date().future(10, TimeUnit.DAYS).time;
-
-    this.abi = Faker.instance().numerify('#'.repeat(Faker.instance().number().numberBetween(50, 200)))
-
-    return this
-}
 
 fun Long.isInTheFuture(): Boolean {
     val currTimestamp = System.currentTimeMillis() / 1000
