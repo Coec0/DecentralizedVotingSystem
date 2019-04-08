@@ -55,6 +55,7 @@ object DatabaseSupplier {
 
 
         try {
+            db.dropCollection(Election::class.java)
             db.createCollection(Election::class.java)
 
 
