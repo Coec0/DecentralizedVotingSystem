@@ -69,6 +69,6 @@ object Main {
 
         }
 
-        launch<GUIApp>(args)
+        //launch<GUIApp>(args)
     }
 }
