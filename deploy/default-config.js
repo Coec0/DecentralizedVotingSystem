@@ -35,14 +35,21 @@
 	},
 	"backend": {
 		"port": 8080,
-		"contracts": [
+		"elections": [
 			{
 				"id": 1,
-				"set": true,
 				"name": "Election",
 				"nodeAddr": null,
-				"bcAddr": null,
-				"abi": null
+				"contracts": {
+					"voterecord": {
+						"bcAddr": null,
+						"abi": null
+					},
+					"votesystem": {
+						"bcAddr": null,
+						"abi": null
+					}
+				}
 			}
 		]		
 	}

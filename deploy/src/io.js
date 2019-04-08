@@ -25,13 +25,17 @@ function getContract(contractName) {
 	return fs.readFileSync(path, { encoding: 'utf8' });
 }
 
-function createBackendConfig(votesystem, config) {
+function createBackendConfig(voterecord, votesystem, config) {
 	let backendConfig = config.backend;
 
-	backendConfig.contracts.filter(contract => contract.set).forEach(contract => {
-		contract.nodeAddr = `ws://localhost:${config.ganache.port}`;
-		contract.bcAddr = votesystem.address;
-		contract.abi = votesystem.abi;
+	backendConfig.elections.forEach(election => {
+		election.nodeAddr = `ws://localhost:${config.ganache.port}`;
+
+		election.contracts.voterecord.bcAddr = voterecord.address;
+		election.contracts.voterecord.abi = voterecord.abi;
+
+		election.contracts.votesystem.bcAddr = votesystem.address;
+		election.contracts.votesystem.abi = votesystem.abi;
 	});
 
 	fs.writeFileSync(backendSettingsPath, JSON.stringify(backendConfig));
