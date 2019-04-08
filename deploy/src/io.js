@@ -44,20 +44,19 @@ function createBackendConfig(voterecord, votesystem, config) {
 
 function startBackend() {
 	return new Promise((resolve, reject) =>{
-		console.log('Starting backend...');
-
-		console.log('Compiling the code...');
+		process.stdout.write('Compiling server code... ');
 		const log = execSync('mvn clean install', { cwd: './../server' }).toString('utf8');
 		if(!log.includes('BUILD SUCCESS')) {
 			return reject(log);
 		}
 		console.log('Success');
 
+		console.log('Starting server');
 		const child = exec(`java -jar Server-0.6-jar-with-dependencies.jar --settings="./.${backendSettingsPath}"`, { cwd: './../server/target' });
 		child.stdout.on('data', (data) => {
 			process.stdout.write(data);
 
-			if (data.includes('Running Server')) {
+			if (data.includes('Started')) {
 				resolve();
 			}
 		});
