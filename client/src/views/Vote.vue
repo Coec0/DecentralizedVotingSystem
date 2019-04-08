@@ -163,7 +163,10 @@ export default {
 
 				// Show components
 				this.loaded = true;
-			}).catch(console.error);
+			}).catch((err) => {
+				console.error(err);
+				this.$store.commit('ADD_NOTIFICATION', { message: 'Error connecting to server', type: 'warn' });
+			});
 		},
 		reset() {
 			this.name = null;
