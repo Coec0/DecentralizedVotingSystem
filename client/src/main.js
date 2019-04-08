@@ -20,12 +20,6 @@ Vue.prototype.$http = axios.create({
 
 Vue.config.productionTip = false;
 
-// Clear notifications before each page load.
-router.beforeEach((to, from, next) => {
-	store.commit('CLEAR_NOTIFICATIONS');
-	next();
-});
-
 // Create our Vue instance and attach it to #app div
 new Vue({
 	router,

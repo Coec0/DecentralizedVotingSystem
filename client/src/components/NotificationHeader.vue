@@ -1,5 +1,5 @@
 <template>
-	<div class="notifications">
+	<div id="notifications">
 		<div v-for="item in items" :key="item.message" class="notification" v-bind:class="item.type">
 			{{ item.message }}
 		</div>
@@ -19,30 +19,33 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-@keyframes slideInFromTop {
-	0% {
-		transform: translateY(-100%);
-	}
-	100% {
-		transform: translateY(0);
-	}
+#notifications {
+	text-align: center;
+	line-height: 1.5;
+	overflow: hidden; 
 }
 
-.notifications {
-	width: 100%;
-	animation-duration: 1s; /* the duration of the animation */
-	animation-timing-function: ease-out; /* how the animation will behave */
-	animation-delay: 0s; /* how long to delay the animation from starting */
-	animation-iteration-count: 1; /* how many times the animation will play */
-	animation-name: slideInFromTop; /* the name of the animation we defined above */
-}
 .notification {
+	animation-duration: 1s;
+	animation-name: slidein;
 	padding: 2px 0px;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.5);
 }
+
+@keyframes slidein {
+  from {
+  	transform: translateY(-50px);
+  }
+
+  to {
+    transform: translateY(0px);
+  }
+}
+
 .notify {
 	background-color: #ffcc00;
 }
+
 .warn {
 	background-color: #B33A3A;
 }
