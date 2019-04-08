@@ -1,18 +1,29 @@
 <template>
-	<div class="tools container flex-grow-1">
-		<whitelist></whitelist>
-		<encrypt-privatekey></encrypt-privatekey>
+	<div class="container">
+		<div class="tools col-md-8">
+			<whitelist-add></whitelist-add>
+			<whitelist-check></whitelist-check>
+			<whitelist-enable></whitelist-enable>
+			<whitelist-disable></whitelist-disable>
+			<encrypt-privatekey></encrypt-privatekey>
+		</div>
 	</div>
 </template>
 
 <script>
-import Whitelist from '@/components/Tools/Whitelist.vue';
+import WhitelistAdd from '@/components/Tools/WhitelistAdd.vue';
+import WhitelistCheck from '@/components/Tools/WhitelistCheck.vue';
+import WhitelistEnable from '@/components/Tools/WhitelistEnable.vue';
+import WhitelistDisable from '@/components/Tools/WhitelistDisable.vue';
 import EncryptPrivateKey from '@/components/Tools/EncryptPrivateKey.vue';
 
 export default {
 	name: 'Tools',
 	components: {
-		'whitelist': Whitelist,
+		'whitelist-add': WhitelistAdd,
+		'whitelist-check': WhitelistCheck,
+		'whitelist-disable': WhitelistDisable,
+		'whitelist-enable': WhitelistEnable,
 		'encrypt-privatekey': EncryptPrivateKey
 	}
 };
@@ -28,20 +39,23 @@ h1 {
 .tools {
 	padding-top: 50px;
 	display: flex;
+	flex-grow: 1;
 	flex-wrap: wrap;
 	justify-content: center;
 	align-content: flex-start;
+	margin-left: auto;
+	margin-right: auto;
 }
 
-.container div {
+.tools div {
 	  transition: box-shadow .3s;
-	  margin: 25px;
+	  margin-top: 25px;
 	  border-radius:10px;
 	  border: 1px solid #ccc;
 	  background: #fff;
 }
 
-.container div:hover {
+.tools div:hover {
   box-shadow: 0 0 11px rgba(33,33,33,.2); 
 }
 </style>

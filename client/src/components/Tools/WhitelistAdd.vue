@@ -1,34 +1,35 @@
 <template>
-	<div class="encrypt container col-md-12">
-		<h3>keccak-256 / XOR</h3>
-		<input class="datainput" type="text" v-model="data" placeholder="Enter data">
-		<input class="passwordinput" type="password" v-model="password" placeholder="Enter password">
+	<div class="whitelist container col-md-12">
+		<h3>Whitelist add</h3>
+		<input class="datainput" type="text" v-model="admin" placeholder="Enter secret key of admin">
+		<input class="datainput" type="text" v-model="address" placeholder="Enter address to whitelist">
 		<p style="margin-top: 10px;">{{ result }}</p>
-		<button class="submit-button" v-on:click="doXOR">Run</button>
+		<button class="submit-button" v-on:click="submit">Run</button>
 	</div>
 </template>
 
 <script>
-import utils from './../../utils/utils.js';
-
 export default {
-	name: 'EncryptPrivateKey',
+	name: 'WhitelistAdd',
 	data() {
 		return {
-			data: null,
-			password: null,
+			admin: null,
+			address: null,
 			result: null
 		}
 	},
 	methods: {
-		doXOR() {
-			if (this.data && this.password) {
-				try {
-					this.result = utils.XOR(this.data, this.password);
-					this.password = null;
-				} catch (err) {
-					this.result = err.message;
-				}
+		async submit() {
+			this.result = null;
+
+			if (!this.address || !this.admin) return;
+
+			try {
+				await this.$store.dispatch('WHITELIST', { admin: this.admin, address: this.address });
+				this.result = `Address ${this.address} whitelisted`;
+			} catch (err) {
+				this.result = err.message || err;
+				console.error(err);
 			}
 		}
 	}
@@ -38,7 +39,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-.encrypt {
+.whitelist {
 	padding: 25px;
 	display: flex;
 	flex-direction: column;
@@ -47,11 +48,6 @@ export default {
 
 .datainput {
 	width: 90%;
-	margin-top: 10px;
-}
-
-.passwordinput {
-	width: 30%;
 	margin-top: 10px;
 }
 

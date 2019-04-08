@@ -29,13 +29,13 @@ export default new Vuex.Store({
 			}
 			state.web3 = instance;
 		},
-		SET_SMARTCONTRACT(state, instance) {
-			if (instance) {
+		SET_CONTRACTS(state, contracts) {
+			if (contracts) {
 				console.log('SmartContract instance set');
-			} else if (state.smartcontract && !instance) {
+			} else if (state.smartcontract && !contracts) {
 				console.log('SmartContract removed');
 			}
-			state.smartcontract = instance;
+			state.contracts = contracts;
 		},
 		SET_CANDIDATES(state, candidates) {
 			if (candidates.length) {
@@ -75,47 +75,65 @@ export default new Vuex.Store({
 				}
 			});
 		},
-		CREATE_SMARTCONTRACT({ commit, state }, options) {
+		CREATE_SMARTCONTRACTS({ commit, state }, contracts) {
 			return new Promise(async (resolve, reject) => {
 				// Error checking
-				if (typeof options !== 'object') return console.error('Object needs to be passed as options');
-				if (!options.scAddr) return console.error('No smartcontract adress specified');
-				if (!options.abi) return console.error('No smartcontract ABI specified');
+				if (typeof contracts !== 'object') return reject('payload required to be object');
 				if (!state.web3) return reject('Tried CREATE_SMARTCONTRACT without web3 set');
+				if (!contracts.voterecord) return reject('voterecord not in payload');
+				if (!contracts.votesystem) return reject('votesystem not in payload');
 
+				let instances = {};
+
+				// Parse and create voterecord
 				try {
+					if (!contracts.voterecord.bcAddr) return reject('No smartcontract adress specified');
+					if (!contracts.voterecord.abi) return reject('No smartcontract ABI specified');
+
 					// Parse JSON string
-					let parsedABI = JSON.parse(options.abi);
+					let parsedABI = JSON.parse(contracts.voterecord.abi);
+
+					// Create smartcontract object and add to our instances object
+					instances.voterecord = new state.web3.eth.Contract(parsedABI, contracts.voterecord.bcAddr);
+				} catch (err) {
+					commit('SET_CONTRACTS', null);
+					return reject(err);
+				}
+
+				// Parse and create votesystem
+				try {
+					if (!contracts.votesystem.bcAddr) return reject('No smartcontract adress specified');
+					if (!contracts.votesystem.abi) return reject('No smartcontract ABI specified');
+
+					// Parse JSON string
+					let parsedABI = JSON.parse(contracts.votesystem.abi);
 
 					// Create smartcontract object
-					let contract = new state.web3.eth.Contract(parsedABI, options.scAddr);
-
-					// Add SC to state
-					commit('SET_SMARTCONTRACT', contract);
-
-					// Tell caller to go on
-					resolve(contract);
-
-					// This if for debugging
-					window.sc = contract;
+					instances.votesystem = new state.web3.eth.Contract(parsedABI, contracts.votesystem.bcAddr);
 				} catch (err) {
-					commit('SET_SMARTCONTRACT', null);
-					reject(err);
+					commit('SET_CONTRACTS', null);
+					return reject(err);
 				}
+
+				// Add smartcontracts to state
+				commit('SET_CONTRACTS', instances);
+
+				// Tell caller to go on
+				resolve(instances);
 			});
 		},
 		FETCH_CANDIDATES({ commit, state }) {
 			return new Promise(async (resolve, reject) => {
 				// Error checking
 				if (!state.web3) return reject('Tried FETCH_CANDIDATES without web3 set');
-				if (!state.smartcontract) return reject('Tried FETCH_CANDIDATES without smartcontract set');
+				if (!state.contracts) return reject('Tried FETCH_CANDIDATES without smartcontracts set');
 				const candidates = [];
 
 				try {
-					const candidateCount = await state.smartcontract.methods.candidateCount().call();
+					const candidateCount = await state.contracts.votesystem.methods.candidateCount().call();
 
 					for (var i = 0; i < candidateCount; i++) {
-						const candidate = await state.smartcontract.methods.allCandidates(i).call();
+						const candidate = await state.contracts.votesystem.methods.allCandidates(i).call();
 
 						candidates.push({
 							id: candidate.id,
@@ -136,13 +154,13 @@ export default new Vuex.Store({
 			commit('SET_CANDIDATES', []);
 			commit('SET_PRIVATEKEY', null);
 			commit('SET_WEB3', null);
-			commit('SET_SMARTCONTRACT', null);
+			commit('SET_CONTRACTS', null);
 			commit('SET_PUBLICKEY', null);
 		},
 		SUBMIT_VOTE({ commit, state }, selection) {
 			return new Promise((resolve, reject) => {
 				if (!state.web3) return reject('Tried SUBMIT_VOTE without web3 set');
-				if (!state.smartcontract) return reject('Tried SUBMIT_VOTE without smartcontract set');
+				if (!state.contracts) return reject('Tried SUBMIT_VOTE without smartcontracts set');
 
 				const pk = state.publickey;
 
@@ -163,7 +181,7 @@ export default new Vuex.Store({
 
 				console.log(data);
 
-				state.smartcontract.methods.vote(data).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address, gas: 6721975 }).then((receipt) => {
+				state.contracts.votesystem.methods.vote(data).send({ from: state.web3.eth.accounts.privateKeyToAccount(state.privatekey).address, gas: 6721975 }).then((receipt) => {
 					console.log(receipt);
 					resolve();
 				}).catch(reject);
@@ -172,10 +190,10 @@ export default new Vuex.Store({
 		FETCH_PUBLICKEY({ commit, state }) {
 			return new Promise(async (resolve, reject) => {
 				if (!state.web3) return reject('Tried FETCH_PUBLICKEY without web3 set');
-				if (!state.smartcontract) return reject('Tried FETCH_PUBLICKEY without smartcontract set');
+				if (!state.contracts) return reject('Tried FETCH_PUBLICKEY without smartcontracts set');
 
 				try {
-					const pk = Object.values(await state.smartcontract.methods.getPublicKey().call());
+					const pk = Object.values(await state.contracts.votesystem.methods.getPublicKey().call());
 
 					let a = bigInt(pk[0]);
 					let b = bigInt(pk[1]);
@@ -187,19 +205,62 @@ export default new Vuex.Store({
 					commit('SET_PUBLICKEY', { a, b, p, q, G, B });
 					resolve();
 				} catch (error) {
-					reject(err);
+					reject(error);
 				}
 			});
 		},
 		WHITELIST({ commit, state }, payload) {
-			return new Promise((resolve, reject) => {
+			return new Promise(async (resolve, reject) => {
 				if (!state.web3) return reject('Tried WHITELIST without web3 set');
-				if (!state.smartcontract) return reject('Tried WHITELIST without smartcontract set');
+				if (!state.contracts) return reject('Tried WHITELIST without smartcontracts set');
 
 				try {
-					reject('NOT IMPLEMENTED');
+					await state.contracts.voterecord.methods.addVoterToWhitelist(payload.address).send({ from: state.web3.eth.accounts.privateKeyToAccount(payload.admin).address, gas: 6721975 })
+					resolve();
 				} catch (error) {
-					reject(err);
+					reject(error);
+				}
+			});
+		},
+		WHITELIST_CHECK({ commit, state }, address) {
+			return new Promise(async (resolve, reject) => {
+				if (!state.web3) return reject('Tried WHITELIST_CHECK without web3 set');
+				if (!state.contracts) return reject('Tried WHITELIST_CHECK without smartcontracts set');
+
+				try {
+					if(await state.contracts.voterecord.methods.isOnWhiteList(address).call()) {
+						resolve(`${address} is allowed to place votes`);
+					} else {
+						resolve(`${address} is not allowed to place votes`);
+					}
+				} catch (error) {
+					reject(error);
+				}
+			});
+		},
+		WHITELIST_ENABLE({ commit, state }, admin) {
+			return new Promise(async (resolve, reject) => {
+				if (!state.web3) return reject('Tried WHITELIST_ENABLE without web3 set');
+				if (!state.contracts) return reject('Tried WHITELIST_ENABLE without smartcontracts set');
+
+				try {
+					await state.contracts.voterecord.methods.enableWhitelist().call({ from: state.web3.eth.accounts.privateKeyToAccount(admin).address});
+					resolve('Whitelist enabled');
+				} catch (error) {
+					reject(error);
+				}
+			});
+		},
+		WHITELIST_DISABLE({ commit, state }, admin) {
+			return new Promise(async (resolve, reject) => {
+				if (!state.web3) return reject('Tried WHITELIST_DISABLE without web3 set');
+				if (!state.contracts) return reject('Tried WHITELIST_DISABLE without smartcontracts set');
+
+				try {
+					await state.contracts.voterecord.methods.disableWhitelist().call({ from: state.web3.eth.accounts.privateKeyToAccount(admin).address});
+					resolve('Whitelist disabled');
+				} catch (error) {
+					reject(error);
 				}
 			});
 		}

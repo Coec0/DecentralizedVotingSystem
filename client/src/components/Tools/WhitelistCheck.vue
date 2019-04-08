@@ -1,7 +1,6 @@
 <template>
-	<div class="encrypt container col-md-8">
-		<h3>Whitelist</h3>
-		<input class="datainput" type="text" v-model="admin" placeholder="Enter secret key of admin">
+	<div class="whitelist container col-md-12">
+		<h3>Whitelist check</h3>
 		<input class="datainput" type="text" v-model="address" placeholder="Enter address to whitelist">
 		<p style="margin-top: 10px;">{{ result }}</p>
 		<button class="submit-button" v-on:click="submit">Run</button>
@@ -10,10 +9,9 @@
 
 <script>
 export default {
-	name: 'Whitelist',
+	name: 'WhitelistCheck',
 	data() {
 		return {
-			admin: null,
 			address: null,
 			result: null
 		}
@@ -25,8 +23,7 @@ export default {
 			if (!this.address) return;
 
 			try {
-				await this.$store.dispatch('WHITELIST', { admin: this.admin, address: this.address });
-				this.result = `Address ${this.address} whitelisted`;
+				this.result = await this.$store.dispatch('WHITELIST_CHECK', this.address);
 			} catch (err) {
 				this.result = err;
 				console.error(err);
@@ -39,7 +36,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-.encrypt {
+.whitelist {
 	padding: 25px;
 	display: flex;
 	flex-direction: column;
