@@ -192,12 +192,12 @@ export default new Vuex.Store({
 			});
 		},
 		WHITELIST({ commit, state }, payload) {
-			return new Promise(async (resolve, reject) => {
+			return new Promise((resolve, reject) => {
 				if (!state.web3) return reject('Tried WHITELIST without web3 set');
 				if (!state.smartcontract) return reject('Tried WHITELIST without smartcontract set');
 
 				try {
-					return reject('NOT IMPLEMENTED');
+					reject('NOT IMPLEMENTED');
 				} catch (error) {
 					reject(err);
 				}
