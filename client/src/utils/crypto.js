@@ -1,6 +1,8 @@
 const web3 = require('web3');
 const bigInt = require("big-integer");
 
+const IDENTITY = bigInt.minusOne;
+
 /**
  * @param  {Integer} 	message		The message to be encrypted
  * @param  {Integer} 	ordG		The order of the generator
@@ -21,15 +23,15 @@ function encrypt(message, ordG, G, B, p, A) {
 	// Check message is smaller than ordG
 	if (!message.lesser(ordG)) throw new RangeError(`message is not less than ord (m=${message} ordG=${ordG})`);
 
-	const random = bigInt(web3.utils.randomHex(32).replace('0x', ''), 16).mod(ordG);
+	// .plus(1).mod(ordG) to avoid getting zero
+	const random = bigInt(web3.utils.randomHex(32).replace('0x', ''), 16).mod(ordG).plus(1).mod(ordG);
 
 	const B1 = doubleAndAdd(G, random, A, p);
-
 	const B2_1 = doubleAndAdd(G, message, A, p);
 	const B2_2 = doubleAndAdd(B, random, A, p);
 	const B2 = findNextPoint(B2_1, B2_2, A, p);
 
-	return [ B1, B2 ];
+	return [ B1, B2, random ];
 }
 
 /**
@@ -42,7 +44,7 @@ function encrypt(message, ordG, G, B, p, A) {
  */
 function doubleAndAdd(P, n, a, m) {
 	checkBigInts(P, n, a, m);
-	if (n.equals(bigInt.zero)) return bigInt.zero;
+	if (n.equals(bigInt.zero)) return IDENTITY;
 	if (n.equals(bigInt.one)) return P;
 
 	if (mod(n, bigInt(2)).equals(bigInt.one)) return pointAdd(P, doubleAndAdd(P, n.minus(1), a, m), m);
@@ -59,6 +61,11 @@ function doubleAndAdd(P, n, a, m) {
  */
 function findNextPoint(P, Q, a, m) {
 	checkBigInts(P, Q, a, m);
+
+	if (P === IDENTITY && Q === IDENTITY) return IDENTITY;
+	if (P === IDENTITY) return Q;
+	if (Q === IDENTITY) return P;
+
 	// Check if same point
 	if (P.x.equals(Q.x) && P.y.equals(Q.y)) {
 		// Do multiplication
@@ -82,7 +89,7 @@ function pointAdd(P, Q, m) {
 
 	if (hasSameX && hasOppositeY) {
 		// Is inverse => no point intersects => return Infinity
-		return Infinity;
+		return IDENTITY;
 	}
 
 	const lambda = calcAddLambda(P, Q, m);

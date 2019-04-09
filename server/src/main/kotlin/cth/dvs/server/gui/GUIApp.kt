@@ -55,8 +55,8 @@ class Test: View("Main"){
                 onUserSelect {
                     currName.set(it.name)
                     currNodeAddr.set(it.nodeAddr)
-                    currBcAddr.set(it.bcAddr)
-                    currAbi.set(it.abi)
+                    //currBcAddr.set(it.bcAddr)
+                    //currAbi.set(it.abi)
                 }
 
                 columnResizePolicy = SmartResize.POLICY

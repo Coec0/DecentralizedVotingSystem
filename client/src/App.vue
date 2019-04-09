@@ -68,7 +68,10 @@ export default {
 		// Hämta vilken elections som finns och lägg dem i vår 'votes' variabel som skapades i data()-metoden.
 		this.$http.get('/getElections').then(result => {
 			this.votes = result.data;
-		}).catch(console.error);
+		}).catch((err) => {
+			console.error(err);
+			this.$store.commit('ADD_NOTIFICATION', { message: 'Error connecting to server', type: 'warn' });
+		});
 
 		// Kolla om Web3 hittar MetaMask
 		if (Web3.givenProvider) {
@@ -90,14 +93,8 @@ export default {
 	text-align: center;
 	background-color: #fafafa;
 	min-height: 100vh;
-}
-
-.white {
-	background-color: #fff;
-}
-
-.gray {
-	background-color: #fafafa;
+	display: flex;
+	flex-direction: column;
 }
 
 body {

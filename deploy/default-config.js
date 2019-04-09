@@ -21,44 +21,35 @@
 		"args": {
 			"candidates": ["Latiif", "Sarah", "Kevin", "Eric", "Zack", "Oscar"],
 			"blocksUntilStart": 0,
-			"blocksUntilEnd": 0,
+			"blocksUntilEnd": 10000,
 			"admins": ["0x38bACc542367B182cC2fECF22eca7F819aB51d6a"],
-			"a": 0,
-			"b": 0,
-			"p": 0,
-			"q": 0,
-			"gx": 0,
-			"gy": 0,
-			"bx": 0,
-			"by": 0
+			"a": 49,
+			"b": 109,
+			"p": 541,
+			"q": 61,
+			"gx": 153,
+			"gy": 308,
+			"bx": 419,
+			"by": 248
 		}
 	},
 	"backend": {
 		"port": 8080,
-		"contracts": [
+		"elections": [
 			{
 				"id": 1,
-				"set": false,
-				"name": "Kommunalval",
+				"name": "Election",
 				"nodeAddr": null,
-				"bcAddr": null,
-				"abi": null
-			},
-			{
-				"id": 2,
-				"set": false,
-				"name": "Landstingsval",
-				"nodeAddr": null,
-				"bcAddr": null,
-				"abi": null
-			},
-			{
-				"id": 3,
-				"set": true,
-				"name": "Riksdagsval",
-				"nodeAddr": null,
-				"bcAddr": null,
-				"abi": null
+				"contracts": {
+					"voterecord": {
+						"bcAddr": null,
+						"abi": null
+					},
+					"votesystem": {
+						"bcAddr": null,
+						"abi": null
+					}
+				}
 			}
 		]		
 	}

@@ -3,6 +3,8 @@ package cth.dvs.server.pojo;
 import io.jsondb.annotation.Document;
 import io.jsondb.annotation.Id;
 
+import java.util.*;
+
 
 @Document(collection = "elections", schemaVersion = "1.0")
 public class Election {
@@ -10,6 +12,10 @@ public class Election {
     @Id
 
     private String id;
+
+    public Election(){
+        contracts = new HashMap<>();
+    }
 
     public String getId() {
         return id;
@@ -35,21 +41,18 @@ public class Election {
         this.nodeAddr = nodeAddr;
     }
 
-    public String getBcAddr() {
-        return bcAddr;
+
+    public void addContract(String contractName, Contract contract){
+        contracts.put(contractName,contract);
     }
 
-    public void setBcAddr(String bcAddr) {
-        this.bcAddr = bcAddr;
+    public void setContracts(Map<String,Contract> contracts){
+        this.contracts = new HashMap<>(contracts);
+    }
+    public Map<String,Contract> getContracts(){
+        return  contracts;
     }
 
-    public String getAbi() {
-        return abi;
-    }
-
-    public void setAbi(String abi) {
-        this.abi = abi;
-    }
 
     private String name;
 
@@ -63,8 +66,8 @@ public class Election {
 
     private transient Long expirationDate;
 
-    private String nodeAddr, bcAddr;
+    private String nodeAddr;
 
-    private String abi;
+    private Map<String,Contract> contracts;
 
 }

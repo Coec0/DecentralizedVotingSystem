@@ -1,5 +1,5 @@
 <template>
-	<div class="container vote">
+	<div class="container flex-grow-1 vote">
 		<div class="error" v-if="error">
 			<h2>Vote hasn't opened yet!</h2>
 		</div>
@@ -97,7 +97,7 @@ export default {
 			}
 		},
 		async pwSubmit() {
-			const pk = utils.decryptPK(this.$store.state.privatekey, this.$store.state.password);
+			const pk = utils.XOR(this.$store.state.privatekey, this.$store.state.password);
 			this.$store.commit('SET_PASSWORD', pk);
 
 			this.state.showSpinner = true;
@@ -147,7 +147,7 @@ export default {
 			// Fetch info about vote
 			this.$http.get(`/getElection/${this.$route.params.id}`).then(async (result) => {
 				// Error handling
-				if (!result.data.nodeAddr || !result.data.abi || !result.data.bcAddr) {
+				if (!result.data.nodeAddr || !result.data.contracts) {
 					this.error = true;
 					return;
 				}
@@ -157,13 +157,16 @@ export default {
 
 				// Do things in store and wait for them to complete
 				await this.$store.dispatch('CREATE_WEB3', result.data.nodeAddr);
-				await this.$store.dispatch('CREATE_SMARTCONTRACT', { abi: result.data.abi, scAddr: result.data.bcAddr });
+				await this.$store.dispatch('CREATE_SMARTCONTRACTS', result.data.contracts);
 				await this.$store.dispatch('FETCH_CANDIDATES');
 				await this.$store.dispatch('FETCH_PUBLICKEY');
 
 				// Show components
 				this.loaded = true;
-			}).catch(console.error);
+			}).catch((err) => {
+				console.error(err);
+				this.$store.commit('ADD_NOTIFICATION', { message: 'Error connecting to server', type: 'warn' });
+			});
 		},
 		reset() {
 			this.name = null;
@@ -202,12 +205,6 @@ h1 {
 
 .container {
 	margin-bottom: 20px;
-}
-
-.content {
-	padding: 40px;
-	margin: auto;
-	background-color: rgba(44,62,80, 0.1);
 }
 
 .fade-enter-active, .fade-leave-active {

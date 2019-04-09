@@ -25,13 +25,17 @@ function getContract(contractName) {
 	return fs.readFileSync(path, { encoding: 'utf8' });
 }
 
-function createBackendConfig(votesystem, config) {
+function createBackendConfig(voterecord, votesystem, config) {
 	let backendConfig = config.backend;
 
-	backendConfig.contracts.filter(contract => contract.set).forEach(contract => {
-		contract.nodeAddr = `ws://localhost:${config.ganache.port}`;
-		contract.bcAddr = votesystem.address;
-		contract.abi = votesystem.abi;
+	backendConfig.elections.forEach(election => {
+		election.nodeAddr = `ws://localhost:${config.ganache.port}`;
+
+		election.contracts.voterecord.bcAddr = voterecord.address;
+		election.contracts.voterecord.abi = voterecord.abi;
+
+		election.contracts.votesystem.bcAddr = votesystem.address;
+		election.contracts.votesystem.abi = votesystem.abi;
 	});
 
 	fs.writeFileSync(backendSettingsPath, JSON.stringify(backendConfig));
@@ -40,20 +44,19 @@ function createBackendConfig(votesystem, config) {
 
 function startBackend() {
 	return new Promise((resolve, reject) =>{
-		console.log('Starting backend...');
-
-		console.log('Compiling the code...');
+		process.stdout.write('Compiling server code... ');
 		const log = execSync('mvn clean install', { cwd: './../server' }).toString('utf8');
 		if(!log.includes('BUILD SUCCESS')) {
 			return reject(log);
 		}
 		console.log('Success');
 
+		console.log('Starting server');
 		const child = exec(`java -jar Server-0.6-jar-with-dependencies.jar --settings="./.${backendSettingsPath}"`, { cwd: './../server/target' });
 		child.stdout.on('data', (data) => {
 			process.stdout.write(data);
 
-			if (data.includes('Running Server')) {
+			if (data.includes('Started')) {
 				resolve();
 			}
 		});
