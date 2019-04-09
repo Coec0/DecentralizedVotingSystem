@@ -70,7 +70,11 @@ simpleD pk@(c,q,g,beta) d (r,t) = point
     where
          point = pointAdd c t (pointInvert c (pointMul c r d))
 
-
+--           Pk           Cipher           m         Tau
+calcTau :: PublicKey -> (Point,Point) -> Integer -> Point
+calcTau pk@(c,q,g,beta) (r,t) m = pointAdd c t $ pointInvert c mg
+   where mg = pointMul c g m         
+   
 prop_encryptDecrypt :: Integer -> Integer -> Integer -> Bool
 prop_encryptDecrypt keySeed' pointSeed' messageSeed' = m == m'
     where
