@@ -1,7 +1,7 @@
 <template>
 	<div class="whitelist container col-md-12">
 		<h3>Whitelist check</h3>
-		<input class="datainput" type="text" v-model="address" placeholder="Enter address to whitelist">
+		<input class="datainput" type="text" v-model="address" placeholder="Enter address to check">
 		<p style="margin-top: 10px;">{{ result }}</p>
 		<button class="submit-button" v-on:click="submit">Run</button>
 	</div>

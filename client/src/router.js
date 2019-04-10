@@ -8,25 +8,34 @@ export default new Router({
 	base: process.env.BASE_URL,
 	routes: [
 		{
-			path: '/',
+			path: '/home',
 			name: 'home',
 			component: () => import(/* webpackChunkName: "home" */ '@/views/Home')
 		},
 		{
 			path: '/vote/:id',
-			name: 'vote',
-			component: () => import(/* webpackChunkName: "home" */ '@/views/Vote')
+			component: () => import(/* webpackChunkName: "home" */ '@/views/Vote'),
+			redirect: {
+				name: 'voting'
+			},
+			children: [
+				{
+					path: 'voting',
+					name: 'voting',
+					component: () => import(/* webpackChunkName: "home" */ '@/views/Vote/Voting')
+				},
+				{
+					path: 'tools',
+					name: 'tools',
+					component: () => import(/* webpackChunkName: "home" */ '@/views/Vote/Tools')
+				},
+				{
+					path: 'results',
+					name: 'results',
+					component: () => import(/* webpackChunkName: "home" */ '@/views/Vote/Results')
+				}
+			]
 		},
-		{
-			path: '/tools',
-			name: 'tools',
-			component: () => import(/* webpackChunkName: "home" */ '@/views/Tools')
-		},
-		{
-			path: '/results',
-			name: 'results',
-			component: () => import(/* webpackChunkName: "home" */ '@/views/Results')
-		},
-		{ path: '*', redirect: '/' }
+		{ path: '*', redirect: '/home' }
 	]
 });
