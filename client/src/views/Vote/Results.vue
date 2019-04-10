@@ -35,6 +35,8 @@ export default {
 
 .container {
 	height: 100px;
+	font-size: 24px;
+	margin-top: 50px;
 }
 
 #title {
