@@ -56,7 +56,7 @@ function startBackend() {
 		child.stdout.on('data', (data) => {
 			process.stdout.write(data);
 
-			if (data.includes('Started')) {
+			if (data.includes('Started') || data.includes('Running Server')) {
 				resolve();
 			}
 		});
