@@ -1,13 +1,13 @@
 <template>
 	<div class="container-fluid d-flex gray">
 		<div>
-			<router-link class="logo hvr-fade" to="/" tag="div">
+			<router-link class="logo hvr-fade" to="/home" tag="div">
 				<span class="fas fa-home"></span>
 			</router-link>
 		</div>
 		<NavButton class="nav-button hvr-fade" v-for="item in items" :key="item.id" :text="item.name" :to="'/vote/' + item.id.toString()"></NavButton>
-		<NavButton v-if="showElectionSpecifics" class="nav-button hvr-fade results" text="Results" to="/results"></NavButton>
-		<NavButton v-if="showElectionSpecifics" class="nav-button hvr-fade" text="Tools" to="/tools"></NavButton>
+		<NavButton v-if="showVote" class="nav-button hvr-fade results" text="Results" to="results"></NavButton>
+		<NavButton v-if="showVote" class="nav-button hvr-fade" text="Tools" to="tools"></NavButton>
 	</div>
 </template>
 
@@ -19,8 +19,8 @@ export default {
 		NavButton
 	},
 	computed: {
-		showElectionSpecifics() {
-			return !!this.$store.state.web3 && !!this.$store.state.contracts;
+		showVote() {
+			return this.$route.fullPath.includes('/vote/');
 		}
 	},
 	props: {
@@ -74,7 +74,7 @@ export default {
 	transition-property: color, background-color;
 }
 
-.hvr-fade:hover, .hvr-fade:focus, .hvr-fade:active, .router-link-exact-active {
+.hvr-fade:hover, .hvr-fade:focus, .hvr-fade:active, .router-link-active {
 	background-color: #2c3e50;
 	color: white;
 }

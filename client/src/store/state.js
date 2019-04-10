@@ -5,7 +5,8 @@ let state = {
 	password: null,
 	web3: null,
 	contracts: null,
-	publickey: null
+	publickey: null,
+	electionName: null
 }
 
 export default state;

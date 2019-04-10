@@ -18,6 +18,10 @@ export default new Vuex.Store({
 				state.notifications.push(notification);
 			}
 		},
+		SET_ELECTION_NAME(state, name) {
+			console.log('Election name set');
+			state.electionName = name;
+		},
 		CLEAR_NOTIFICATIONS(state) {
 			state.notifications = [];
 		},
