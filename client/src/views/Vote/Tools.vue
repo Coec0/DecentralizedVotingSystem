@@ -6,6 +6,7 @@
 			<whitelist-enable></whitelist-enable>
 			<whitelist-disable></whitelist-disable>
 			<encrypt-privatekey></encrypt-privatekey>
+			<results-add></results-add>
 		</div>
 	</div>
 </template>
@@ -16,6 +17,7 @@ import WhitelistCheck from '@/components/Tools/WhitelistCheck.vue';
 import WhitelistEnable from '@/components/Tools/WhitelistEnable.vue';
 import WhitelistDisable from '@/components/Tools/WhitelistDisable.vue';
 import EncryptPrivateKey from '@/components/Tools/EncryptPrivateKey.vue';
+import ResultsAdd from '@/components/Tools/ResultsAdd.vue';
 
 export default {
 	name: 'Tools',
@@ -24,7 +26,8 @@ export default {
 		'whitelist-check': WhitelistCheck,
 		'whitelist-disable': WhitelistDisable,
 		'whitelist-enable': WhitelistEnable,
-		'encrypt-privatekey': EncryptPrivateKey
+		'encrypt-privatekey': EncryptPrivateKey,
+		'results-add': ResultsAdd
 	}
 };
 </script>

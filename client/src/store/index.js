@@ -160,6 +160,7 @@ export default new Vuex.Store({
 			commit('SET_WEB3', null);
 			commit('SET_CONTRACTS', null);
 			commit('SET_PUBLICKEY', null);
+			commit('SET_ELECTION_NAME', null);
 		},
 		SUBMIT_VOTE({ commit, state }, selection) {
 			return new Promise((resolve, reject) => {
