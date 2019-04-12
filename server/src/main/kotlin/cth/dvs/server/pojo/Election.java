@@ -15,6 +15,7 @@ public class Election {
 
     public Election(){
         contracts = new HashMap<>();
+        result = "UNASSIGNED";
     }
 
     public String getId() {
@@ -60,6 +61,14 @@ public class Election {
         return expirationDate;
     }
 
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
     public void setExpirationDate(Long expirationDate) {
         this.expirationDate = expirationDate;
     }
@@ -67,6 +76,7 @@ public class Election {
     private transient Long expirationDate;
 
     private String nodeAddr;
+    private String result;
 
     private Map<String,Contract> contracts;
 
