@@ -110,6 +110,16 @@ object DatabaseSupplier {
 
     }
 
+    public fun findElectionResultsById(id: String): String {
+        val res = db.findById(id, Election::class.java)
+
+        return if (res == null || !res.isActive()) {
+            "{}"
+        } else {
+            res.result
+        }
+
+    }
 
     fun addFromJson(rawData: String): Boolean {
 
