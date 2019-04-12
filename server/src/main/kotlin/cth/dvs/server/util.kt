@@ -7,6 +7,7 @@ import com.google.gson.JsonObject
 import cth.dvs.server.pojo.Election
 import io.jsondb.InvalidJsonDbApiUsageException
 import io.jsondb.JsonDBTemplate
+import io.jsondb.query.Update
 import javafx.collections.ObservableList
 import spark.kotlin.RouteHandler
 import tornadofx.observable
@@ -86,6 +87,7 @@ object DatabaseSupplier {
             val e = JsonObject()
             e.addProperty("id", it.id)
             e.addProperty("name", it.name)
+            e.addProperty("result",it.result)
             jsonArr.add(e)
         }
 
@@ -124,6 +126,12 @@ object DatabaseSupplier {
         }
 
 
+    }
+
+    fun setResult(id:Int, result:String){
+        val update = Update.update("result",result)
+        val jxQuery = String.format("/.[id='%s']", id.toString())
+        db.findAndModify(jxQuery,update,Election::class.java)
     }
 }
 
