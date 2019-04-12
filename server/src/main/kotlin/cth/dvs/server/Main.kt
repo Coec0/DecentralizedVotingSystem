@@ -53,6 +53,22 @@ object Main {
 
         }
 
+
+        http.get("/api/getElectionResults/:id") {
+            makeCORS()
+
+
+            val id = request.params(":id") ?: ""
+            if (id.isNullOrEmpty()) {
+                response.status(400)
+                return@get "400 - BAD REQUEST"
+            } else {
+                return@get DatabaseSupplier.findElectionResultsById(id)
+            }
+
+
+        }
+
         http.post("/api/add", "application/json") {
             makeCORS()
 
