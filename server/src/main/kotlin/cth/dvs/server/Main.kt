@@ -69,6 +69,29 @@ object Main {
 
         }
 
+        http.post("/api/setElectionResults/:id","text/plain"){
+            makeCORS()
+            val id = request.params(":id") ?: ""
+            val rawResult = request.queryParams().first()
+
+            if (rawResult.isNullOrEmpty()){
+                response.status(400)
+                return@post "Invalid result to be set"
+            }
+
+
+            if (id.isNullOrEmpty()) {
+                response.status(400)
+                return@post "Invalid id"
+            }
+
+
+
+            DatabaseSupplier.setResult(id.toInt(),rawResult)
+            response.status(200)
+            return@post "Ok"
+        }
+
         //launch<GUIApp>(args)
     }
 }
