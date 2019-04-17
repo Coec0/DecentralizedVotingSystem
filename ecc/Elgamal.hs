@@ -1,13 +1,8 @@
 module Elgamal(PublicKey,SecretKey,Cipher,decryptMessage,decryptSumOfMessages) where
 
 import EllipticAlgebra
-
 import Test.QuickCheck
-import System.Random
 import Data.Maybe
-import System.Entropy
-import Data.Binary.Get
-import qualified Data.ByteString.Lazy as B
  
 
 --                  G    ord(g)  g     beta=d.g
@@ -24,7 +19,7 @@ generateKeys c@(a,b,p) seed = (pk,d)
     where 
         pk :: PublicKey
         lstOfG = getGenerators c
-        g = lstOfG <> (seed `mod` sizeOf lstOfG)
+        g = lstOfG <|> (seed `mod` sizeOf lstOfG)
         q = getOrderOfGenerator c g
         d = (pickSecret q p seed `mod` p) :: Integer
         pk = (c,q,g,pointMul c g d)
@@ -48,10 +43,10 @@ decryptMessage pk@(c,q,g,beta) d (r,t) = fst $ head $ filter (\candidate -> snd 
          point = pointAdd c t (pointInvert c (pointMul c r d))
 
 
-(<>) :: [a] -> Integer -> a
-(<>) [] _ = error "Empty list"
-(<>) (x:_) 0 = x
-(<>) (_:xs) n = xs <> (n-1)
+(<|>) :: [a] -> Integer -> a
+(<|>) [] _ = error "Empty list"
+(<|>) (x:_) 0 = x
+(<|>) (_:xs) n = xs <|> (n-1)
 
 sizeOf :: [a] -> Integer
 sizeOf = foldr (\x -> (+) 1) 0
