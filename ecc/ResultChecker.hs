@@ -71,14 +71,27 @@ sK = snd testKeys
 getElectionResult :: String -> IO ()
 getElectionResult path = do
     register <- readElectoralRegister path
-    putStrLn ("Total pepople voted is " ++ show (length register))
+    putStrLn ("Total people voted is " ++ show (length register))
     putStrLn "Filtering out invalid ballots"
     (valid,invalid) <- separateVotes pK sK register
     putStrLn (show (length invalid) ++ " invalid ballots found.")
     print (tallyVotes pK sK valid)
 
 
+    
+
+
 aggregate :: Num a => [a] -> [a] -> [a]
 aggregate [] y = y 
 aggregate x [] = x
 aggregate x y = zipWith (+) x y
+
+
+main :: IO ()
+main = do
+    rawInput <- getContents
+    let register = parseRegister rawInput
+    putStrLn ("# voters:\t" ++ show (length register))
+    (valid,invalid) <- separateVotes pK sK register
+    putStrLn ("# invalid: \t" ++ show (length invalid))
+    print (tallyVotes pK sK valid)
