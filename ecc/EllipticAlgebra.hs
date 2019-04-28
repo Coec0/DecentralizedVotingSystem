@@ -120,20 +120,5 @@ getGenerators c = map snd  possibleCandidates
         --largestOrder = maximum $ map fst possibleCandidates 
 
 isPrime k = null [ x | x <- [2..k - 1], k `mod` x == 0]
--- The main program
-main :: IO ()    
-main = do
-    args <- getArgs
-    let a = read (args !! 0) :: Integer
-    let b = read (args !! 1) :: Integer
-    let p = read (args !! 2) :: Integer
-    
-    let x = read (args !! 3) :: Integer
-    let y = read (args !! 4) :: Integer
- 
-    let n = read (args !! 5) :: Integer
 
-    let r = pointMul (a,b,p) (Coord x y) n
-
-    print r
 
