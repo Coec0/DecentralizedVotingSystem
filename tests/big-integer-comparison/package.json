@@ -1,0 +1,17 @@
+{
+  "name": "big-integer-comparison",
+  "version": "1.0.0",
+  "description": "Compares big-integer libraries speed",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zack Lundqvist",
+  "license": "ISC",
+  "dependencies": {
+    "big-integer": "^1.6.43",
+    "big.js": "^5.2.2",
+    "bignumber.js": "^8.1.1",
+    "jsbn": "^1.1.0"
+  }
+}
