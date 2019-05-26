@@ -19,7 +19,7 @@
 		"name": "VotingSystem",
 		"filename": "votingsystem.sol",
 		"args": {
-			"candidates": ["Latiif", "Sarah", "Kevin", "Eric", "Zack", "Oscar"],
+			"candidates": ["Latiif", "Sarah", "Kevin", "Eric", "Zack", "Oscar", "Carlo"],
 			"blocksUntilStart": 0,
 			"blocksUntilEnd": 10000,
 			"admins": ["0x38bACc542367B182cC2fECF22eca7F819aB51d6a"],

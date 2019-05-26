@@ -75,6 +75,7 @@ export default {
 				// Set next state
 				this.state.showSpinner = false;
 				this.state.privatekey = false;
+				this.state.password = false;
 				this.state.selection = true;
 			} else {
 				// If no, go to password phase
@@ -87,13 +88,15 @@ export default {
 				// Set next state
 				this.state.showSpinner = false;
 				this.state.privatekey = false;
+				this.state.selection = false;
 				this.state.password = true;
 			}
 		},
 		async pwSubmit() {
 			const pk = utils.XOR(this.$store.state.privatekey, this.$store.state.password);
-			this.$store.commit('SET_PASSWORD', pk);
+			this.$store.commit('SET_PRIVATEKEY', pk);
 
+			this.state.password = false;
 			this.state.showSpinner = true;
 			this.state.spinnerText = 'Retreiving wallet';
 			const validKey = await utils.isValidPK(this.$store.state.web3, this.$store.state.privatekey);
@@ -103,7 +106,9 @@ export default {
 				console.log('Valid key')
 				this.state.spinnerText = 'Wallet found!';
 				await utils.sleep(2000);
+
 				this.state.showSpinner = false;
+				this.state.privatekey = false;
 				this.state.password = false;
 				this.state.selection = true;
 			} else {
@@ -111,8 +116,10 @@ export default {
 				console.log('Invalid key')
 				this.state.spinnerText = 'Wallet was not found';
 				await utils.sleep(2000);
+
 				this.state.showSpinner = false;
 				this.state.password = false;
+				this.state.selection = false;
 				this.state.privatekey = true;
 			}
 		},
